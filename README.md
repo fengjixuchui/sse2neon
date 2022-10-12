@@ -121,6 +121,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [Cog](https://github.com/losnoco/Cog) is a free and open source audio player for macOS.
 * [dab-cmdline](https://github.com/JvanKatwijk/dab-cmdline) provides entries for the functionality to handle Digital audio broadcasting (DAB)/DAB+ through some simple calls.
 * [DISTRHO](https://distrho.sourceforge.io/) is an open-source project for Cross-Platform Audio Plugins.
+* [Dragonfly](https://github.com/dragonflydb/dragonfly) is a modern in-memory datastore, fully compatible with Redis and Memcached APIs.
 * [EDGE](https://github.com/3dfxdev/EDGE) is an advanced OpenGL source port spawned from the DOOM engine, with focus on easy development and expansion for modders and end-users.
 * [Embree](https://github.com/embree/embree) is a collection of high-performance ray tracing kernels. Its target users are graphics application engineers who want to improve the performance of their photo-realistic rendering application by leveraging Embree's performance-optimized ray tracing kernels.
 * [emp-tool](https://github.com/emp-toolkit/emp-tool) aims to provide a benchmark for secure computation and allowing other researchers to experiment and extend.
@@ -129,10 +130,13 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [fsrc](https://github.com/elsamuko/fsrc) is capable of searching large codebases for text snippets.
 * [gmmlib](https://github.com/intel/gmmlib) is the Intel Graphics Memory Management Library that provides device specific and buffer management for the Intel Graphics Compute Runtime for OpenCL and the Intel Media Driver for VAAPI.
 * [iqtree2](https://github.com/iqtree/iqtree2) is an efficient and versatile stochastic implementation to infer phylogenetic trees by maximum likelihood.
+* [indelPost](https://github.com/stjude/indelPost) is a Python library for indel processing via realignment and read-based phasing to resolve alignment ambiguities.
 * [IResearch](https://github.com/iresearch-toolkit/iresearch) is a cross-platform, high-performance document oriented search engine library written entirely in C++ with the focus on a pluggability of different ranking/similarity models.
+* [Kraken](https://github.com/Wabi-Studios/Kraken) is a 3D animation platform redefining animation composition, collaborative workflows, simulation engines, skeletal rigging systems, and look development from storyboard to final render.
 * [kram](https://github.com/alecazam/kram) is a wrapper to several popular encoders to and from PNG/[KTX](https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/) files with [LDR/HDR and BC/ASTC/ETC2](https://developer.arm.com/solutions/graphics-and-gaming/developer-guides/learn-the-basics/adaptive-scalable-texture-compression/single-page).
 * [Krita](https://invent.kde.org/graphics/krita) is a cross-platform application that offers an end-to-end solution for creating digital art files from scratch built on the KDE and Qt frameworks.
 * [libCML](https://github.com/belosthomas/libCML) is a SLAM library and scientific tool, which include a novel fast thread-safe graph map implementation.
+* [libhdfs3](https://github.com/ClickHouse/libhdfs3) is implemented based on native Hadoop RPC protocol and Hadoop Distributed File System (HDFS), a highly fault-tolerant distributed fs, data transfer protocol.
 * [libpostal](https://github.com/openvenues/libpostal) is a C library for parsing/normalizing street addresses around the world using statistical NLP and open data.
 * [libscapi](https://github.com/cryptobiu/libscapi) stands for the "Secure Computation API", providing  reliable, efficient, and highly flexible cryptographic infrastructure.
 * [libmatoya](https://github.com/matoya/libmatoya) is a cross-platform application development library, providing various features such as common cryptography tasks.
@@ -151,6 +155,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [Olive](https://github.com/olive-editor/olive) is a free non-linear video editor for Windows, macOS, and Linux.
 * [OpenXRay](https://github.com/OpenXRay/xray-16) is an improved version of the X-Ray engine, used in world famous S.T.A.L.K.E.R. game series by GSC Game World.
 * [parallel-n64](https://github.com/libretro/parallel-n64) is an optimized/rewritten Nintendo 64 emulator made specifically for [Libretro](https://www.libretro.com/).
+* [Pathfinder C++](https://github.com/floppyhammer/pathfinder-cpp) is a fast, practical, GPU-based rasterizer for fonts and vector graphics using Vulkan and C++.
 * [PFFFT](https://github.com/marton78/pffft) does 1D Fast Fourier Transforms, of single precision real and complex vectors.
 * [pixaccess](https://github.com/oliverue/pixaccess) provides the abstractions for integer and float bitmaps, pixels, and aliased (nearest neighbor) and anti-aliased (bi-linearly interpolated) pixel access.
 * [PlutoSDR Firmware](https://github.com/seanstone/plutosdr-fw) is the customized firmware for the [PlutoSDR](https://wiki.analog.com/university/tools/pluto) that can be used to introduce fundamentals of Software Defined Radio (SDR) or Radio Frequency (RF) or Communications as advanced topics in electrical engineering in a self or instructor lead setting.
@@ -167,6 +172,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [Surge](https://github.com/surge-synthesizer/surge) is an open source digital synthesizer.
 * [Typesense](https://github.com/typesense/typesense) is a fast, typo-tolerant search engine for building delightful search experiences.
 * [VelocyPack](https://github.com/arangodb/velocypack) is a fast and compact format for serialization and storage.
+* [VOLK](https://github.com/gnuradio/volk), Vector-Optimized Library of Kernel, is a sub-project of [GNU Radio](https://www.gnuradio.org/).
 * [XEVE](https://github.com/mpeg5/xeve) (eXtra-fast Essential Video Encoder) is an open sourced and fast MPEG-5 EVC encoder.
 * [XMRig](https://github.com/xmrig/xmrig) is an open source CPU miner for [Monero](https://web.getmonero.org/) cryptocurrency.
 
