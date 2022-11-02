@@ -105,6 +105,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [Apache Doris](https://doris.apache.org/) is a Massively Parallel Processing (MPP) based interactive SQL data warehousing for reporting and analysis.
 * [Apache Impala](https://impala.apache.org/) is a lightning-fast, distributed SQL queries for petabytes of data stored in Apache Hadoop clusters.
 * [Apache Kudu](https://kudu.apache.org/) completes Hadoop's storage layer to enable fast analytics on fast data.
+* [ares](https://github.com/ares-emulator/ares) is a cross-platform, open source, multi-system emulator, focusing on accuracy and preservation.
 * [ART](https://github.com/dinosaure/art) is an implementation in OCaml of [Adaptive Radix Tree](https://db.in.tum.de/~leis/papers/ART.pdf) (ART).
 * [Async](https://github.com/romange/async) is a set of c++ primitives that allows efficient and rapid development in C++17 on GNU/Linux systems.
 * [avec](https://github.com/unevens/avec) is a little library for using SIMD instructions on both x86 and Arm.
@@ -129,6 +130,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [FoundationDB](https://www.foundationdb.org) is a distributed database designed to handle large volumes of structured data across clusters of commodity servers.
 * [fsrc](https://github.com/elsamuko/fsrc) is capable of searching large codebases for text snippets.
 * [gmmlib](https://github.com/intel/gmmlib) is the Intel Graphics Memory Management Library that provides device specific and buffer management for the Intel Graphics Compute Runtime for OpenCL and the Intel Media Driver for VAAPI.
+* [HISE](https://github.com/christophhart/HISE) is a cross-platform open source audio application for building virtual instruments, emphasizing on sampling, but includes some basic synthesis features for making hybrid instruments as well as audio effects.
 * [iqtree2](https://github.com/iqtree/iqtree2) is an efficient and versatile stochastic implementation to infer phylogenetic trees by maximum likelihood.
 * [indelPost](https://github.com/stjude/indelPost) is a Python library for indel processing via realignment and read-based phasing to resolve alignment ambiguities.
 * [IResearch](https://github.com/iresearch-toolkit/iresearch) is a cross-platform, high-performance document oriented search engine library written entirely in C++ with the focus on a pluggability of different ranking/similarity models.
@@ -162,6 +164,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [PowerToys](https://github.com/microsoft/PowerToys) is a set of utilities for power users to tune and streamline their Windows experience for greater productivity.
 * [Pygame](https://www.pygame.org) is cross-platform and designed to make it easy to write multimedia software, such as games, in Python.
 * [R:RandomFieldsUtils](https://cran.r-project.org/web/packages/RandomFieldsUtils) provides various utilities might be used in spatial statistics and elsewhere. (CRAN)
+* [ReHLDS](https://github.com/gennadykataev/rehlds) is fully compatible with latest Half-Life Dedicated Server (HLDS) with a lot of defects and (potential) bugs fixed.
 * [rkcommon](https://github.com/ospray/rkcommon) represents a common set of C++ infrastructure and CMake utilities used by various components of [Intel oneAPI Rendering Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/rendering-toolkit.html).
 * [RPCS3](https://github.com/RPCS3/rpcs3) is the world's first free and open-source PlayStation 3 emulator/debugger, written in C++.
 * [simd_utils](https://github.com/JishinMaster/simd_utils) is a header-only library implementing common mathematical functions using SIMD intrinsics.
@@ -170,6 +173,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [srsLTE](https://github.com/srsLTE/srsLTE) is an open source SDR LTE software suite.
 * [SSW](https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library) is a fast implementation of the [Smith-Waterman algorithm](https://en.wikipedia.org/wiki/Smith%E2%80%93Waterman_algorithm), which uses the SIMD instructions to parallelize the algorithm at the instruction level.
 * [Surge](https://github.com/surge-synthesizer/surge) is an open source digital synthesizer.
+* [The Forge](https://github.com/ConfettiFX/The-Forge) is a cross-platform rendering framework, providing building blocks to write your own game engine.
 * [Typesense](https://github.com/typesense/typesense) is a fast, typo-tolerant search engine for building delightful search experiences.
 * [VelocyPack](https://github.com/arangodb/velocypack) is a fast and compact format for serialization and storage.
 * [VOLK](https://github.com/gnuradio/volk), Vector-Optimized Library of Kernel, is a sub-project of [GNU Radio](https://www.gnuradio.org/).
