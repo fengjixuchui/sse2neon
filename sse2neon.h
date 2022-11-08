@@ -489,6 +489,57 @@ FORCE_INLINE uint8x16x4_t _sse2neon_vld1q_u8_x4(const uint8_t *p)
 }
 #endif
 
+#if !defined(__aarch64__)
+/* emulate vaddv u8 variant */
+FORCE_INLINE uint8_t _sse2neon_vaddv_u8(uint8x8_t v8)
+{
+    const uint64x1_t v1 = vpaddl_u32(vpaddl_u16(vpaddl_u8(v8)));
+    return vget_lane_u8(vreinterpret_u8_u64(v1), 0);
+}
+#else
+// Wraps vaddv_u8
+FORCE_INLINE uint8_t _sse2neon_vaddv_u8(uint8x8_t v8)
+{
+    return vaddv_u8(v8);
+}
+#endif
+
+#if !defined(__aarch64__)
+/* emulate vaddvq u8 variant */
+FORCE_INLINE uint8_t _sse2neon_vaddvq_u8(uint8x16_t a)
+{
+    uint8x8_t tmp = vpadd_u8(vget_low_u8(a), vget_high_u8(a));
+    uint8_t res = 0;
+    for (int i = 0; i < 8; ++i)
+        res += tmp[i];
+    return res;
+}
+#else
+// Wraps vaddvq_u8
+FORCE_INLINE uint8_t _sse2neon_vaddvq_u8(uint8x16_t a)
+{
+    return vaddvq_u8(a);
+}
+#endif
+
+#if !defined(__aarch64__)
+/* emulate vaddvq u16 variant */
+FORCE_INLINE uint16_t _sse2neon_vaddvq_u16(uint16x8_t a)
+{
+    uint32x4_t m = vpaddlq_u16(a);
+    uint64x2_t n = vpaddlq_u32(m);
+    uint64x1_t o = vget_low_u64(n) + vget_high_u64(n);
+
+    return vget_lane_u32((uint32x2_t) o, 0);
+}
+#else
+// Wraps vaddvq_u16
+FORCE_INLINE uint16_t _sse2neon_vaddvq_u16(uint16x8_t a)
+{
+    return vaddvq_u16(a);
+}
+#endif
+
 /* Function Naming Conventions
  * The naming convention of SSE intrinsics is straightforward. A generic SSE
  * intrinsic function is given as follows:
@@ -566,16 +617,12 @@ FORCE_INLINE uint8x16x4_t _sse2neon_vld1q_u8_x4(const uint8_t *p)
     +------+------+------+------+------+------+-------------+
  */
 
-/* Constants for use with _mm_prefetch.  */
+/* Constants for use with _mm_prefetch. */
 enum _mm_hint {
-    _MM_HINT_NTA = 0,  /* load data to L1 and L2 cache, mark it as NTA */
-    _MM_HINT_T0 = 1,   /* load data to L1 and L2 cache */
-    _MM_HINT_T1 = 2,   /* load data to L2 cache only */
-    _MM_HINT_T2 = 3,   /* load data to L2 cache only, mark it as NTA */
-    _MM_HINT_ENTA = 4, /* exclusive version of _MM_HINT_NTA */
-    _MM_HINT_ET0 = 5,  /* exclusive version of _MM_HINT_T0 */
-    _MM_HINT_ET1 = 6,  /* exclusive version of _MM_HINT_T1 */
-    _MM_HINT_ET2 = 7   /* exclusive version of _MM_HINT_T2 */
+    _MM_HINT_NTA = 0, /* load data to L1 and L2 cache, mark it as NTA */
+    _MM_HINT_T0 = 1,  /* load data to L1 and L2 cache */
+    _MM_HINT_T1 = 2,  /* load data to L2 cache only */
+    _MM_HINT_T2 = 3,  /* load data to L2 cache only, mark it as NTA */
 };
 
 // The bit field mapping to the FPCR(floating-point control register)
@@ -2303,12 +2350,25 @@ FORCE_INLINE __m128 _mm_or_ps(__m128 a, __m128 b)
 // https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_pmulhuw
 #define _m_pmulhuw(a, b) _mm_mulhi_pu16(a, b)
 
-// Loads one cache line of data from address p to a location closer to the
-// processor. https://msdn.microsoft.com/en-us/library/84szxsww(v=vs.100).aspx
-FORCE_INLINE void _mm_prefetch(const void *p, int i)
+// Fetch the line of data from memory that contains address p to a location in
+// the cache heirarchy specified by the locality hint i.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_prefetch
+FORCE_INLINE void _mm_prefetch(char const *p, int i)
 {
-    (void) i;
-    __builtin_prefetch(p);
+    switch (i) {
+    case _MM_HINT_NTA:
+        __builtin_prefetch(p, 0, 0);
+        break;
+    case _MM_HINT_T0:
+        __builtin_prefetch(p, 0, 3);
+        break;
+    case _MM_HINT_T1:
+        __builtin_prefetch(p, 0, 2);
+        break;
+    case _MM_HINT_T2:
+        __builtin_prefetch(p, 0, 1);
+        break;
+    }
 }
 
 // Compute the absolute differences of packed unsigned 8-bit integers in a and
@@ -8623,35 +8683,6 @@ const static uint8_t _sse2neon_cmpestr_mask8b[16] ALIGN_STRUCT(16) = {
             SSE2NEON_CAT(SSE2NEON_NUMBER_OF_LANES_, type), la, lb, mtx);       \
     }
 
-#if !defined(__aarch64__)
-/* emulate vaddv u8 variant */
-static inline uint8_t vaddv_u8(uint8x8_t v8)
-{
-    const uint64x1_t v1 = vpaddl_u32(vpaddl_u16(vpaddl_u8(v8)));
-    return vget_lane_u8(vreinterpret_u8_u64(v1), 0);
-}
-
-/* emulate vaddvq u8 variant */
-static inline uint8_t vaddvq_u8(uint8x16_t a)
-{
-    uint8x8_t tmp = vpadd_u8(vget_low_u8(a), vget_high_u8(a));
-    uint8_t res = 0;
-    for (int i = 0; i < 8; ++i)
-        res += tmp[i];
-    return res;
-}
-
-/* emulate vaddvq u16 variant */
-static inline uint16_t vaddvq_u16(uint16x8_t a)
-{
-    uint32x4_t m = vpaddlq_u16(a);
-    uint64x2_t n = vpaddlq_u32(m);
-    uint64x1_t o = vget_low_u64(n) + vget_high_u64(n);
-
-    return vget_lane_u32((uint32x2_t) o, 0);
-}
-#endif
-
 static int _sse2neon_aggregate_equal_any_8x16(int la, int lb, __m128i mtx[16])
 {
     int res = 0;
@@ -8665,7 +8696,7 @@ static int _sse2neon_aggregate_equal_any_8x16(int la, int lb, __m128i mtx[16])
             vandq_u8(vec, vreinterpretq_u8_m128i(mtx[j])));
         mtx[j] = vreinterpretq_m128i_u8(
             vshrq_n_u8(vreinterpretq_u8_m128i(mtx[j]), 7));
-        int tmp = vaddvq_u8(vreinterpretq_u8_m128i(mtx[j])) ? 1 : 0;
+        int tmp = _sse2neon_vaddvq_u8(vreinterpretq_u8_m128i(mtx[j])) ? 1 : 0;
         res |= (tmp << j);
     }
     return res;
@@ -8682,14 +8713,14 @@ static int _sse2neon_aggregate_equal_any_16x8(int la, int lb, __m128i mtx[16])
             vandq_u16(vec, vreinterpretq_u16_m128i(mtx[j])));
         mtx[j] = vreinterpretq_m128i_u16(
             vshrq_n_u16(vreinterpretq_u16_m128i(mtx[j]), 15));
-        int tmp = vaddvq_u16(vreinterpretq_u16_m128i(mtx[j])) ? 1 : 0;
+        int tmp = _sse2neon_vaddvq_u16(vreinterpretq_u16_m128i(mtx[j])) ? 1 : 0;
         res |= (tmp << j);
     }
     return res;
 }
 
-#define SSE2NEON_GENERATE_CMP_EQUAL_ANY(f_prefix) \
-    f_prefix##IMPL(byte) f_prefix##IMPL(word)
+#define SSE2NEON_GENERATE_CMP_EQUAL_ANY(prefix) \
+    prefix##IMPL(byte) prefix##IMPL(word)
 
 SSE2NEON_GENERATE_CMP_EQUAL_ANY(SSE2NEON_CMP_EQUAL_ANY_)
 
@@ -8736,7 +8767,7 @@ static int _sse2neon_aggregate_ranges_8x16(int la, int lb, __m128i mtx[16])
             vshrq_n_u16(vreinterpretq_u16_m128i(mtx[j]), 8));
         uint16x8_t vec_res = vandq_u16(vreinterpretq_u16_m128i(mtx[j]),
                                        vreinterpretq_u16_m128i(tmp));
-        int t = vaddvq_u16(vec_res) ? 1 : 0;
+        int t = _sse2neon_vaddvq_u16(vec_res) ? 1 : 0;
         res |= (t << j);
     }
     return res;
@@ -8745,11 +8776,13 @@ static int _sse2neon_aggregate_ranges_8x16(int la, int lb, __m128i mtx[16])
 #define SSE2NEON_CMP_RANGES_IS_BYTE 1
 #define SSE2NEON_CMP_RANGES_IS_WORD 0
 
-#define SSE2NEON_GENERATE_CMP_RANGES(f_prefix)               \
-    f_prefix##IMPL(byte, uint, u, f_prefix##IS_BYTE)         \
-        f_prefix##IMPL(byte, int, s, f_prefix##IS_BYTE)      \
-            f_prefix##IMPL(word, uint, u, f_prefix##IS_WORD) \
-                f_prefix##IMPL(word, int, s, f_prefix##IS_WORD)
+/* clang-format off */
+#define SSE2NEON_GENERATE_CMP_RANGES(prefix)             \
+    prefix##IMPL(byte, uint, u, prefix##IS_BYTE)         \
+    prefix##IMPL(byte, int, s, prefix##IS_BYTE)      \
+    prefix##IMPL(word, uint, u, prefix##IS_WORD) \
+    prefix##IMPL(word, int, s, prefix##IS_WORD)
+/* clang-format on */
 
 SSE2NEON_GENERATE_CMP_RANGES(SSE2NEON_CMP_RANGES_)
 
@@ -8780,7 +8813,7 @@ static int _sse2neon_cmp_byte_equal_each(__m128i a, int la, __m128i b, int lb)
     res_lo = vand_u8(res_lo, vec_mask);
     res_hi = vand_u8(res_hi, vec_mask);
 
-    int res = vaddv_u8(res_lo) + (vaddv_u8(res_hi) << 8);
+    int res = _sse2neon_vaddv_u8(res_lo) + (_sse2neon_vaddv_u8(res_hi) << 8);
     return res;
 }
 
@@ -8798,7 +8831,7 @@ static int _sse2neon_cmp_word_equal_each(__m128i a, int la, __m128i b, int lb)
     mtx = vbslq_u16(vec0, vdupq_n_u16(0), mtx);
     mtx = vbslq_u16(vec1, tmp, mtx);
     mtx = vandq_u16(mtx, vec_mask);
-    return vaddvq_u16(mtx);
+    return _sse2neon_vaddvq_u16(mtx);
 }
 
 #define SSE2NEON_AGGREGATE_EQUAL_ORDER_IS_UBYTE 1
@@ -8838,17 +8871,16 @@ static int _sse2neon_cmp_word_equal_each(__m128i a, int la, __m128i b, int lb)
         return res;                                                            \
     }
 
-#define SSE2NEON_GENERATE_AGGREGATE_EQUAL_ORDER(f_prefix) \
-    f_prefix##IMPL(8, 16, f_prefix##IS_UBYTE)             \
-        f_prefix##IMPL(16, 8, f_prefix##IS_UWORD)
+#define SSE2NEON_GENERATE_AGGREGATE_EQUAL_ORDER(prefix) \
+    prefix##IMPL(8, 16, prefix##IS_UBYTE) prefix##IMPL(16, 8, prefix##IS_UWORD)
 
 SSE2NEON_GENERATE_AGGREGATE_EQUAL_ORDER(SSE2NEON_AGGREGATE_EQUAL_ORDER_)
 
 #undef SSE2NEON_AGGREGATE_EQUAL_ORDER_IS_UBYTE
 #undef SSE2NEON_AGGREGATE_EQUAL_ORDER_IS_UWORD
 
-#define SSE2NEON_GENERATE_CMP_EQUAL_ORDERED(f_prefix) \
-    f_prefix##IMPL(byte) f_prefix##IMPL(word)
+#define SSE2NEON_GENERATE_CMP_EQUAL_ORDERED(prefix) \
+    prefix##IMPL(byte) prefix##IMPL(word)
 
 SSE2NEON_GENERATE_CMP_EQUAL_ORDERED(SSE2NEON_CMP_EQUAL_ORDERED_)
 
@@ -8882,7 +8914,7 @@ static cmpestr_func_t _sse2neon_cmpfunc_table[] = {
 #undef _
 };
 
-static inline int _sse2neon_sido_negative(int res, int lb, int imm8, int bound)
+FORCE_INLINE int _sse2neon_sido_negative(int res, int lb, int imm8, int bound)
 {
     switch (imm8 & 0x30) {
     case _SIDD_NEGATIVE_POLARITY:
