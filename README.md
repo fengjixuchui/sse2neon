@@ -102,6 +102,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [Aaru Data Preservation Suite](https://www.aaru.app/) is a fully-featured software package to preserve all storage media from the very old to the cutting edge, as well as to give detailed information about any supported image file (whether from Aaru or not) and to extract the files from those images.
 * [aether-game-utils](https://github.com/johnhues/aether-game-utils) is a collection of cross platform utilities for quickly creating small game prototypes in C++.
 * [ALE](https://github.com/sc932/ALE), aka Assembly Likelihood Evaluation, is a tool for evaluating accuracy of assemblies without the need of a reference genome.
+* [ATAK-CIV](https://github.com/deptofdefense/AndroidTacticalAssaultKit-CIV), Android Tactical Assault Kit for Civilian Use, is the official geospatial-temporal and situational awareness tool used by the US Government.
 * [Apache Doris](https://doris.apache.org/) is a Massively Parallel Processing (MPP) based interactive SQL data warehousing for reporting and analysis.
 * [Apache Impala](https://impala.apache.org/) is a lightning-fast, distributed SQL queries for petabytes of data stored in Apache Hadoop clusters.
 * [Apache Kudu](https://kudu.apache.org/) completes Hadoop's storage layer to enable fast analytics on fast data.
@@ -114,7 +115,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [bipartite_motif_finder](https://github.com/soedinglab/bipartite_motif_finder) as known as BMF (Bipartite Motif Finder) is an open source tool for finding co-occurences of sequence motifs in genomic sequences.
 * [Blender](https://www.blender.org/) is the free and open source 3D creation suite, supporting the entirety of the 3D pipeline.
 * [Boo](https://github.com/AxioDL/boo) is a cross-platform windowing and event manager similar to SDL or SFML, with additional 3D rendering functionality.
-* [Cardinal](https://github.com/DISTRHO/Cardinal) is a free and open-source virtual modular synthesizer plugin.
+* [Brickworks](https://github.com/sdangelo/brickworks) is a music DSP toolkit that supplies with the fundamental building blocks for creating and enhancing audio engines on any platform.
 * [CARTA](https://github.com/CARTAvis/carta-backend) is a new visualization tool designed for viewing radio astronomy images in CASA, FITS, MIRIAD, and HDF5 formats (using the IDIA custom schema for HDF5).
 * [Catcoon](https://github.com/i-evi/catcoon) is a [feedforward neural network](https://en.wikipedia.org/wiki/Feedforward_neural_network) implementation in C.
 * [compute-runtime](https://github.com/intel/compute-runtime), the Intel Graphics Compute Runtime for oneAPI Level Zero and OpenCL Driver, provides compute API support (Level Zero, OpenCL) for Intel graphics hardware architectures (HD Graphics, Xe).
@@ -141,6 +142,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [libhdfs3](https://github.com/ClickHouse/libhdfs3) is implemented based on native Hadoop RPC protocol and Hadoop Distributed File System (HDFS), a highly fault-tolerant distributed fs, data transfer protocol.
 * [libpostal](https://github.com/openvenues/libpostal) is a C library for parsing/normalizing street addresses around the world using statistical NLP and open data.
 * [libscapi](https://github.com/cryptobiu/libscapi) stands for the "Secure Computation API", providing  reliable, efficient, and highly flexible cryptographic infrastructure.
+* [libstreamvbyte](https://github.com/wst24365888/libstreamvbyte) is a C++ implementation of [StreamVByte](https://arxiv.org/abs/1709.08990).
 * [libmatoya](https://github.com/matoya/libmatoya) is a cross-platform application development library, providing various features such as common cryptography tasks.
 * [Loosejaw](https://github.com/TheHolyDiver/Loosejaw) provides deep hybrid CPU/GPU digital signal processing.
 * [Madronalib](https://github.com/madronalabs/madronalib) enables efficient audio DSP on SIMD processors with readable and brief C++ code.
@@ -171,6 +173,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [SMhasher](https://github.com/rurban/smhasher) provides comprehensive Hash function quality and speed tests.
 * [SNN++](https://github.com/ianmkim/snnpp) implements a single layer non linear Spiking Neural Network for images classification and generation.
 * [Spack](https://github.com/spack/spack) is a multi-platform package manager that builds and installs multiple versions and configurations of software.
+* [SRA](https://github.com/ncbi/sra-tools) is a collection of tools and libraries for using data in the [INSDC Sequence Read Archives](https://www.ncbi.nlm.nih.gov/sra/docs/).
 * [srsLTE](https://github.com/srsLTE/srsLTE) is an open source SDR LTE software suite.
 * [SSW](https://github.com/mengyao/Complete-Striped-Smith-Waterman-Library) is a fast implementation of the [Smith-Waterman algorithm](https://en.wikipedia.org/wiki/Smith%E2%80%93Waterman_algorithm), which uses the SIMD instructions to parallelize the algorithm at the instruction level.
 * [Surge](https://github.com/surge-synthesizer/surge) is an open source digital synthesizer.
@@ -178,8 +181,11 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [Typesense](https://github.com/typesense/typesense) is a fast, typo-tolerant search engine for building delightful search experiences.
 * [VelocyPack](https://github.com/arangodb/velocypack) is a fast and compact format for serialization and storage.
 * [VOLK](https://github.com/gnuradio/volk), Vector-Optimized Library of Kernel, is a sub-project of [GNU Radio](https://www.gnuradio.org/).
+* [Vowpal Wabbit](https://github.com/VowpalWabbit/vowpal_wabbit) is a machine learning system which pushes the frontier of machine learning with techniques such as online, hashing, allreduce, reductions, learning2search, active, and interactive learning.
+* [Winter](https://github.com/rosenthj/Winter) is the top rated chess engine from Switzerland and has competed at top invite only computer chess events.
 * [XEVE](https://github.com/mpeg5/xeve) (eXtra-fast Essential Video Encoder) is an open sourced and fast MPEG-5 EVC encoder.
 * [XMRig](https://github.com/xmrig/xmrig) is an open source CPU miner for [Monero](https://web.getmonero.org/) cryptocurrency.
+* [YACL](https://github.com/secretflow/yasl) is a C++ library contains modules and utilities which [SecretFlow](https://github.com/secretflow) code depends on.
 
 ## Related Projects
 * [SIMDe](https://github.com/simd-everywhere/simde): fast and portable implementations of SIMD
@@ -204,6 +210,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [Port with SSE2Neon and SIMDe](https://developer.arm.com/documentation/102581/0200/Port-with-SSE2Neon-and-SIMDe)
 * [Genomics: Optimizing the BWA aligner for Arm Servers](https://community.arm.com/arm-community-blogs/b/high-performance-computing-blog/posts/optimizing-genomics-and-the-bwa-aligner-for-arm-servers)
 * [Bit twiddling with Arm Neon: beating SSE movemasks, counting bits and more](https://community.arm.com/arm-community-blogs/b/infrastructure-solutions-blog/posts/porting-x86-vector-bitmask-optimizations-to-arm-neon)
+* [C/C++ on Graviton](https://github.com/aws/aws-graviton-getting-started/blob/main/c-c%2B%2B.md)
 
 ## Licensing
 

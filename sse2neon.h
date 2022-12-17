@@ -111,6 +111,44 @@
 #define SSE2NEON_ALLOC_DEFINED
 #endif
 
+/* If using MSVC */
+#ifdef _MSC_VER
+#include <intrin.h>
+#if (defined(_M_AMD64) || defined(__x86_64__)) || \
+    (defined(_M_ARM) || defined(__arm__))
+#define SSE2NEON_HAS_BITSCAN64
+#endif
+#endif
+
+/* Compiler barrier */
+#define SSE2NEON_BARRIER()                     \
+    do {                                       \
+        __asm__ __volatile__("" ::: "memory"); \
+        (void) 0;                              \
+    } while (0)
+
+/* Memory barriers
+ * __atomic_thread_fence does not include a compiler barrier; instead,
+ * the barrier is part of __atomic_load/__atomic_store's "volatile-like"
+ * semantics.
+ */
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)
+#include <stdatomic.h>
+#endif
+
+FORCE_INLINE void _sse2neon_smp_mb(void)
+{
+    SSE2NEON_BARRIER();
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) && \
+    !defined(__STDC_NO_ATOMICS__)
+    atomic_thread_fence(memory_order_seq_cst);
+#elif defined(__GNUC__) || defined(__clang__)
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+#else
+    /* FIXME: MSVC support */
+#endif
+}
+
 /* Architecture-specific build options */
 /* FIXME: #pragma GCC push_options is only available on GCC */
 #if defined(__GNUC__)
@@ -149,6 +187,17 @@
 #if defined __has_include && __has_include(<arm_acle.h>)
 #include <arm_acle.h>
 #endif
+#endif
+
+/* Apple Silicon cache lines are double of what is commonly used by Intel, AMD
+ * and other Arm microarchtectures use.
+ * From sysctl -a on Apple M1:
+ * hw.cachelinesize: 128
+ */
+#if defined(__APPLE__) && (defined(__aarch64__) || defined(__arm64__))
+#define SSE2NEON_CACHELINE_SIZE 128
+#else
+#define SSE2NEON_CACHELINE_SIZE 64
 #endif
 
 /* Rounding functions require either Aarch64 instructions or libm failback */
@@ -2621,12 +2670,35 @@ FORCE_INLINE __m128 _mm_setzero_ps(void)
     })
 #endif
 
-// Guarantees that every preceding store is globally visible before any
-// subsequent store.
-// https://msdn.microsoft.com/en-us/library/5h2w73d1%28v=vs.90%29.aspx
+// Perform a serializing operation on all store-to-memory instructions that were
+// issued prior to this instruction. Guarantees that every store instruction
+// that precedes, in program order, is globally visible before any store
+// instruction which follows the fence in program order.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sfence
 FORCE_INLINE void _mm_sfence(void)
 {
-    __sync_synchronize();
+    _sse2neon_smp_mb();
+}
+
+// Perform a serializing operation on all load-from-memory and store-to-memory
+// instructions that were issued prior to this instruction. Guarantees that
+// every memory access that precedes, in program order, the memory fence
+// instruction is globally visible before any memory instruction which follows
+// the fence in program order.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_mfence
+FORCE_INLINE void _mm_mfence(void)
+{
+    _sse2neon_smp_mb();
+}
+
+// Perform a serializing operation on all load-from-memory instructions that
+// were issued prior to this instruction. Guarantees that every load instruction
+// that precedes, in program order, is globally visible before any load
+// instruction which follows the fence in program order.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_lfence
+FORCE_INLINE void _mm_lfence(void)
+{
+    _sse2neon_smp_mb();
 }
 
 // FORCE_INLINE __m128 _mm_shuffle_ps(__m128 a, __m128 b, __constrange(0,255)
@@ -3311,13 +3383,29 @@ FORCE_INLINE __m128 _mm_castsi128_ps(__m128i a)
     return vreinterpretq_m128_s32(vreinterpretq_s32_m128i(a));
 }
 
-// Cache line containing p is flushed and invalidated from all caches in the
-// coherency domain. :
-// https://msdn.microsoft.com/en-us/library/ba08y07y(v=vs.100).aspx
+// Invalidate and flush the cache line that contains p from all levels of the
+// cache hierarchy.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_clflush
+#if defined(__APPLE__)
+#include <libkern/OSCacheControl.h>
+#endif
 FORCE_INLINE void _mm_clflush(void const *p)
 {
     (void) p;
-    // no corollary for Neon?
+
+    /* sys_icache_invalidate is supported since macOS 10.5.
+     * However, it does not work on non-jailbroken iOS devices, although the
+     * compilation is successful.
+     */
+#if defined(__APPLE__)
+    sys_icache_invalidate((void *) (uintptr_t) p, SSE2NEON_CACHELINE_SIZE);
+#elif defined(__GNUC__) || defined(__clang__)
+    uintptr_t ptr = (uintptr_t) p;
+    __builtin___clear_cache((char *) ptr,
+                            (char *) ptr + SSE2NEON_CACHELINE_SIZE);
+#else
+    /* FIXME: MSVC support */
+#endif
 }
 
 // Compares the 8 signed or unsigned 16-bit integers in a and the 8 signed or
@@ -8719,8 +8807,11 @@ static int _sse2neon_aggregate_equal_any_16x8(int la, int lb, __m128i mtx[16])
     return res;
 }
 
+/* clang-format off */
 #define SSE2NEON_GENERATE_CMP_EQUAL_ANY(prefix) \
-    prefix##IMPL(byte) prefix##IMPL(word)
+    prefix##IMPL(byte) \
+    prefix##IMPL(word)
+/* clang-format on */
 
 SSE2NEON_GENERATE_CMP_EQUAL_ANY(SSE2NEON_CMP_EQUAL_ANY_)
 
@@ -8779,8 +8870,8 @@ static int _sse2neon_aggregate_ranges_8x16(int la, int lb, __m128i mtx[16])
 /* clang-format off */
 #define SSE2NEON_GENERATE_CMP_RANGES(prefix)             \
     prefix##IMPL(byte, uint, u, prefix##IS_BYTE)         \
-    prefix##IMPL(byte, int, s, prefix##IS_BYTE)      \
-    prefix##IMPL(word, uint, u, prefix##IS_WORD) \
+    prefix##IMPL(byte, int, s, prefix##IS_BYTE)          \
+    prefix##IMPL(word, uint, u, prefix##IS_WORD)         \
     prefix##IMPL(word, int, s, prefix##IS_WORD)
 /* clang-format on */
 
@@ -8871,16 +8962,22 @@ static int _sse2neon_cmp_word_equal_each(__m128i a, int la, __m128i b, int lb)
         return res;                                                            \
     }
 
+/* clang-format off */
 #define SSE2NEON_GENERATE_AGGREGATE_EQUAL_ORDER(prefix) \
-    prefix##IMPL(8, 16, prefix##IS_UBYTE) prefix##IMPL(16, 8, prefix##IS_UWORD)
+    prefix##IMPL(8, 16, prefix##IS_UBYTE)               \
+    prefix##IMPL(16, 8, prefix##IS_UWORD)
+/* clang-format on */
 
 SSE2NEON_GENERATE_AGGREGATE_EQUAL_ORDER(SSE2NEON_AGGREGATE_EQUAL_ORDER_)
 
 #undef SSE2NEON_AGGREGATE_EQUAL_ORDER_IS_UBYTE
 #undef SSE2NEON_AGGREGATE_EQUAL_ORDER_IS_UWORD
 
+/* clang-format off */
 #define SSE2NEON_GENERATE_CMP_EQUAL_ORDERED(prefix) \
-    prefix##IMPL(byte) prefix##IMPL(word)
+    prefix##IMPL(byte)                              \
+    prefix##IMPL(word)
+/* clang-format on */
 
 SSE2NEON_GENERATE_CMP_EQUAL_ORDERED(SSE2NEON_CMP_EQUAL_ORDERED_)
 
@@ -8930,14 +9027,133 @@ FORCE_INLINE int _sse2neon_sido_negative(int res, int lb, int imm8, int bound)
     return res & ((bound == 8) ? 0xFF : 0xFFFF);
 }
 
+FORCE_INLINE int _sse2neon_clz(unsigned int x)
+{
+#if _MSC_VER
+    DWORD cnt = 0;
+    if (_BitScanForward(&cnt, x))
+        return cnt;
+    return 32;
+#else
+    return x != 0 ? __builtin_clz(x) : 32;
+#endif
+}
+
+FORCE_INLINE int _sse2neon_ctz(unsigned int x)
+{
+#if _MSC_VER
+    DWORD cnt = 0;
+    if (_BitScanReverse(&cnt, x))
+        return 31 - cnt;
+    return 32;
+#else
+    return x != 0 ? __builtin_ctz(x) : 32;
+#endif
+}
+
+FORCE_INLINE int _sse2neon_ctzll(unsigned long long x)
+{
+#if _MSC_VER
+    unsigned long cnt;
+#ifdef defined(SSE2NEON_HAS_BITSCAN64)
+    (defined(_M_AMD64) || defined(__x86_64__))
+        if((_BitScanForward64(&cnt, x))
+            return (int)(cnt);
+#else
+    if (_BitScanForward(&cnt, (unsigned long) (x)))
+        return (int) cnt;
+    if (_BitScanForward(&cnt, (unsigned long) (x >> 32)))
+        return (int) (cnt + 32);
+#endif
+    return 64;
+#else
+    return x != 0 ? __builtin_ctzll(x) : 64;
+#endif
+}
+
 #define SSE2NEON_MIN(x, y) (x) < (y) ? (x) : (y)
-#define SSE2NEON_GET_LENGTH_OR_BOUND(la, lb, bound) \
-    int tmp1 = la ^ (la >> 31);                     \
-    la = tmp1 - (la >> 31);                         \
-    int tmp2 = lb ^ (lb >> 31);                     \
-    lb = tmp2 - (lb >> 31);                         \
-    la = SSE2NEON_MIN(la, bound);                   \
-    lb = SSE2NEON_MIN(lb, bound);
+
+#define SSE2NEON_CMPSTR_SET_UPPER(var, imm) \
+    const int var = (imm & 0x01) ? 8 : 16
+
+#define SSE2NEON_CMPESTRX_LEN_PAIR(a, b, la, lb) \
+    int tmp1 = la ^ (la >> 31);                  \
+    la = tmp1 - (la >> 31);                      \
+    int tmp2 = lb ^ (lb >> 31);                  \
+    lb = tmp2 - (lb >> 31);                      \
+    la = SSE2NEON_MIN(la, bound);                \
+    lb = SSE2NEON_MIN(lb, bound)
+
+// Compare all pairs of character in string a and b,
+// then aggregate the result.
+// As the only difference of PCMPESTR* and PCMPISTR* is the way to calculate the
+// length of string, we use SSE2NEON_CMP{I,E}STRX_GET_LEN to get the length of
+// string a and b.
+#define SSE2NEON_COMP_AGG(a, b, la, lb, imm8, IE)                  \
+    SSE2NEON_CMPSTR_SET_UPPER(bound, imm8);                        \
+    SSE2NEON_##IE##_LEN_PAIR(a, b, la, lb);                        \
+    int r2 = (_sse2neon_cmpfunc_table[imm8 & 0x0f])(a, la, b, lb); \
+    r2 = _sse2neon_sido_negative(r2, lb, imm8, bound)
+
+#define SSE2NEON_CMPSTR_GENERATE_INDEX(r2, bound, imm8)          \
+    return (r2 == 0) ? bound                                     \
+                     : ((imm8 & 0x40) ? (31 - _sse2neon_clz(r2)) \
+                                      : _sse2neon_ctz(r2))
+
+#define SSE2NEON_CMPSTR_GENERATE_MASK(dst)                                     \
+    __m128i dst = vreinterpretq_m128i_u8(vdupq_n_u8(0));                       \
+    if (imm8 & 0x40) {                                                         \
+        if (bound == 8) {                                                      \
+            uint16x8_t tmp = vtstq_u16(vdupq_n_u16(r2),                        \
+                                       vld1q_u16(_sse2neon_cmpestr_mask16b));  \
+            dst = vreinterpretq_m128i_u16(vbslq_u16(                           \
+                tmp, vdupq_n_u16(-1), vreinterpretq_u16_m128i(dst)));          \
+        } else {                                                               \
+            uint8x16_t vec_r2 =                                                \
+                vcombine_u8(vdup_n_u8(r2), vdup_n_u8(r2 >> 8));                \
+            uint8x16_t tmp =                                                   \
+                vtstq_u8(vec_r2, vld1q_u8(_sse2neon_cmpestr_mask8b));          \
+            dst = vreinterpretq_m128i_u8(                                      \
+                vbslq_u8(tmp, vdupq_n_u8(-1), vreinterpretq_u8_m128i(dst)));   \
+        }                                                                      \
+    } else {                                                                   \
+        if (bound == 16) {                                                     \
+            dst = vreinterpretq_m128i_u16(                                     \
+                vsetq_lane_u16(r2 & 0xffff, vreinterpretq_u16_m128i(dst), 0)); \
+        } else {                                                               \
+            dst = vreinterpretq_m128i_u8(                                      \
+                vsetq_lane_u8(r2 & 0xff, vreinterpretq_u8_m128i(dst), 0));     \
+        }                                                                      \
+    }                                                                          \
+    return dst
+
+// Compare packed strings in a and b with lengths la and lb using the control
+// in imm8, and returns 1 if b did not contain a null character and the
+// resulting mask was zero, and 0 otherwise.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpestra
+FORCE_INLINE int _mm_cmpestra(__m128i a,
+                              int la,
+                              __m128i b,
+                              int lb,
+                              const int imm8)
+{
+    int lb_cpy = lb;
+    SSE2NEON_COMP_AGG(a, b, la, lb, imm8, CMPESTRX);
+    return !r2 & (lb_cpy > bound);
+}
+
+// Compare packed strings in a and b with lengths la and lb using the control in
+// imm8, and returns 1 if the resulting mask was non-zero, and 0 otherwise.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpestrc
+FORCE_INLINE int _mm_cmpestrc(__m128i a,
+                              int la,
+                              __m128i b,
+                              int lb,
+                              const int imm8)
+{
+    SSE2NEON_COMP_AGG(a, b, la, lb, imm8, CMPESTRX);
+    return r2 != 0;
+}
 
 // Compare packed strings in a and b with lengths la and lb using the control
 // in imm8, and store the generated index in dst.
@@ -8948,15 +9164,8 @@ FORCE_INLINE int _mm_cmpestri(__m128i a,
                               int lb,
                               const int imm8)
 {
-    const int upper = (imm8 & 0x01) ? 8 : 16;
-
-    SSE2NEON_GET_LENGTH_OR_BOUND(la, lb, upper)
-
-    int r2 = (_sse2neon_cmpfunc_table[imm8 & 0x0f])(a, la, b, lb);
-    r2 = _sse2neon_sido_negative(r2, lb, imm8, upper);
-    return (r2 == 0)
-               ? upper
-               : ((imm8 & 0x40) ? (31 - __builtin_clz(r2)) : __builtin_ctz(r2));
+    SSE2NEON_COMP_AGG(a, b, la, lb, imm8, CMPESTRX);
+    SSE2NEON_CMPSTR_GENERATE_INDEX(r2, bound, imm8);
 }
 
 // Compare packed strings in a and b with lengths la and lb using the control
@@ -8965,38 +9174,141 @@ FORCE_INLINE int _mm_cmpestri(__m128i a,
 FORCE_INLINE __m128i
 _mm_cmpestrm(__m128i a, int la, __m128i b, int lb, const int imm8)
 {
-    const int bound = (imm8 & 0x01) ? 8 : 16;
+    SSE2NEON_COMP_AGG(a, b, la, lb, imm8, CMPESTRX);
+    SSE2NEON_CMPSTR_GENERATE_MASK(dst);
+}
 
-    SSE2NEON_GET_LENGTH_OR_BOUND(la, lb, bound)
+// Compare packed strings in a and b with lengths la and lb using the control in
+// imm8, and returns bit 0 of the resulting bit mask.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpestro
+FORCE_INLINE int _mm_cmpestro(__m128i a,
+                              int la,
+                              __m128i b,
+                              int lb,
+                              const int imm8)
+{
+    SSE2NEON_COMP_AGG(a, b, la, lb, imm8, CMPESTRX);
+    return r2 & 1;
+}
 
-    int r2 = (_sse2neon_cmpfunc_table[imm8 & 0x0f])(a, la, b, lb);
-    r2 = _sse2neon_sido_negative(r2, lb, imm8, bound);
+// Compare packed strings in a and b with lengths la and lb using the control in
+// imm8, and returns 1 if any character in a was null, and 0 otherwise.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpestrs
+FORCE_INLINE int _mm_cmpestrs(__m128i a,
+                              int la,
+                              __m128i b,
+                              int lb,
+                              const int imm8)
+{
+    SSE2NEON_CMPSTR_SET_UPPER(bound, imm8);
+    return la <= (bound - 1);
+}
 
-    __m128i dst = vreinterpretq_m128i_u8(vdupq_n_u8(0));
-    if (imm8 & 0x40) {
-        if (bound == 8) {
-            uint16x8_t tmp = vtstq_u16(vdupq_n_u16(r2),
-                                       vld1q_u16(_sse2neon_cmpestr_mask16b));
-            dst = vreinterpretq_m128i_u16(
-                vbslq_u16(tmp, vdupq_n_u16(-1), vreinterpretq_u16_m128i(dst)));
-        } else {
-            uint8x16_t vec_r2 = vcombine_u8(vdup_n_u8(r2), vdup_n_u8(r2 >> 8));
-            uint8x16_t tmp =
-                vtstq_u8(vec_r2, vld1q_u8(_sse2neon_cmpestr_mask8b));
-            dst = vreinterpretq_m128i_u8(
-                vbslq_u8(tmp, vdupq_n_u8(-1), vreinterpretq_u8_m128i(dst)));
-        }
-    } else {
-        if (bound == 16) {
-            dst = vreinterpretq_m128i_u16(
-                vsetq_lane_u16(r2 & 0xffff, vreinterpretq_u16_m128i(dst), 0));
-        } else {
-            dst = vreinterpretq_m128i_u8(
-                vsetq_lane_u8(r2 & 0xff, vreinterpretq_u8_m128i(dst), 0));
-        }
-    }
+// Compare packed strings in a and b with lengths la and lb using the control in
+// imm8, and returns 1 if any character in b was null, and 0 otherwise.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpestrz
+FORCE_INLINE int _mm_cmpestrz(__m128i a,
+                              int la,
+                              __m128i b,
+                              int lb,
+                              const int imm8)
+{
+    SSE2NEON_CMPSTR_SET_UPPER(bound, imm8);
+    return lb <= (bound - 1);
+}
 
-    return dst;
+#define SSE2NEON_CMPISTRX_LENGTH(str, len, imm8)                         \
+    do {                                                                 \
+        if (imm8 & 0x01) {                                               \
+            uint16x8_t equal_mask_##str =                                \
+                vceqq_u16(vreinterpretq_u16_m128i(str), vdupq_n_u16(0)); \
+            uint8x8_t res_##str = vshrn_n_u16(equal_mask_##str, 4);      \
+            uint64_t matches_##str =                                     \
+                vget_lane_u64(vreinterpret_u64_u8(res_##str), 0);        \
+            len = _sse2neon_ctzll(matches_##str) >> 3;                   \
+        } else {                                                         \
+            uint16x8_t equal_mask_##str = vreinterpretq_u16_u8(          \
+                vceqq_u8(vreinterpretq_u8_m128i(str), vdupq_n_u8(0)));   \
+            uint8x8_t res_##str = vshrn_n_u16(equal_mask_##str, 4);      \
+            uint64_t matches_##str =                                     \
+                vget_lane_u64(vreinterpret_u64_u8(res_##str), 0);        \
+            len = _sse2neon_ctzll(matches_##str) >> 2;                   \
+        }                                                                \
+    } while (0)
+
+#define SSE2NEON_CMPISTRX_LEN_PAIR(a, b, la, lb) \
+    int la, lb;                                  \
+    do {                                         \
+        SSE2NEON_CMPISTRX_LENGTH(a, la, imm8);   \
+        SSE2NEON_CMPISTRX_LENGTH(b, lb, imm8);   \
+    } while (0)
+
+// Compare packed strings with implicit lengths in a and b using the control in
+// imm8, and returns 1 if b did not contain a null character and the resulting
+// mask was zero, and 0 otherwise.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpistra
+FORCE_INLINE int _mm_cmpistra(__m128i a, __m128i b, const int imm8)
+{
+    SSE2NEON_COMP_AGG(a, b, la, lb, imm8, CMPISTRX);
+    return !r2 & (lb >= bound);
+}
+
+// Compare packed strings with implicit lengths in a and b using the control in
+// imm8, and returns 1 if the resulting mask was non-zero, and 0 otherwise.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpistrc
+FORCE_INLINE int _mm_cmpistrc(__m128i a, __m128i b, const int imm8)
+{
+    SSE2NEON_COMP_AGG(a, b, la, lb, imm8, CMPISTRX);
+    return r2 != 0;
+}
+
+// Compare packed strings with implicit lengths in a and b using the control in
+// imm8, and store the generated index in dst.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpistri
+FORCE_INLINE int _mm_cmpistri(__m128i a, __m128i b, const int imm8)
+{
+    SSE2NEON_COMP_AGG(a, b, la, lb, imm8, CMPISTRX);
+    SSE2NEON_CMPSTR_GENERATE_INDEX(r2, bound, imm8);
+}
+
+// Compare packed strings with implicit lengths in a and b using the control in
+// imm8, and store the generated mask in dst.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpistrm
+FORCE_INLINE __m128i _mm_cmpistrm(__m128i a, __m128i b, const int imm8)
+{
+    SSE2NEON_COMP_AGG(a, b, la, lb, imm8, CMPISTRX);
+    SSE2NEON_CMPSTR_GENERATE_MASK(dst);
+}
+
+// Compare packed strings with implicit lengths in a and b using the control in
+// imm8, and returns bit 0 of the resulting bit mask.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpistro
+FORCE_INLINE int _mm_cmpistro(__m128i a, __m128i b, const int imm8)
+{
+    SSE2NEON_COMP_AGG(a, b, la, lb, imm8, CMPISTRX);
+    return r2 & 1;
+}
+
+// Compare packed strings with implicit lengths in a and b using the control in
+// imm8, and returns 1 if any character in a was null, and 0 otherwise.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpistrs
+FORCE_INLINE int _mm_cmpistrs(__m128i a, __m128i b, const int imm8)
+{
+    SSE2NEON_CMPSTR_SET_UPPER(bound, imm8);
+    int la;
+    SSE2NEON_CMPISTRX_LENGTH(a, la, imm8);
+    return la <= (bound - 1);
+}
+
+// Compare packed strings with implicit lengths in a and b using the control in
+// imm8, and returns 1 if any character in b was null, and 0 otherwise.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpistrz
+FORCE_INLINE int _mm_cmpistrz(__m128i a, __m128i b, const int imm8)
+{
+    SSE2NEON_CMPSTR_SET_UPPER(bound, imm8);
+    int lb;
+    SSE2NEON_CMPISTRX_LENGTH(b, lb, imm8);
+    return lb <= (bound - 1);
 }
 
 // Compares the 2 signed 64-bit integers in a and the 2 signed 64-bit integers

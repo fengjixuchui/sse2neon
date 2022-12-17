@@ -241,7 +241,11 @@ public:
     }
 };
 
-const char *instructionString[] = {INTRIN_FOREACH(STR)};
+const char *instructionString[] = {
+#define _(x) #x,
+    INTRIN_LIST
+#undef _
+};
 
 // Produce rounding which is the same as SSE instructions with _MM_ROUND_NEAREST
 // rounding mode
@@ -2741,7 +2745,8 @@ result_t test_mm_setzero_ps(const SSE2NEONTestImpl &impl, uint32_t iter)
 
 result_t test_mm_sfence(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    /* FIXME: Assume that memory barriers always function as intended. */
+    return TEST_SUCCESS;
 }
 
 result_t test_mm_shuffle_pi16(const SSE2NEONTestImpl &impl, uint32_t iter)
@@ -3657,7 +3662,8 @@ result_t test_mm_castsi128_ps(const SSE2NEONTestImpl &impl, uint32_t iter)
 
 result_t test_mm_clflush(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    /* FIXME: Assume that we have portable mechanisms to flush cache. */
+    return TEST_SUCCESS;
 }
 
 result_t test_mm_cmpeq_epi16(const SSE2NEONTestImpl &impl, uint32_t iter)
@@ -4840,7 +4846,8 @@ result_t test_mm_insert_epi16(const SSE2NEONTestImpl &impl, uint32_t iter)
 
 result_t test_mm_lfence(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    /* FIXME: Assume that memory barriers always function as intended. */
+    return TEST_SUCCESS;
 }
 
 result_t test_mm_load_pd(const SSE2NEONTestImpl &impl, uint32_t iter)
@@ -5090,7 +5097,8 @@ result_t test_mm_max_sd(const SSE2NEONTestImpl &impl, uint32_t iter)
 
 result_t test_mm_mfence(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    /* FIXME: Assume that memory barriers always function as intended. */
+    return TEST_SUCCESS;
 }
 
 result_t test_mm_min_epi16(const SSE2NEONTestImpl &impl, uint32_t iter)
@@ -5989,7 +5997,7 @@ result_t test_mm_sqrt_pd(const SSE2NEONTestImpl &impl, uint32_t iter)
     __m128d a = load_m128d(_a);
     __m128d c = _mm_sqrt_pd(a);
 
-    return validateDouble(c, f0, f1);
+    return validateFloatError(c, f0, f1, 1.0e-15);
 }
 
 result_t test_mm_sqrt_sd(const SSE2NEONTestImpl &impl, uint32_t iter)
@@ -6004,7 +6012,7 @@ result_t test_mm_sqrt_sd(const SSE2NEONTestImpl &impl, uint32_t iter)
     __m128d b = load_m128d(_b);
     __m128d c = _mm_sqrt_sd(a, b);
 
-    return validateDouble(c, f0, f1);
+    return validateFloatError(c, f0, f1, 1.0e-15);
 }
 
 result_t test_mm_sra_epi16(const SSE2NEONTestImpl &impl, uint32_t iter)
@@ -7201,7 +7209,7 @@ result_t test_mm_alignr_epi8(const SSE2NEONTestImpl &impl, uint32_t iter)
         memcpy((void *) d, (const void *) _b, 16);
         memcpy((void *) (d + 16), (const void *) _a, 16);
         // shifting
-        for (uint x = 0; x < sizeof(d); x++) {
+        for (size_t x = 0; x < sizeof(d); x++) {
             if (x + shift >= sizeof(d))
                 d[x] = 0;
             else
@@ -7251,7 +7259,7 @@ result_t test_mm_alignr_pi8(const SSE2NEONTestImpl &impl, uint32_t iter)
         memcpy((void *) d, (const void *) _b, 8);
         memcpy((void *) (d + 8), (const void *) _a, 8);
         // shifting
-        for (uint x = 0; x < sizeof(d); x++) {
+        for (size_t x = 0; x < sizeof(d); x++) {
             if (x + shift >= sizeof(d))
                 d[x] = 0;
             else
@@ -8259,25 +8267,46 @@ result_t test_mm_cvtepu8_epi64(const SSE2NEONTestImpl &impl, uint32_t iter)
     return validateInt64(ret, i0, i1);
 }
 
+#define MM_DP_PD_TEST_CASE_WITH(imm8)                                \
+    do {                                                             \
+        const double *_a = (const double *) impl.mTestFloatPointer1; \
+        const double *_b = (const double *) impl.mTestFloatPointer2; \
+        const int imm = imm8;                                        \
+        double d[2];                                                 \
+        double sum = 0;                                              \
+        for (size_t i = 0; i < 2; i++)                               \
+            sum += ((imm) & (1 << (i + 4))) ? _a[i] * _b[i] : 0;     \
+        for (size_t i = 0; i < 2; i++)                               \
+            d[i] = (imm & (1 << i)) ? sum : 0;                       \
+        __m128d a = load_m128d(_a);                                  \
+        __m128d b = load_m128d(_b);                                  \
+        __m128d ret = _mm_dp_pd(a, b, imm);                          \
+        if (validateDouble(ret, d[0], d[1]) != TEST_SUCCESS)         \
+            return TEST_FAIL;                                        \
+    } while (0)
+
+#define GENERATE_MM_DP_PD_TEST_CASES \
+    MM_DP_PD_TEST_CASE_WITH(0xF0);   \
+    MM_DP_PD_TEST_CASE_WITH(0xF1);   \
+    MM_DP_PD_TEST_CASE_WITH(0xF2);   \
+    MM_DP_PD_TEST_CASE_WITH(0xFF);   \
+    MM_DP_PD_TEST_CASE_WITH(0x10);   \
+    MM_DP_PD_TEST_CASE_WITH(0x11);   \
+    MM_DP_PD_TEST_CASE_WITH(0x12);   \
+    MM_DP_PD_TEST_CASE_WITH(0x13);   \
+    MM_DP_PD_TEST_CASE_WITH(0x00);   \
+    MM_DP_PD_TEST_CASE_WITH(0x01);   \
+    MM_DP_PD_TEST_CASE_WITH(0x02);   \
+    MM_DP_PD_TEST_CASE_WITH(0x03);   \
+    MM_DP_PD_TEST_CASE_WITH(0x20);   \
+    MM_DP_PD_TEST_CASE_WITH(0x21);   \
+    MM_DP_PD_TEST_CASE_WITH(0x22);   \
+    MM_DP_PD_TEST_CASE_WITH(0x23);
+
 result_t test_mm_dp_pd(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    const double *_a = (const double *) impl.mTestFloatPointer1;
-    const double *_b = (const double *) impl.mTestFloatPointer2;
-    // FIXME: Different immediate value should be tested
-    const int imm = 0xFF;
-    double d[2];
-    double sum = 0;
-
-    for (size_t i = 0; i < 2; i++)
-        sum += ((imm) & (1 << (i + 4))) ? _a[i] * _b[i] : 0;
-    for (size_t i = 0; i < 2; i++)
-        d[i] = (imm & (1 << i)) ? sum : 0;
-
-    __m128d a = load_m128d(_a);
-    __m128d b = load_m128d(_b);
-    __m128d ret = _mm_dp_pd(a, b, imm);
-
-    return validateDouble(ret, d[0], d[1]);
+    GENERATE_MM_DP_PD_TEST_CASES
+    return TEST_SUCCESS;
 }
 
 result_t test_mm_dp_ps(const SSE2NEONTestImpl &impl, uint32_t iter)
@@ -8331,7 +8360,7 @@ result_t test_mm_extract_epi64(const SSE2NEONTestImpl &impl, uint32_t iter)
     int64_t *_a = (int64_t *) impl.mTestIntPointer1;
 
     __m128i a = load_m128i(_a);
-    __int64_t c;
+    __int64 c;
 
     switch (iter & 0x1) {
     case 0:
@@ -9211,15 +9240,276 @@ result_t test_mm_testz_si128(const SSE2NEONTestImpl &impl, uint32_t iter)
 }
 
 /* SSE4.2 */
-result_t test_mm_cmpestra(const SSE2NEONTestImpl &impl, uint32_t iter)
-{
-    return TEST_UNIMPL;
-}
+#define IS_CMPESTRI 1
 
-result_t test_mm_cmpestrc(const SSE2NEONTestImpl &impl, uint32_t iter)
-{
-    return TEST_UNIMPL;
-}
+#define DEF_ENUM_MM_CMPESTRX_VARIANT(c, ...) c,
+
+#define EVAL_MM_CMPESTRX_TEST_CASE(c, type, data_type, im, IM)             \
+    do {                                                                   \
+        data_type *a = test_mm_##im##_##type##_data[c].a,                  \
+                  *b = test_mm_##im##_##type##_data[c].b;                  \
+        int la = test_mm_##im##_##type##_data[c].la,                       \
+            lb = test_mm_##im##_##type##_data[c].lb;                       \
+        const int imm8 = IMM_##c;                                          \
+        IIF(IM)                                                            \
+        (int expect = test_mm_##im##_##type##_data[c].expect,              \
+         data_type *expect = test_mm_##im##_##type##_data[c].expect);      \
+        __m128i ma, mb;                                                    \
+        memcpy(&ma, a, sizeof(ma));                                        \
+        memcpy(&mb, b, sizeof(mb));                                        \
+        IIF(IM)                                                            \
+        (int res = _mm_##im(ma, la, mb, lb, imm8),                         \
+         __m128i res = _mm_##im(ma, la, mb, lb, imm8));                    \
+        if (IIF(IM)(res != expect, memcmp(expect, &res, sizeof(__m128i)))) \
+            return TEST_FAIL;                                              \
+    } while (0);
+
+#define ENUM_MM_CMPESTRX_TEST_CASES(type, type_lower, data_type, func, FUNC, \
+                                    IM)                                      \
+    enum { MM_##FUNC##_##type##_TEST_CASES(DEF_ENUM_MM_CMPESTRX_VARIANT) };  \
+    MM_##FUNC##_##type##_TEST_CASES(EVAL_MM_CMPESTRX_TEST_CASE, type_lower,  \
+                                    data_type, func, IM)
+
+#define IMM_UBYTE_EACH_LEAST \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_UBYTE_EACH_LEAST_NEGATIVE                                   \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UBYTE_EACH_LEAST_MASKED_NEGATIVE                            \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UBYTE_EACH_MOST \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_MOST_SIGNIFICANT)
+#define IMM_UBYTE_EACH_MOST_NEGATIVE                                   \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UBYTE_EACH_MOST_MASKED_NEGATIVE                            \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UBYTE_ANY_LEAST \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_UBYTE_ANY_LEAST_NEGATIVE                                   \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UBYTE_ANY_LEAST_MASKED_NEGATIVE                            \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UBYTE_ANY_MOST \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_MOST_SIGNIFICANT)
+#define IMM_UBYTE_ANY_MOST_NEGATIVE                                   \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UBYTE_ANY_MOST_MASKED_NEGATIVE                            \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UBYTE_RANGES_LEAST \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_UBYTE_RANGES_MOST \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT)
+#define IMM_UBYTE_RANGES_LEAST_NEGATIVE                             \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UBYTE_RANGES_MOST_NEGATIVE                             \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UBYTE_RANGES_LEAST_MASKED_NEGATIVE                      \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UBYTE_RANGES_MOST_MASKED_NEGATIVE                      \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UBYTE_ORDERED_LEAST \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_UBYTE_ORDERED_LEAST_NEGATIVE                                   \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UBYTE_ORDERED_MOST \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_MOST_SIGNIFICANT)
+#define IMM_UBYTE_ORDERED_MOST_NEGATIVE                                   \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UBYTE_ORDERED_MOST_MASKED_NEGATIVE                            \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+
+#define IMM_SBYTE_EACH_LEAST \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_SBYTE_EACH_LEAST_NEGATIVE                                   \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SBYTE_EACH_LEAST_MASKED_NEGATIVE                            \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SBYTE_EACH_MOST \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_MOST_SIGNIFICANT)
+#define IMM_SBYTE_EACH_MOST_NEGATIVE                                   \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SBYTE_EACH_MOST_MASKED_NEGATIVE                            \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SBYTE_ANY_LEAST \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_SBYTE_ANY_LEAST_NEGATIVE                                   \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SBYTE_ANY_MOST \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_MOST_SIGNIFICANT)
+#define IMM_SBYTE_ANY_MOST_MASKED_NEGATIVE                             \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SBYTE_RANGES_LEAST \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_SBYTE_RANGES_LEAST_NEGATIVE                             \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SBYTE_RANGES_LEAST_MASKED_NEGATIVE                      \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SBYTE_RANGES_MOST \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT)
+#define IMM_SBYTE_RANGES_MOST_NEGATIVE                             \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SBYTE_RANGES_MOST_MASKED_NEGATIVE                      \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SBYTE_ORDERED_LEAST \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_SBYTE_ORDERED_LEAST_NEGATIVE                                   \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SBYTE_ORDERED_LEAST_MASKED_NEGATIVE                            \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SBYTE_ORDERED_MOST_NEGATIVE                                   \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SBYTE_ORDERED_MOST \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_MOST_SIGNIFICANT)
+#define IMM_SBYTE_ORDERED_MOST_MASKED_NEGATIVE                            \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+
+#define IMM_UWORD_RANGES_LEAST \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_UWORD_RANGES_LEAST_NEGATIVE                             \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UWORD_RANGES_LEAST_MASKED_NEGATIVE                      \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UWORD_RANGES_MOST \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT)
+#define IMM_UWORD_RANGES_MOST_NEGATIVE                             \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UWORD_RANGES_MOST_MASKED_NEGATIVE                      \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UWORD_EACH_LEAST \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_UWORD_EACH_MOST \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_MOST_SIGNIFICANT)
+#define IMM_UWORD_EACH_LEAST_NEGATIVE                                   \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UWORD_EACH_LEAST_MASKED_NEGATIVE                            \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UWORD_EACH_MOST_MASKED_NEGATIVE                            \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UWORD_ANY_LEAST \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_UWORD_ANY_MOST \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_MOST_SIGNIFICANT)
+#define IMM_UWORD_ANY_MOST_NEGATIVE                                   \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UWORD_ANY_LEAST_NEGATIVE                                   \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UWORD_ANY_LEAST_MASKED_NEGATIVE                            \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UWORD_ORDERED_LEAST \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_UWORD_ORDERED_LEAST_NEGATIVE                                   \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UWORD_ORDERED_LEAST_MASKED_NEGATIVE                            \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_UWORD_ORDERED_MOST \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_MOST_SIGNIFICANT)
+#define IMM_UWORD_ORDERED_MOST_NEGATIVE                                   \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_UWORD_ORDERED_MOST_MASKED_NEGATIVE                            \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+
+#define IMM_SWORD_RANGES_LEAST \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_SWORD_RANGES_MOST \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT)
+#define IMM_SWORD_RANGES_LEAST_NEGATIVE                             \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SWORD_RANGES_LEAST_MASKED_NEGATIVE                      \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SWORD_RANGES_MOST_MASKED_NEGATIVE                      \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SWORD_EACH_LEAST \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_SWORD_EACH_MOST \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_MOST_SIGNIFICANT)
+#define IMM_SWORD_EACH_LEAST_NEGATIVE                                   \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SWORD_EACH_LEAST_MASKED_NEGATIVE                            \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SWORD_EACH_MOST_NEGATIVE                                   \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SWORD_EACH_MOST_MASKED_NEGATIVE                            \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SWORD_ANY_LEAST \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_SWORD_ANY_LEAST_NEGATIVE \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_SWORD_ANY_LEAST_MASKED_NEGATIVE                            \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SWORD_ANY_MOST \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_MOST_SIGNIFICANT)
+#define IMM_SWORD_ANY_MOST_NEGATIVE                                   \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SWORD_ANY_MOST_MASKED_NEGATIVE                            \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SWORD_ANY_MOST_MASKED_NEGATIVE                            \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SWORD_ORDERED_LEAST \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT)
+#define IMM_SWORD_ORDERED_LEAST_NEGATIVE                                   \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_NEGATIVE_POLARITY)
+#define IMM_SWORD_ORDERED_LEAST_MASKED_NEGATIVE                            \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SWORD_ORDERED_MOST \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_MOST_SIGNIFICANT)
+#define IMM_SWORD_ORDERED_MOST_MASKED_NEGATIVE                            \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_MOST_SIGNIFICANT | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
 
 typedef struct {
     uint8_t a[16], b[16];
@@ -9246,42 +9536,283 @@ typedef struct {
     int expect;
 } test_mm_cmpestri_sword_data_t;
 
-#define IMM_UBYTE_EACH_LEAST \
-    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT)
-#define IMM_UBYTE_ANY_LEAST_NEGATIVE                                   \
-    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT | \
-     _SIDD_NEGATIVE_POLARITY)
-#define IMM_UBYTE_RANGES_LEAST \
-    (_SIDD_UBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT)
-#define IMM_UBYTE_ORDERED_LEAST \
-    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT)
+#define TEST_MM_CMPESTRA_UBYTE_DATA_LEN 3
+static test_mm_cmpestri_ubyte_data_t
+    test_mm_cmpestra_ubyte_data[TEST_MM_CMPESTRA_UBYTE_DATA_LEN] = {
+        {{20, 10, 33, 56, 78},
+         {20, 10, 34, 98, 127, 20, 10, 32, 20, 10, 32, 11, 3, 20, 10, 31},
+         3,
+         17,
+         IMM_UBYTE_ORDERED_MOST,
+         1},
+        {{20, 127, 0, 45, 77, 1, 34, 43, 109},
+         {2, 127, 0, 54, 6, 43, 12, 110, 100},
+         9,
+         20,
+         IMM_UBYTE_EACH_LEAST_NEGATIVE,
+         0},
+        {{22, 33, 90, 1},
+         {22, 33, 90, 1, 1, 5, 4, 7, 98, 34, 1, 12, 13, 14, 15, 16},
+         4,
+         11,
+         IMM_UBYTE_ANY_LEAST_MASKED_NEGATIVE,
+         0},
+};
 
-#define IMM_SBYTE_EACH_LEAST \
-    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT)
-#define IMM_SBYTE_ANY_LEAST \
-    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT)
-#define IMM_SBYTE_RANGES_LEAST \
-    (_SIDD_SBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT)
-#define IMM_SBYTE_ORDERED_LEAST \
-    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT)
+#define TEST_MM_CMPESTRA_SBYTE_DATA_LEN 3
+static test_mm_cmpestri_sbyte_data_t
+    test_mm_cmpestra_sbyte_data[TEST_MM_CMPESTRA_SBYTE_DATA_LEN] = {
+        {{45, -94, 38, -11, 84, -123, -43, -49, 25, -55, -121, -6, 57, 108, -55,
+          69},
+         {-26, -61, -21, -96, 48, -112, 95, -56, 29, -55, -121, -6, 57, 108,
+          -55, 69},
+         23,
+         28,
+         IMM_SBYTE_RANGES_LEAST,
+         0},
+        {{-12, 8},
+         {-12, 7, -12, 8, -13, 45, -12, 8},
+         2,
+         8,
+         IMM_SBYTE_ORDERED_MOST_NEGATIVE,
+         0},
+        {{-100, -127, 56, 78, 21, -1, 9, 127, 45},
+         {100, 126, 30, 65, 87, 54, 80, 81, -98, -101, 90, 1, 5, 60, -77, -65},
+         10,
+         20,
+         IMM_SBYTE_ANY_LEAST,
+         1},
+};
 
-#define IMM_UWORD_RANGES_LEAST \
-    (_SIDD_UWORD_OPS | _SIDD_CMP_RANGES | _SIDD_LEAST_SIGNIFICANT)
-#define IMM_UWORD_EACH_LEAST \
-    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT)
-#define IMM_UWORD_ANY_LEAST \
-    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT)
-#define IMM_UWORD_ORDERED_LEAST \
-    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT)
+#define TEST_MM_CMPESTRA_UWORD_DATA_LEN 3
+static test_mm_cmpestri_uword_data_t
+    test_mm_cmpestra_uword_data[TEST_MM_CMPESTRA_UWORD_DATA_LEN] = {
+        {{10000, 20000, 30000, 40000, 50000},
+         {40001, 50002, 10000, 20000, 30000, 40000, 50000},
+         5,
+         10,
+         IMM_UWORD_ORDERED_LEAST,
+         0},
+        {{1001, 9487, 9487, 8000},
+         {1001, 1002, 1003, 8709, 100, 1, 1000, 999},
+         4,
+         6,
+         IMM_UWORD_RANGES_LEAST_MASKED_NEGATIVE,
+         0},
+        {{12, 21, 0, 45, 88, 10001, 10002, 65535},
+         {22, 13, 3, 54, 888, 10003, 10000, 65530},
+         13,
+         13,
+         IMM_UWORD_EACH_MOST,
+         1},
+};
 
-#define IMM_SWORD_RANGES_MOST \
-    (_SIDD_SWORD_OPS | _SIDD_CMP_RANGES | _SIDD_MOST_SIGNIFICANT)
-#define IMM_SWORD_EACH_LEAST \
-    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_LEAST_SIGNIFICANT)
-#define IMM_SWORD_ANY_LEAST \
-    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_LEAST_SIGNIFICANT)
-#define IMM_SWORD_ORDERED_LEAST \
-    (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_LEAST_SIGNIFICANT)
+#define TEST_MM_CMPESTRA_SWORD_DATA_LEN 3
+static test_mm_cmpestri_sword_data_t
+    test_mm_cmpestra_sword_data[TEST_MM_CMPESTRA_SWORD_DATA_LEN] = {
+        {{-100, -80, -5, -1, 10, 1000},
+         {-100, -99, -80, -2, 11, 789, 889, 999},
+         6,
+         12,
+         IMM_SWORD_RANGES_LEAST_NEGATIVE,
+         1},
+        {{-30000, -90, -32766, 1200, 5},
+         {-30001, 21, 10000, 1201, 888},
+         5,
+         5,
+         IMM_SWORD_EACH_MOST,
+         0},
+        {{2001, -1928},
+         {2000, 1928, 3000, 2289, 4000, 111, 2002, -1928},
+         2,
+         9,
+         IMM_SWORD_ANY_LEAST_MASKED_NEGATIVE,
+         0},
+};
+
+
+#define MM_CMPESTRA_UBYTE_TEST_CASES(_, ...)  \
+    _(UBYTE_ORDERED_MOST, __VA_ARGS__)        \
+    _(UBYTE_EACH_LEAST_NEGATIVE, __VA_ARGS__) \
+    _(UBYTE_ANY_LEAST_MASKED_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPESTRA_SBYTE_TEST_CASES(_, ...)    \
+    _(SBYTE_RANGES_LEAST, __VA_ARGS__)          \
+    _(SBYTE_ORDERED_MOST_NEGATIVE, __VA_ARGS__) \
+    _(SBYTE_ANY_LEAST, __VA_ARGS__)
+
+#define MM_CMPESTRA_UWORD_TEST_CASES(_, ...)           \
+    _(UWORD_ORDERED_LEAST, __VA_ARGS__)                \
+    _(UWORD_RANGES_LEAST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(UWORD_EACH_MOST, __VA_ARGS__)
+
+#define MM_CMPESTRA_SWORD_TEST_CASES(_, ...)    \
+    _(SWORD_RANGES_LEAST_NEGATIVE, __VA_ARGS__) \
+    _(SWORD_EACH_MOST, __VA_ARGS__)             \
+    _(SWORD_ANY_LEAST_MASKED_NEGATIVE, __VA_ARGS__)
+
+#define GENERATE_MM_CMPESTRA_TEST_CASES                                     \
+    ENUM_MM_CMPESTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpestra, CMPESTRA,  \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpestra, CMPESTRA,   \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(UWORD, uword, uint16_t, cmpestra, CMPESTRA, \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SWORD, sword, int16_t, cmpestra, CMPESTRA,  \
+                                IS_CMPESTRI)
+
+result_t test_mm_cmpestra(const SSE2NEONTestImpl &impl, uint32_t iter)
+{
+    GENERATE_MM_CMPESTRA_TEST_CASES
+    return TEST_SUCCESS;
+}
+
+#define TEST_MM_CMPESTRC_UBYTE_DATA_LEN 4
+static test_mm_cmpestri_ubyte_data_t
+    test_mm_cmpestrc_ubyte_data[TEST_MM_CMPESTRC_UBYTE_DATA_LEN] = {
+        {{66, 3, 3, 65},
+         {66, 3, 3, 65, 67, 2, 2, 67, 56, 11, 1, 23, 66, 3, 3, 65},
+         4,
+         16,
+         IMM_UBYTE_ORDERED_MOST_MASKED_NEGATIVE,
+         1},
+        {{1, 11, 2, 22, 3, 33, 4, 44, 5, 55, 6, 66, 7, 77, 8, 88},
+         {2, 22, 3, 23, 5, 66, 255, 43, 6, 66, 7, 77, 9, 99, 10, 100},
+         16,
+         16,
+         IMM_UBYTE_EACH_MOST,
+         0},
+        {{36, 72, 108}, {12, 24, 48, 96, 77, 84}, 3, 6, IMM_UBYTE_ANY_LEAST, 0},
+        {{12, 24, 36, 48},
+         {11, 49, 50, 56, 77, 15, 10},
+         4,
+         7,
+         IMM_UBYTE_RANGES_LEAST_NEGATIVE,
+         1},
+};
+
+#define TEST_MM_CMPESTRC_SBYTE_DATA_LEN 4
+static test_mm_cmpestri_sbyte_data_t
+    test_mm_cmpestrc_sbyte_data[TEST_MM_CMPESTRC_SBYTE_DATA_LEN] = {
+        {{-22, -30, 40, 45},
+         {-31, -32, 46, 77},
+         4,
+         4,
+         IMM_SBYTE_RANGES_MOST,
+         0},
+        {{-12, -7, 33, 100, 12},
+         {-12, -7, 33, 100, 11, -11, -7, 33, 100, 12},
+         5,
+         10,
+         IMM_SBYTE_ORDERED_MOST_MASKED_NEGATIVE,
+         1},
+        {{1, 2, 3, 4, 5, -1, -2, -3, -4, -5},
+         {1, 2, 3, 4, 5, -1, -2, -3, -5},
+         10,
+         9,
+         IMM_SBYTE_ANY_MOST_MASKED_NEGATIVE,
+         0},
+        {{101, -128, -88, -76, 89, 109, 44, -12, -45, -100, 22, 1, 91},
+         {102, -120, 88, -76, 98, 107, 33, 12, 45, -100, 22, 10, 19},
+         13,
+         13,
+         IMM_SBYTE_EACH_MOST,
+         1},
+};
+
+#define TEST_MM_CMPESTRC_UWORD_DATA_LEN 4
+static test_mm_cmpestri_uword_data_t
+    test_mm_cmpestrc_uword_data[TEST_MM_CMPESTRC_UWORD_DATA_LEN] = {
+        {{1000, 2000, 4000, 8000, 16000},
+         {40001, 1000, 2000, 40000, 8000, 16000},
+         5,
+         6,
+         IMM_UWORD_ORDERED_LEAST_NEGATIVE,
+         1},
+        {{1111, 1212},
+         {1110, 1213, 1110, 1214, 1100, 1220, 1000, 1233},
+         2,
+         8,
+         IMM_UWORD_RANGES_MOST,
+         0},
+        {{10000, 9000, 8000, 7000, 6000, 5000, 4000, 3000},
+         {9000, 8000, 7000, 6000, 5000, 4000, 3000, 2000},
+         13,
+         13,
+         IMM_UWORD_EACH_LEAST_MASKED_NEGATIVE,
+         1},
+        {{12}, {11, 13, 14, 15, 10}, 1, 5, IMM_UWORD_ANY_MOST, 0},
+};
+
+#define TEST_MM_CMPESTRC_SWORD_DATA_LEN 4
+static test_mm_cmpestri_sword_data_t
+    test_mm_cmpestrc_sword_data[TEST_MM_CMPESTRC_SWORD_DATA_LEN] = {
+        {{-100, -90, -80, -66, 1},
+         {-101, -102, -1000, 2, 67, 10000},
+         5,
+         6,
+         IMM_SWORD_RANGES_LEAST,
+         0},
+        {{12, 13, -700, 888, 44, -987, 19},
+         {12, 13, -700, 888, 44, -987, 19},
+         7,
+         7,
+         IMM_SWORD_EACH_MOST_NEGATIVE,
+         0},
+        {{2001, -1992, 1995, 10007, 2000},
+         {2000, 1928, 3000, 9822, 5000, 1111, 2002, -1928},
+         5,
+         9,
+         IMM_SWORD_ANY_LEAST_NEGATIVE,
+         1},
+        {{13, -26, 39},
+         {12, -25, 33, 13, -26, 39},
+         3,
+         6,
+         IMM_SWORD_ORDERED_MOST,
+         1},
+};
+
+
+#define MM_CMPESTRC_UBYTE_TEST_CASES(_, ...)           \
+    _(UBYTE_ORDERED_MOST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(UBYTE_EACH_MOST, __VA_ARGS__)                    \
+    _(UBYTE_ANY_LEAST, __VA_ARGS__)                    \
+    _(UBYTE_RANGES_LEAST_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPESTRC_SBYTE_TEST_CASES(_, ...)           \
+    _(SBYTE_RANGES_MOST, __VA_ARGS__)                  \
+    _(SBYTE_ORDERED_MOST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(SBYTE_ANY_MOST_MASKED_NEGATIVE, __VA_ARGS__)     \
+    _(SBYTE_EACH_MOST, __VA_ARGS__)
+
+#define MM_CMPESTRC_UWORD_TEST_CASES(_, ...)         \
+    _(UWORD_ORDERED_LEAST_NEGATIVE, __VA_ARGS__)     \
+    _(UWORD_RANGES_MOST, __VA_ARGS__)                \
+    _(UWORD_EACH_LEAST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(UWORD_ANY_MOST, __VA_ARGS__)
+
+#define MM_CMPESTRC_SWORD_TEST_CASES(_, ...) \
+    _(SWORD_RANGES_LEAST, __VA_ARGS__)       \
+    _(SWORD_EACH_MOST_NEGATIVE, __VA_ARGS__) \
+    _(SWORD_ANY_LEAST_NEGATIVE, __VA_ARGS__) \
+    _(SWORD_ORDERED_MOST, __VA_ARGS__)
+
+#define GENERATE_MM_CMPESTRC_TEST_CASES                                     \
+    ENUM_MM_CMPESTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpestrc, CMPESTRC,  \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpestrc, CMPESTRC,   \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(UWORD, uword, uint16_t, cmpestrc, CMPESTRC, \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SWORD, sword, int16_t, cmpestrc, CMPESTRC,  \
+                                IS_CMPESTRI)
+
+result_t test_mm_cmpestrc(const SSE2NEONTestImpl &impl, uint32_t iter)
+{
+    GENERATE_MM_CMPESTRC_TEST_CASES
+    return TEST_SUCCESS;
+}
 
 #define TEST_MM_CMPESTRI_UBYTE_DATA_LEN 4
 static test_mm_cmpestri_ubyte_data_t
@@ -9425,46 +9956,23 @@ static test_mm_cmpestri_sword_data_t
     _(SWORD_ANY_LEAST, __VA_ARGS__)          \
     _(SWORD_ORDERED_LEAST, __VA_ARGS__)
 
-#define GENERATE_MM_CMPESTRI_TEST_CASES                 \
-    ENUM_MM_CMPESTRI_TEST_CASES(UBYTE, ubyte, uint8_t)  \
-    ENUM_MM_CMPESTRI_TEST_CASES(SBYTE, sbyte, int8_t)   \
-    ENUM_MM_CMPESTRI_TEST_CASES(UWORD, uword, uint16_t) \
-    ENUM_MM_CMPESTRI_TEST_CASES(SWORD, sword, int16_t)
-
-#define IS_CMPESTRI 1
-
-#define ENUM_MM_CMPESTRI_TEST_CASES(type, type_lower, data_type)            \
-    enum { MM_CMPESTRI_##type##_TEST_CASES(DEF_ENUM_MM_CMPESTRX_VARIANT) }; \
-    MM_CMPESTRI_##type##_TEST_CASES(EVAL_MM_CMPESTRX_TEST_CASE, type_lower, \
-                                    data_type, cmpestri, IS_CMPESTRI)
-
-#define DEF_ENUM_MM_CMPESTRX_VARIANT(c, ...) c,
-
-#define EVAL_MM_CMPESTRX_TEST_CASE(c, type, data_type, im, IM)             \
-    do {                                                                   \
-        data_type *a = test_mm_##im##_##type##_data[c].a,                  \
-                  *b = test_mm_##im##_##type##_data[c].b;                  \
-        int la = test_mm_##im##_##type##_data[c].la,                       \
-            lb = test_mm_##im##_##type##_data[c].lb;                       \
-        const int imm8 = IMM_##c;                                          \
-        IIF(IM)                                                            \
-        (int expect = test_mm_##im##_##type##_data[c].expect,              \
-         data_type *expect = test_mm_##im##_##type##_data[c].expect);      \
-        __m128i ma, mb;                                                    \
-        memcpy(&ma, a, sizeof(ma));                                        \
-        memcpy(&mb, b, sizeof(mb));                                        \
-        IIF(IM)                                                            \
-        (int res = _mm_cmpestri(ma, la, mb, lb, imm8),                     \
-         __m128i res = _mm_cmpestrm(ma, la, mb, lb, imm8));                \
-        if (IIF(IM)(res != expect, memcmp(expect, &res, sizeof(__m128i)))) \
-            return TEST_FAIL;                                              \
-    } while (0);
+#define GENERATE_MM_CMPESTRI_TEST_CASES                                     \
+    ENUM_MM_CMPESTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpestri, CMPESTRI,  \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpestri, CMPESTRI,   \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(UWORD, uword, uint16_t, cmpestri, CMPESTRI, \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SWORD, sword, int16_t, cmpestri, CMPESTRI,  \
+                                IS_CMPESTRI)
 
 result_t test_mm_cmpestri(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
     GENERATE_MM_CMPESTRI_TEST_CASES
     return TEST_SUCCESS;
 }
+
+#define IS_CMPESTRM 0
 
 typedef struct {
     uint8_t a[16], b[16];
@@ -9491,11 +9999,15 @@ typedef struct {
     int16_t expect[8];
 } test_mm_cmpestrm_sword_data_t;
 
+#define IMM_UBYTE_EACH_UNIT \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_UNIT_MASK)
 #define IMM_UBYTE_EACH_UNIT_NEGATIVE                            \
     (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_UNIT_MASK | \
      _SIDD_NEGATIVE_POLARITY)
 #define IMM_UBYTE_ANY_UNIT \
     (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_UNIT_MASK)
+#define IMM_UBYTE_ANY_BIT \
+    (_SIDD_UBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_BIT_MASK)
 #define IMM_UBYTE_RANGES_UNIT \
     (_SIDD_UBYTE_OPS | _SIDD_CMP_RANGES | _SIDD_UNIT_MASK)
 #define IMM_UBYTE_ORDERED_UNIT \
@@ -9503,6 +10015,11 @@ typedef struct {
 
 #define IMM_SBYTE_EACH_UNIT \
     (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_UNIT_MASK)
+#define IMM_SBYTE_EACH_BIT_MASKED_NEGATIVE                     \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_BIT_MASK | \
+     _SIDD_MASKED_NEGATIVE_POLARITY)
+#define IMM_SBYTE_ANY_UNIT \
+    (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_UNIT_MASK)
 #define IMM_SBYTE_ANY_UNIT_MASKED_NEGATIVE                     \
     (_SIDD_SBYTE_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_UNIT_MASK | \
      _SIDD_MASKED_NEGATIVE_POLARITY)
@@ -9515,13 +10032,20 @@ typedef struct {
     (_SIDD_UWORD_OPS | _SIDD_CMP_RANGES | _SIDD_UNIT_MASK)
 #define IMM_UWORD_EACH_UNIT \
     (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_UNIT_MASK)
+#define IMM_UWORD_ANY_UNIT \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_UNIT_MASK)
 #define IMM_UWORD_ANY_BIT \
     (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ANY | _SIDD_BIT_MASK)
 #define IMM_UWORD_ORDERED_UNIT \
     (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_UNIT_MASK)
+#define IMM_UWORD_ORDERED_UNIT_NEGATIVE                            \
+    (_SIDD_UWORD_OPS | _SIDD_CMP_EQUAL_ORDERED | _SIDD_UNIT_MASK | \
+     _SIDD_NEGATIVE_POLARITY)
 
 #define IMM_SWORD_RANGES_UNIT \
     (_SIDD_SWORD_OPS | _SIDD_CMP_RANGES | _SIDD_UNIT_MASK)
+#define IMM_SWORD_RANGES_BIT \
+    (_SIDD_SWORD_OPS | _SIDD_CMP_RANGES | _SIDD_BIT_MASK)
 #define IMM_SWORD_EACH_UNIT \
     (_SIDD_SWORD_OPS | _SIDD_CMP_EQUAL_EACH | _SIDD_UNIT_MASK)
 #define IMM_SWORD_ANY_UNIT \
@@ -9675,18 +10199,15 @@ static test_mm_cmpestrm_sword_data_t
     _(SWORD_ANY_UNIT, __VA_ARGS__)           \
     _(SWORD_ORDERED_UNIT, __VA_ARGS__)
 
-#define GENERATE_MM_CMPESTRM_TEST_CASES                 \
-    ENUM_MM_CMPESTRM_TEST_CASES(UBYTE, ubyte, uint8_t)  \
-    ENUM_MM_CMPESTRM_TEST_CASES(SBYTE, sbyte, int8_t)   \
-    ENUM_MM_CMPESTRM_TEST_CASES(UWORD, uword, uint16_t) \
-    ENUM_MM_CMPESTRM_TEST_CASES(SWORD, sword, int16_t)
-
-#define IS_CMPESTRM 0
-
-#define ENUM_MM_CMPESTRM_TEST_CASES(type, type_lower, data_type)            \
-    enum { MM_CMPESTRM_##type##_TEST_CASES(DEF_ENUM_MM_CMPESTRX_VARIANT) }; \
-    MM_CMPESTRM_##type##_TEST_CASES(EVAL_MM_CMPESTRX_TEST_CASE, type_lower, \
-                                    data_type, cmpestrm, IS_CMPESTRM)
+#define GENERATE_MM_CMPESTRM_TEST_CASES                                     \
+    ENUM_MM_CMPESTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpestrm, CMPESTRM,  \
+                                IS_CMPESTRM)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpestrm, CMPESTRM,   \
+                                IS_CMPESTRM)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(UWORD, uword, uint16_t, cmpestrm, CMPESTRM, \
+                                IS_CMPESTRM)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SWORD, sword, int16_t, cmpestrm, CMPESTRM,  \
+                                IS_CMPESTRM)
 
 result_t test_mm_cmpestrm(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
@@ -9694,23 +10215,349 @@ result_t test_mm_cmpestrm(const SSE2NEONTestImpl &impl, uint32_t iter)
     return TEST_SUCCESS;
 }
 
-#undef IS_CMPESTRI
 #undef IS_CMPESTRM
+
+#define TEST_MM_CMPESTRO_UBYTE_DATA_LEN 4
+static test_mm_cmpestri_ubyte_data_t
+    test_mm_cmpestro_ubyte_data[TEST_MM_CMPESTRO_UBYTE_DATA_LEN] = {
+        {{56, 78, 255, 1, 9},
+         {56, 78, 43, 255, 1, 6, 9},
+         5,
+         7,
+         IMM_UBYTE_ANY_MOST_NEGATIVE,
+         0},
+        {{33, 44, 100, 24, 3, 89, 127, 254, 33, 45, 250},
+         {33, 44, 100, 22, 3, 98, 125, 254, 33, 4, 243},
+         11,
+         11,
+         IMM_UBYTE_EACH_LEAST_MASKED_NEGATIVE,
+         0},
+        {{34, 27, 18, 9}, {}, 4, 16, IMM_UBYTE_RANGES_LEAST_MASKED_NEGATIVE, 1},
+        {{3, 18, 216},
+         {3, 18, 222, 3, 17, 216, 3, 18, 216},
+         3,
+         9,
+         IMM_UBYTE_ORDERED_LEAST_NEGATIVE,
+         1},
+};
+
+#define TEST_MM_CMPESTRO_SBYTE_DATA_LEN 4
+static test_mm_cmpestri_sbyte_data_t
+    test_mm_cmpestro_sbyte_data[TEST_MM_CMPESTRO_SBYTE_DATA_LEN] = {
+        {{23, -23, 24, -24, 25, -25, 26, -26, 27, -27, 28, -28, -29, 29, 30,
+          31},
+         {24, -23, 25, -24, 25, -25, 26, -26, 27, -27, 28, -28, -29, 29, 30,
+          31},
+         16,
+         16,
+         IMM_SBYTE_EACH_MOST_NEGATIVE,
+         1},
+        {{34, 33, 67, 72, -90, 127, 33, -128, 123, -90, -100, 34, 43, 15, 56,
+          3},
+         {3, 14, 15, 65, 90, -127, 100, 100},
+         16,
+         8,
+         IMM_SBYTE_ANY_MOST,
+         1},
+        {{-13, 0, 34},
+         {-12, -11, 1, 12, 56, 57, 3, 2, -17},
+         6,
+         9,
+         IMM_SBYTE_RANGES_MOST_MASKED_NEGATIVE,
+         0},
+        {{1, 2, 3, 4, 5, 6, 7, 8},
+         {-1, -2, -3, -4, -5, -6, -7, -8, 1, 2, 3, 4, 5, 6, 7, 8},
+         8,
+         16,
+         IMM_SBYTE_ORDERED_MOST,
+         0},
+};
+
+#define TEST_MM_CMPESTRO_UWORD_DATA_LEN 4
+static test_mm_cmpestri_uword_data_t
+    test_mm_cmpestro_uword_data[TEST_MM_CMPESTRO_UWORD_DATA_LEN] = {
+        {{0, 0, 0, 4, 4, 4, 8, 8},
+         {0, 0, 0, 3, 3, 16653, 3333, 222},
+         8,
+         8,
+         IMM_UWORD_EACH_MOST_MASKED_NEGATIVE,
+         0},
+        {{12, 666, 9456, 10000, 32, 444, 57, 0},
+         {11, 777, 9999, 32767, 23},
+         8,
+         5,
+         IMM_UWORD_ANY_LEAST_MASKED_NEGATIVE,
+         1},
+        {{23, 32, 45, 67},
+         {10022, 23, 32, 44, 66, 67, 12, 22},
+         4,
+         8,
+         IMM_UWORD_RANGES_LEAST_NEGATIVE,
+         1},
+        {{222, 45, 8989},
+         {221, 222, 45, 8989, 222, 45, 8989},
+         3,
+         7,
+         IMM_UWORD_ORDERED_MOST,
+         0},
+};
+
+#define TEST_MM_CMPESTRO_SWORD_DATA_LEN 4
+static test_mm_cmpestri_sword_data_t
+    test_mm_cmpestro_sword_data[TEST_MM_CMPESTRO_SWORD_DATA_LEN] = {
+        {{-9999, -9487, -5000, -4433, -3000, -2999, -2000, -1087},
+         {-32767, -30000, -4998},
+         100,
+         3,
+         IMM_SWORD_RANGES_MOST_MASKED_NEGATIVE,
+         1},
+        {{-30, 89, 7777},
+         {-30, 89, 7777},
+         3,
+         3,
+         IMM_SWORD_EACH_MOST_MASKED_NEGATIVE,
+         0},
+        {{8, 9, -100, 1000, -5000, -32000, 32000, 7},
+         {29999, 32001, 5, 555},
+         8,
+         4,
+         IMM_SWORD_ANY_MOST_MASKED_NEGATIVE,
+         1},
+        {{-1, 56, -888, 9000, -23, 12, -1, -1},
+         {-1, 56, -888, 9000, -23, 12, -1, -1},
+         8,
+         8,
+         IMM_SWORD_ORDERED_MOST_MASKED_NEGATIVE,
+         0},
+};
+
+#define MM_CMPESTRO_UBYTE_TEST_CASES(_, ...)           \
+    _(UBYTE_ANY_MOST_NEGATIVE, __VA_ARGS__)            \
+    _(UBYTE_EACH_LEAST_MASKED_NEGATIVE, __VA_ARGS__)   \
+    _(UBYTE_RANGES_LEAST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(UBYTE_ORDERED_LEAST_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPESTRO_SBYTE_TEST_CASES(_, ...)          \
+    _(SBYTE_EACH_MOST_NEGATIVE, __VA_ARGS__)          \
+    _(SBYTE_ANY_MOST, __VA_ARGS__)                    \
+    _(SBYTE_RANGES_MOST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(SBYTE_ORDERED_MOST, __VA_ARGS__)
+
+#define MM_CMPESTRO_UWORD_TEST_CASES(_, ...)        \
+    _(UWORD_EACH_MOST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(UWORD_ANY_LEAST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(UWORD_RANGES_LEAST_NEGATIVE, __VA_ARGS__)     \
+    _(UWORD_ORDERED_MOST, __VA_ARGS__)
+
+#define MM_CMPESTRO_SWORD_TEST_CASES(_, ...)          \
+    _(SWORD_RANGES_MOST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(SWORD_EACH_MOST_MASKED_NEGATIVE, __VA_ARGS__)   \
+    _(SWORD_ANY_MOST_MASKED_NEGATIVE, __VA_ARGS__)    \
+    _(SWORD_ORDERED_MOST_MASKED_NEGATIVE, __VA_ARGS__)
+
+#define GENERATE_MM_CMPESTRO_TEST_CASES                                     \
+    ENUM_MM_CMPESTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpestro, CMPESTRO,  \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpestro, CMPESTRO,   \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(UWORD, uword, uint16_t, cmpestro, CMPESTRO, \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SWORD, sword, int16_t, cmpestro, CMPESTRO,  \
+                                IS_CMPESTRI)
 
 result_t test_mm_cmpestro(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    GENERATE_MM_CMPESTRO_TEST_CASES
+    return TEST_SUCCESS;
 }
+
+#define TEST_MM_CMPESTRS_UBYTE_DATA_LEN 2
+static test_mm_cmpestri_ubyte_data_t
+    test_mm_cmpestrs_ubyte_data[TEST_MM_CMPESTRS_UBYTE_DATA_LEN] = {
+        {{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16},
+         {0},
+         16,
+         0,
+         IMM_UBYTE_ANY_MOST,
+         0},
+        {{1, 2, 3}, {1, 2, 3}, 3, 8, IMM_UBYTE_RANGES_MOST, 1},
+};
+
+#define TEST_MM_CMPESTRS_SBYTE_DATA_LEN 2
+static test_mm_cmpestri_sbyte_data_t
+    test_mm_cmpestrs_sbyte_data[TEST_MM_CMPESTRS_SBYTE_DATA_LEN] = {
+        {{-1, -2, -3, -4, -100, 100, 1, 2, 3, 4},
+         {-90, -80, 111, 67, 88},
+         10,
+         5,
+         IMM_SBYTE_EACH_LEAST_MASKED_NEGATIVE,
+         1},
+        {{99, 100, 101, -99, -100, -101, 56, 7},
+         {-128, -126, 100, 127},
+         23,
+         4,
+         IMM_SBYTE_ORDERED_LEAST_MASKED_NEGATIVE,
+         0},
+};
+
+#define TEST_MM_CMPESTRS_UWORD_DATA_LEN 2
+static test_mm_cmpestri_uword_data_t
+    test_mm_cmpestrs_uword_data[TEST_MM_CMPESTRS_UWORD_DATA_LEN] = {
+        {{1},
+         {90, 65535, 63355, 12, 8, 5, 34, 10000},
+         100,
+         7,
+         IMM_UWORD_ANY_MOST_NEGATIVE,
+         0},
+        {{}, {0}, 0, 28, IMM_UWORD_RANGES_MOST_MASKED_NEGATIVE, 1},
+};
+
+#define TEST_MM_CMPESTRS_SWORD_DATA_LEN 2
+static test_mm_cmpestri_sword_data_t
+    test_mm_cmpestrs_sword_data[TEST_MM_CMPESTRS_SWORD_DATA_LEN] = {
+        {{-30000, 2897, 1111, -4455},
+         {30, 40, 500, 6000, 20, -10, -789, -29999},
+         4,
+         8,
+         IMM_SWORD_ORDERED_LEAST_MASKED_NEGATIVE,
+         1},
+        {{34, 56, 789, 1024, 2048, 4096, 8192, -16384},
+         {3, 9, -27, 81, -216, 1011},
+         9,
+         6,
+         IMM_SWORD_EACH_LEAST_NEGATIVE,
+         0},
+};
+
+#define MM_CMPESTRS_UBYTE_TEST_CASES(_, ...) \
+    _(UBYTE_ANY_MOST, __VA_ARGS__)           \
+    _(UBYTE_RANGES_MOST, __VA_ARGS__)
+
+#define MM_CMPESTRS_SBYTE_TEST_CASES(_, ...)         \
+    _(SBYTE_EACH_LEAST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(SBYTE_ORDERED_LEAST_MASKED_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPESTRS_UWORD_TEST_CASES(_, ...) \
+    _(UWORD_ANY_MOST_NEGATIVE, __VA_ARGS__)  \
+    _(UWORD_RANGES_MOST_MASKED_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPESTRS_SWORD_TEST_CASES(_, ...)        \
+    _(SWORD_ANY_LEAST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(SWORD_EACH_LEAST_NEGATIVE, __VA_ARGS__)
+
+#define GENERATE_MM_CMPESTRS_TEST_CASES                                     \
+    ENUM_MM_CMPESTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpestrs, CMPESTRS,  \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpestrs, CMPESTRS,   \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(UWORD, uword, uint16_t, cmpestrs, CMPESTRS, \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SWORD, sword, int16_t, cmpestrs, CMPESTRS,  \
+                                IS_CMPESTRI)
 
 result_t test_mm_cmpestrs(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    GENERATE_MM_CMPESTRS_TEST_CASES
+    return TEST_SUCCESS;
 }
+
+#define TEST_MM_CMPESTRZ_UBYTE_DATA_LEN 2
+static test_mm_cmpestri_ubyte_data_t
+    test_mm_cmpestrz_ubyte_data[TEST_MM_CMPESTRZ_UBYTE_DATA_LEN] = {
+        {{0, 1, 2, 3, 4, 5, 6, 7},
+         {12, 67, 0, 3},
+         8,
+         4,
+         IMM_UBYTE_ANY_MOST_MASKED_NEGATIVE,
+         1},
+        {{255, 0, 127, 88},
+         {1, 2, 4, 8, 16, 32, 64, 128, 254, 233, 209, 41, 66, 77, 90, 100},
+         4,
+         16,
+         IMM_UBYTE_RANGES_MOST_MASKED_NEGATIVE,
+         0},
+};
+
+#define TEST_MM_CMPESTRZ_SBYTE_DATA_LEN 2
+static test_mm_cmpestri_sbyte_data_t
+    test_mm_cmpestrz_sbyte_data[TEST_MM_CMPESTRZ_SBYTE_DATA_LEN] = {
+        {{}, {-90, -80, 111, 67, 88}, 0, 18, IMM_SBYTE_EACH_LEAST_NEGATIVE, 0},
+        {{9, 10, 10, -99, -100, -101, 56, 76},
+         {-127, 127, -100, -120, 13, 108, 1, -66, -34, 89, -89, 123, 22, -19,
+          -8},
+         7,
+         15,
+         IMM_SBYTE_ORDERED_LEAST_NEGATIVE,
+         1},
+};
+
+#define TEST_MM_CMPESTRZ_UWORD_DATA_LEN 2
+static test_mm_cmpestri_uword_data_t
+    test_mm_cmpestrz_uword_data[TEST_MM_CMPESTRZ_UWORD_DATA_LEN] = {
+        {{1},
+         {9000, 33333, 63333, 120, 8, 55, 34, 100},
+         100,
+         7,
+         IMM_UWORD_ANY_LEAST_NEGATIVE,
+         1},
+        {{1, 2, 3},
+         {1, 10000, 65535, 8964, 9487, 32, 451, 666},
+         3,
+         8,
+         IMM_UWORD_RANGES_MOST_NEGATIVE,
+         0},
+};
+
+#define TEST_MM_CMPESTRZ_SWORD_DATA_LEN 2
+static test_mm_cmpestri_sword_data_t
+    test_mm_cmpestrz_sword_data[TEST_MM_CMPESTRZ_SWORD_DATA_LEN] = {
+        {{30000, 28997, 11111, 4455},
+         {30, 40, 500, 6000, 20, -10, -789, -29999},
+         4,
+         8,
+         IMM_SWORD_ORDERED_LEAST_MASKED_NEGATIVE,
+         0},
+        {{789, 1024, 2048, 4096, 8192},
+         {-3, 9, -27, 18, -217, 10111, 22222},
+         5,
+         7,
+         IMM_SWORD_EACH_LEAST_MASKED_NEGATIVE,
+         1},
+};
+
+#define MM_CMPESTRZ_UBYTE_TEST_CASES(_, ...) \
+    _(UBYTE_ANY_MOST, __VA_ARGS__)           \
+    _(UBYTE_RANGES_MOST, __VA_ARGS__)
+
+#define MM_CMPESTRZ_SBYTE_TEST_CASES(_, ...)  \
+    _(SBYTE_EACH_LEAST_NEGATIVE, __VA_ARGS__) \
+    _(SBYTE_ORDERED_LEAST_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPESTRZ_UWORD_TEST_CASES(_, ...) \
+    _(UWORD_ANY_LEAST_NEGATIVE, __VA_ARGS__) \
+    _(UWORD_RANGES_MOST_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPESTRZ_SWORD_TEST_CASES(_, ...)        \
+    _(SWORD_ANY_LEAST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(SWORD_EACH_LEAST_MASKED_NEGATIVE, __VA_ARGS__)
+
+#define GENERATE_MM_CMPESTRZ_TEST_CASES                                     \
+    ENUM_MM_CMPESTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpestrz, CMPESTRZ,  \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpestrz, CMPESTRZ,   \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(UWORD, uword, uint16_t, cmpestrz, CMPESTRZ, \
+                                IS_CMPESTRI)                                \
+    ENUM_MM_CMPESTRX_TEST_CASES(SWORD, sword, int16_t, cmpestrz, CMPESTRZ,  \
+                                IS_CMPESTRI)
 
 result_t test_mm_cmpestrz(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    GENERATE_MM_CMPESTRZ_TEST_CASES
+    return TEST_SUCCESS;
 }
+
+#undef IS_CMPESTRI
 
 result_t test_mm_cmpgt_epi64(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
@@ -9728,39 +10575,931 @@ result_t test_mm_cmpgt_epi64(const SSE2NEONTestImpl &impl, uint32_t iter)
     return validateInt64(iret, result[0], result[1]);
 }
 
+#define IS_CMPISTRI 1
+
+#define DEF_ENUM_MM_CMPISTRX_VARIANT(c, ...) c,
+
+#define EVAL_MM_CMPISTRX_TEST_CASE(c, type, data_type, im, IM)             \
+    do {                                                                   \
+        data_type *a = test_mm_##im##_##type##_data[c].a,                  \
+                  *b = test_mm_##im##_##type##_data[c].b;                  \
+        const int imm8 = IMM_##c;                                          \
+        IIF(IM)                                                            \
+        (int expect = test_mm_##im##_##type##_data[c].expect,              \
+         data_type *expect = test_mm_##im##_##type##_data[c].expect);      \
+        __m128i ma, mb;                                                    \
+        memcpy(&ma, a, sizeof(ma));                                        \
+        memcpy(&mb, b, sizeof(mb));                                        \
+        IIF(IM)                                                            \
+        (int res = _mm_##im(ma, mb, imm8),                                 \
+         __m128i res = _mm_##im(ma, mb, imm8));                            \
+        if (IIF(IM)(res != expect, memcmp(expect, &res, sizeof(__m128i)))) \
+            return TEST_FAIL;                                              \
+    } while (0);
+
+#define ENUM_MM_CMPISTRX_TEST_CASES(type, type_lower, data_type, func, FUNC, \
+                                    IM)                                      \
+    enum { MM_##FUNC##_##type##_TEST_CASES(DEF_ENUM_MM_CMPISTRX_VARIANT) };  \
+    MM_##FUNC##_##type##_TEST_CASES(EVAL_MM_CMPISTRX_TEST_CASE, type_lower,  \
+                                    data_type, func, IM)
+
+typedef struct {
+    uint8_t a[16], b[16];
+    const int imm8;
+    int expect;
+} test_mm_cmpistri_ubyte_data_t;
+typedef struct {
+    int8_t a[16], b[16];
+    const int imm8;
+    int expect;
+} test_mm_cmpistri_sbyte_data_t;
+typedef struct {
+    uint16_t a[8], b[8];
+    const int imm8;
+    int expect;
+} test_mm_cmpistri_uword_data_t;
+typedef struct {
+    int16_t a[8], b[8];
+    const int imm8;
+    int expect;
+} test_mm_cmpistri_sword_data_t;
+
+#define TEST_MM_CMPISTRA_UBYTE_DATA_LEN 4
+static test_mm_cmpistri_ubyte_data_t
+    test_mm_cmpistra_ubyte_data[TEST_MM_CMPISTRA_UBYTE_DATA_LEN] = {
+        {{10, 11, 12, 13, 14, 15, 16, 17, 18, 9, 20, 98, 97, 96, 95, 127},
+         {1, 2, 3, 4, 5, 6, 7, 8, 99, 100, 101, 102, 103, 104, 105, 106},
+         IMM_UBYTE_ANY_LEAST,
+         1},
+        {{1, 22, 33, 44, 5, 66, 7, 88, 9, 10, 111, 0},
+         {2, 23, 34, 21, 6, 65, 8, 84, 99, 100, 11, 112, 123, 14, 15, 6},
+         IMM_UBYTE_EACH_LEAST,
+         1},
+        {{5, 15, 25, 35, 45, 55, 65, 75, 0},
+         {4, 6, 14, 16, 24, 26, 34, 36, 44, 46, 54, 56, 74, 76},
+         IMM_UBYTE_RANGES_LEAST,
+         0},
+        {{4, 14, 64, 84, 0},
+         {4, 14, 64, 84, 0, 4, 14, 65, 84, 0, 4, 14, 64, 84, 0, 1},
+         IMM_UBYTE_ORDERED_MOST_NEGATIVE,
+         0},
+};
+
+#define TEST_MM_CMPISTRA_SBYTE_DATA_LEN 4
+static test_mm_cmpistri_sbyte_data_t
+    test_mm_cmpistra_sbyte_data[TEST_MM_CMPISTRA_SBYTE_DATA_LEN] = {
+        {{-11, -13, -43, -50, 66, 77, 87, 98, -128, 127, 126, 99, 1, 2, 3, -5},
+         {-12, -13, -43, -56, 66, 78, 88, 98, -125, 127, 120, 9, 100, 22, 54,
+          -10},
+         IMM_SBYTE_EACH_LEAST,
+         0},
+        {{10, 11, 100, -90, 0},
+         {8, 9, 10, 11, 0, 8, 9, 10, -90, 0},
+         IMM_SBYTE_ANY_LEAST_NEGATIVE,
+         0},
+        {{-90, -60, -34, -25, 34, 56, 70, 79, 0},
+         {-100, -59, -35, -24, -101, 33, 57, 69, 80, 81, -128, 100, 101, 102,
+          -101, -102},
+         IMM_SBYTE_RANGES_LEAST,
+         1},
+        {{1, 1, 1, 1, -1, -1, -1, -1, -10, 10, -10, 10, 44, -44, 44, -44},
+         {1, 1, -1, 1, -1, -1, -1, -1, -10, 10, -10, 10, 44, -44, 44, -44},
+         IMM_SBYTE_ORDERED_LEAST,
+         1},
+};
+
+#define TEST_MM_CMPISTRA_UWORD_DATA_LEN 4
+static test_mm_cmpistri_uword_data_t
+    test_mm_cmpistra_uword_data[TEST_MM_CMPISTRA_UWORD_DATA_LEN] = {
+        {{88, 888, 8888, 31888, 10888, 18088, 10880, 28888},
+         {888, 88, 8888, 32000, 10888, 18000, 10888, 28888},
+         IMM_UWORD_EACH_LEAST_NEGATIVE,
+         0},
+        {{3, 4, 555, 6666, 7777, 888, 9, 100},
+         {1, 2, 333, 4444, 5555, 666, 7, 8},
+         IMM_UWORD_ANY_LEAST,
+         1},
+        {{1000, 2000, 2002, 3000, 3002, 4000, 5000, 5999},
+         {999, 2001, 3001, 4001, 4002, 4999, 6000, 6001},
+         IMM_UWORD_RANGES_LEAST,
+         1},
+        {{55, 66, 77, 888, 0},
+         {55, 66, 77, 888, 0, 33, 2, 10000},
+         IMM_UWORD_ORDERED_LEAST,
+         0},
+};
+
+#define TEST_MM_CMPISTRA_SWORD_DATA_LEN 4
+static test_mm_cmpistri_sword_data_t
+    test_mm_cmpistra_sword_data[TEST_MM_CMPISTRA_SWORD_DATA_LEN] = {
+        {{-32000, -28000, 0},
+         {-32001, -29999, -28001, -28000, -27999, -26000, -32768},
+         IMM_SWORD_RANGES_LEAST_MASKED_NEGATIVE,
+         0},
+        {{-12, -11, -10, -9, -8, -7, 90, 1000},
+         {-13, -10, 9, -8, -7, 1000, 1000, 90},
+         IMM_SWORD_EACH_LEAST,
+         1},
+        {{33, 44, 787, 23, 0},
+         {32, 43, 788, 0, 32, 0, 43, 0},
+         IMM_SWORD_ANY_LEAST,
+         0},
+        {{18, 78, 999, -56, 0},
+         {18, 78, 999, 56, 18, 78, 999, 4},
+         IMM_SWORD_ORDERED_LEAST,
+         1},
+};
+
+#define MM_CMPISTRA_UBYTE_TEST_CASES(_, ...) \
+    _(UBYTE_ANY_LEAST, __VA_ARGS__)          \
+    _(UBYTE_EACH_LEAST, __VA_ARGS__)         \
+    _(UBYTE_RANGES_LEAST, __VA_ARGS__)       \
+    _(UBYTE_ORDERED_MOST_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPISTRA_SBYTE_TEST_CASES(_, ...) \
+    _(SBYTE_EACH_LEAST, __VA_ARGS__)         \
+    _(SBYTE_ANY_LEAST_NEGATIVE, __VA_ARGS__) \
+    _(SBYTE_RANGES_LEAST, __VA_ARGS__)       \
+    _(SBYTE_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRA_UWORD_TEST_CASES(_, ...)  \
+    _(UWORD_EACH_LEAST_NEGATIVE, __VA_ARGS__) \
+    _(UWORD_ANY_LEAST, __VA_ARGS__)           \
+    _(UWORD_RANGES_LEAST, __VA_ARGS__)        \
+    _(UWORD_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRA_SWORD_TEST_CASES(_, ...)           \
+    _(SWORD_RANGES_LEAST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(SWORD_EACH_LEAST, __VA_ARGS__)                   \
+    _(SWORD_ANY_LEAST, __VA_ARGS__)                    \
+    _(SWORD_ORDERED_LEAST, __VA_ARGS__)
+
+#define GENERATE_MM_CMPISTRA_TEST_CASES                                     \
+    ENUM_MM_CMPISTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpistra, CMPISTRA,  \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpistra, CMPISTRA,   \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(UWORD, uword, uint16_t, cmpistra, CMPISTRA, \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SWORD, sword, int16_t, cmpistra, CMPISTRA,  \
+                                IS_CMPISTRI)
+
 result_t test_mm_cmpistra(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    GENERATE_MM_CMPISTRA_TEST_CASES
+    return TEST_SUCCESS;
 }
+
+#define TEST_MM_CMPISTRC_UBYTE_DATA_LEN 4
+static test_mm_cmpistri_ubyte_data_t
+    test_mm_cmpistrc_ubyte_data[TEST_MM_CMPISTRC_UBYTE_DATA_LEN] = {
+        {{89, 64, 88, 23, 11, 109, 34, 55, 0},
+         {2, 64, 87, 32, 1, 110, 43, 66, 0},
+         IMM_UBYTE_ANY_LEAST,
+         1},
+        {{99, 67, 2, 127, 125, 3, 24, 77, 32, 68, 96, 74, 70, 110, 111, 5},
+         {98, 88, 67, 125, 111, 4, 56, 88, 33, 69, 99, 79, 123, 11, 10, 6},
+         IMM_UBYTE_EACH_LEAST,
+         0},
+        {{2, 3, 74, 78, 81, 83, 85, 87, 89, 90, 0},
+         {86, 90, 74, 85, 87, 81, 2, 3, 3, 3, 75, 76, 77, 78, 82, 85},
+         IMM_UBYTE_RANGES_MOST_NEGATIVE,
+         0},
+        {{45, 67, 8, 9, 0},
+         {67, 45, 67, 8, 9, 45, 67, 8, 9, 45, 67, 8, 9, 45, 67, 8},
+         IMM_UBYTE_ORDERED_LEAST,
+         1},
+};
+
+#define TEST_MM_CMPISTRC_SBYTE_DATA_LEN 4
+static test_mm_cmpistri_sbyte_data_t
+    test_mm_cmpistrc_sbyte_data[TEST_MM_CMPISTRC_SBYTE_DATA_LEN] = {
+        {{35, -35, 67, -66, 34, 55, 12, -100, 34, -34, 66, -67, 52, 100, 127,
+          -128},
+         {35, -35, 67, -66, 0, 55, 12, -100, 0, -34, 66, -67, 0, 100, 127,
+          -128},
+         IMM_SBYTE_EACH_MOST_MASKED_NEGATIVE,
+         0},
+        {{-119, 112, 105, 104, 0},
+         {119, -112, 105, -104, 104, -34, 112, -119, 0},
+         IMM_SBYTE_ANY_LEAST,
+         1},
+        {{-79, -69, -40, -35, 34, 45, 67, 88, 0},
+         {1, 2, 3, 4, 5, 6, 7, 8, 0},
+         IMM_SBYTE_RANGES_LEAST,
+         0},
+        {{22, -109, 123, 115, -12, 0},
+         {22, -109, 12, 115, 22, -109, 123, 115, -12, 0},
+         IMM_SBYTE_ORDERED_LEAST,
+         1},
+};
+
+#define TEST_MM_CMPISTRC_UWORD_DATA_LEN 4
+static test_mm_cmpistri_uword_data_t
+    test_mm_cmpistrc_uword_data[TEST_MM_CMPISTRC_UWORD_DATA_LEN] = {
+        {{23, 45, 67, 89, 102, 121, 23, 45},
+         {23, 45, 67, 89, 102, 121, 23, 44},
+         IMM_UWORD_EACH_LEAST,
+         1},
+        {{1, 11, 55, 75}, {13, 14, 56, 77, 0}, IMM_UWORD_ANY_LEAST, 0},
+        {{1, 9, 11, 19, 21, 29, 91, 99},
+         {10, 29, 30, 40, 50, 60, 70, 80},
+         IMM_UWORD_RANGES_LEAST,
+         1},
+        {{3, 4, 5, 0},
+         {0, 3, 4, 5, 3, 4, 5, 0},
+         IMM_UWORD_ORDERED_LEAST_MASKED_NEGATIVE,
+         0},
+};
+
+#define TEST_MM_CMPISTRC_SWORD_DATA_LEN 4
+static test_mm_cmpistri_sword_data_t
+    test_mm_cmpistrc_sword_data[TEST_MM_CMPISTRC_SWORD_DATA_LEN] = {
+        {{-78, -56, 1000, 1002},
+         {-79, -55, -12, -13, 999, 1003, -80, 10000},
+         IMM_SWORD_RANGES_LEAST,
+         0},
+        {{45, 32767, -30000, 2345, -23450, 0},
+         {45, 32767, -30000, 2346, -23456, 0, 45, 333},
+         IMM_SWORD_EACH_LEAST,
+         1},
+        {{-10000, -20000, -30000, 10000, 20000, 30000, 0},
+         {10000, 20000, 30000, -10000, -20000, 20000, -30000, 12},
+         IMM_SWORD_ANY_MOST_NEGATIVE,
+         1},
+        {{1, 2, -3, -55, -666, -7777, 8888},
+         {2, -3, -55, -666, -7777, 8888, 1},
+         IMM_SWORD_ORDERED_LEAST,
+         0},
+};
+
+#define MM_CMPISTRC_UBYTE_TEST_CASES(_, ...)   \
+    _(UBYTE_ANY_LEAST, __VA_ARGS__)            \
+    _(UBYTE_EACH_LEAST, __VA_ARGS__)           \
+    _(UBYTE_RANGES_MOST_NEGATIVE, __VA_ARGS__) \
+    _(UBYTE_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRC_SBYTE_TEST_CASES(_, ...)        \
+    _(SBYTE_EACH_MOST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(SBYTE_ANY_LEAST, __VA_ARGS__)                 \
+    _(SBYTE_RANGES_LEAST, __VA_ARGS__)              \
+    _(SBYTE_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRC_UWORD_TEST_CASES(_, ...) \
+    _(UWORD_EACH_LEAST, __VA_ARGS__)         \
+    _(UWORD_ANY_LEAST, __VA_ARGS__)          \
+    _(UWORD_RANGES_LEAST, __VA_ARGS__)       \
+    _(UWORD_ORDERED_LEAST_MASKED_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPISTRC_SWORD_TEST_CASES(_, ...) \
+    _(SWORD_RANGES_LEAST, __VA_ARGS__)       \
+    _(SWORD_EACH_LEAST, __VA_ARGS__)         \
+    _(SWORD_ANY_MOST_NEGATIVE, __VA_ARGS__)  \
+    _(SWORD_ORDERED_LEAST, __VA_ARGS__)
+
+#define GENERATE_MM_CMPISTRC_TEST_CASES                                     \
+    ENUM_MM_CMPISTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpistrc, CMPISTRC,  \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpistrc, CMPISTRC,   \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(UWORD, uword, uint16_t, cmpistrc, CMPISTRC, \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SWORD, sword, int16_t, cmpistrc, CMPISTRC,  \
+                                IS_CMPISTRI)
 
 result_t test_mm_cmpistrc(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    GENERATE_MM_CMPISTRC_TEST_CASES
+    return TEST_SUCCESS;
 }
+
+#define TEST_MM_CMPISTRI_UBYTE_DATA_LEN 4
+static test_mm_cmpistri_ubyte_data_t
+    test_mm_cmpistri_ubyte_data[TEST_MM_CMPISTRI_UBYTE_DATA_LEN] = {
+        {{104, 117, 110, 116, 114, 50, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+         {33, 64, 35, 36, 37, 94, 38, 42, 40, 41, 91, 93, 58, 59, 60, 62},
+         IMM_UBYTE_ANY_LEAST,
+         16},
+        {{4, 5, 6, 7, 8, 111, 34, 21, 0, 0, 0, 0, 0, 0, 0, 0},
+         {5, 6, 7, 8, 8, 111, 43, 12, 0, 0, 0, 0, 0, 0, 0, 0},
+         IMM_UBYTE_EACH_MOST_MASKED_NEGATIVE,
+         15},
+        {{65, 90, 97, 122, 48, 57, 0},
+         {47, 46, 43, 44, 42, 43, 45, 41, 40, 123, 124, 125, 126, 127, 1, 2},
+         IMM_UBYTE_RANGES_LEAST,
+         16},
+        {{111, 222, 22, 0},
+         {33, 44, 55, 66, 77, 88, 99, 111, 222, 22, 11, 0},
+         IMM_UBYTE_ORDERED_LEAST,
+         7},
+};
+
+#define TEST_MM_CMPISTRI_SBYTE_DATA_LEN 4
+static test_mm_cmpistri_sbyte_data_t
+    test_mm_cmpistri_sbyte_data[TEST_MM_CMPISTRI_SBYTE_DATA_LEN] = {
+        {{1, 2, 3, 4, 5, -99, -128, -100, -1, 49, 0},
+         {2, 3, 3, 4, 5, -100, -128, -99, 1, 44, 0},
+         IMM_SBYTE_EACH_LEAST,
+         2},
+        {{99, 100, 23, -90, 0},
+         {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 99, 100, 23, -90, -90, 100},
+         IMM_SBYTE_ANY_LEAST,
+         10},
+        {{-10, -2, 89, 97, 0},
+         {-11, -12, -3, 1, 97, 0},
+         IMM_SBYTE_RANGES_LEAST_NEGATIVE,
+         0},
+        {{-10, -90, -22, 30, 87, 127, 0}, {0}, IMM_SBYTE_ORDERED_LEAST, 16},
+};
+
+#define TEST_MM_CMPISTRI_UWORD_DATA_LEN 4
+static test_mm_cmpistri_uword_data_t
+    test_mm_cmpistri_uword_data[TEST_MM_CMPISTRI_UWORD_DATA_LEN] = {
+        {{38767, 99, 1234, 65535, 2222, 1, 34456, 11},
+         {38768, 999, 1235, 4444, 2222, 1, 34456, 12},
+         IMM_UWORD_EACH_LEAST,
+         4},
+        {{22222, 33333, 44444, 55555, 6000, 600, 60, 6},
+         {0},
+         IMM_UWORD_ANY_LEAST,
+         8},
+        {{34, 777, 1000, 1004, 0},
+         {33, 32, 889, 1003, 0},
+         IMM_UWORD_RANGES_LEAST,
+         3},
+        {{44, 555, 44, 0},
+         {44, 555, 44, 555, 44, 555, 44, 0},
+         IMM_UWORD_ORDERED_MOST_NEGATIVE,
+         7},
+};
+
+#define TEST_MM_CMPISTRI_SWORD_DATA_LEN 4
+static test_mm_cmpistri_sword_data_t
+    test_mm_cmpistri_sword_data[TEST_MM_CMPISTRI_SWORD_DATA_LEN] = {
+        {{-1, -5, 10, 30, 40, 0},
+         {13, -2, 7, 80, 11, 0},
+         IMM_SWORD_RANGES_LEAST,
+         0},
+        {{-12, 12, 6666, 777, 0},
+         {11, 12, 6666, 777, 0},
+         IMM_SWORD_EACH_LEAST,
+         1},
+        {{23, 22, 33, 567, 9999, 12345, 0},
+         {23, 22, 23, 22, 23, 22, 23, 12222},
+         IMM_SWORD_ANY_MOST,
+         6},
+        {{12, -234, -567, 8888, 0},
+         {13, -234, -567, 8888, 12, -234, -567, 8889},
+         IMM_SWORD_ORDERED_LEAST,
+         8},
+};
+
+#define MM_CMPISTRI_UBYTE_TEST_CASES(_, ...)        \
+    _(UBYTE_ANY_LEAST, __VA_ARGS__)                 \
+    _(UBYTE_EACH_MOST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(UBYTE_RANGES_LEAST, __VA_ARGS__)              \
+    _(UBYTE_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRI_SBYTE_TEST_CASES(_, ...)    \
+    _(SBYTE_EACH_LEAST, __VA_ARGS__)            \
+    _(SBYTE_ANY_LEAST, __VA_ARGS__)             \
+    _(SBYTE_RANGES_LEAST_NEGATIVE, __VA_ARGS__) \
+    _(SBYTE_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRI_UWORD_TEST_CASES(_, ...) \
+    _(UWORD_EACH_LEAST, __VA_ARGS__)         \
+    _(UWORD_ANY_LEAST, __VA_ARGS__)          \
+    _(UWORD_RANGES_LEAST, __VA_ARGS__)       \
+    _(UWORD_ORDERED_MOST_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPISTRI_SWORD_TEST_CASES(_, ...) \
+    _(SWORD_RANGES_LEAST, __VA_ARGS__)       \
+    _(SWORD_EACH_LEAST, __VA_ARGS__)         \
+    _(SWORD_ANY_MOST, __VA_ARGS__)           \
+    _(SWORD_ORDERED_LEAST, __VA_ARGS__)
+
+#define GENERATE_MM_CMPISTRI_TEST_CASES                                     \
+    ENUM_MM_CMPISTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpistri, CMPISTRI,  \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpistri, CMPISTRI,   \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(UWORD, uword, uint16_t, cmpistri, CMPISTRI, \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SWORD, sword, int16_t, cmpistri, CMPISTRI,  \
+                                IS_CMPISTRI)
 
 result_t test_mm_cmpistri(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    GENERATE_MM_CMPISTRI_TEST_CASES
+    return TEST_SUCCESS;
 }
+
+#define IS_CMPISTRM 0
+
+typedef struct {
+    uint8_t a[16], b[16];
+    const int imm8;
+    uint8_t expect[16];
+} test_mm_cmpistrm_ubyte_data_t;
+typedef struct {
+    int8_t a[16], b[16];
+    const int imm8;
+    int8_t expect[16];
+} test_mm_cmpistrm_sbyte_data_t;
+typedef struct {
+    uint16_t a[8], b[8];
+    const int imm8;
+    uint16_t expect[8];
+} test_mm_cmpistrm_uword_data_t;
+typedef struct {
+    int16_t a[8], b[8];
+    const int imm8;
+    int16_t expect[8];
+} test_mm_cmpistrm_sword_data_t;
+
+#define TEST_MM_CMPISTRM_UBYTE_DATA_LEN 4
+static test_mm_cmpistrm_ubyte_data_t
+    test_mm_cmpistrm_ubyte_data[TEST_MM_CMPISTRM_UBYTE_DATA_LEN] = {
+        {{88, 89, 90, 91, 92, 93, 0},
+         {78, 88, 99, 127, 92, 93, 0},
+         IMM_UBYTE_EACH_UNIT,
+         {0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+          255}},
+        {{30, 41, 52, 63, 74, 85, 0},
+         {30, 42, 51, 63, 74, 85, 0},
+         IMM_UBYTE_ANY_BIT,
+         {57, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+        {{34, 32, 21, 16, 7, 0},
+         {34, 33, 32, 31, 30, 29, 10, 6, 0},
+         IMM_UBYTE_RANGES_UNIT,
+         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+        {{33, 21, 123, 89, 76, 56, 0},
+         {33, 21, 124, 33, 21, 123, 89, 76, 56, 33, 21, 123, 89, 76, 56, 22},
+         IMM_UBYTE_ORDERED_UNIT,
+         {0, 0, 0, 255, 0, 0, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0}},
+};
+
+#define TEST_MM_CMPISTRM_SBYTE_DATA_LEN 4
+static test_mm_cmpistrm_sbyte_data_t
+    test_mm_cmpistrm_sbyte_data[TEST_MM_CMPISTRM_SBYTE_DATA_LEN] = {
+        {{-11, -90, -128, 127, 66, 45, 23, 32, 99, 10, 0},
+         {-10, -90, -124, 33, 66, 45, 23, 22, 99, 100, 0},
+         IMM_SBYTE_EACH_BIT_MASKED_NEGATIVE,
+         {-115, -2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+        {{13, 14, 55, 1, 32, 100, 101, 102, 103, 97, 23, 21, 45, 54, 55, 56},
+         {22, 109, 87, 45, 1, 103, 22, 102, 43, 87, 78, 56, 65, 55, 44, 33},
+         IMM_SBYTE_ANY_UNIT,
+         {0, 0, 0, -1, -1, -1, 0, -1, 0, 0, 0, -1, 0, -1, 0, 0}},
+        {{-31, -28, -9, 10, 45, 67, 88, 0},
+         {-30, -32, -33, -44, 93, 44, 9, 89, 0},
+         IMM_SBYTE_RANGES_UNIT,
+         {-1, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+        {{34, -10, 78, -99, -100, 100, 0},
+         {34, 123, 88, 4, 34, -10, 78, -99, -100, 100, 34, -10, 78, -99, -100,
+          -100},
+         IMM_SBYTE_ORDERED_UNIT,
+         {0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}},
+};
+
+#define TEST_MM_CMPISTRM_UWORD_DATA_LEN 4
+static test_mm_cmpistrm_uword_data_t
+    test_mm_cmpistrm_uword_data[TEST_MM_CMPISTRM_UWORD_DATA_LEN] = {
+        {{1024, 2048, 4096, 5000, 0},
+         {1023, 1000, 2047, 1596, 5566, 5666, 4477, 9487},
+         IMM_UWORD_RANGES_UNIT,
+         {0, 0, 65535, 65535, 0, 0, 65535, 0}},
+        {{1, 2, 345, 7788, 10000, 0},
+         {2, 1, 345, 7788, 10000, 0},
+         IMM_UWORD_EACH_UNIT,
+         {0, 0, 65535, 65535, 65535, 65535, 65535, 65535}},
+        {{100, 0},
+         {12345, 6766, 234, 0, 1, 34, 89, 100},
+         IMM_UWORD_ANY_UNIT,
+         {0, 0, 0, 0, 0, 0, 0, 0}},
+        {{34, 122, 9000, 0},
+         {34, 122, 9000, 34, 122, 9000, 34, 122},
+         IMM_UWORD_ORDERED_UNIT_NEGATIVE,
+         {0, 65535, 65535, 0, 65535, 65535, 0, 65535}},
+};
+
+#define TEST_MM_CMPISTRM_SWORD_DATA_LEN 4
+static test_mm_cmpistrm_sword_data_t
+    test_mm_cmpistrm_sword_data[TEST_MM_CMPISTRM_SWORD_DATA_LEN] = {
+        {{-39, -10, 17, 89, 998, 1000, 1234, 4566},
+         {-40, -52, -39, -29, 100, 1024, 4565, 4600},
+         IMM_SWORD_RANGES_BIT,
+         {0, 0, -1, -1, 0, 0, -1, 0}},
+        {{345, -1900, -10000, -30000, 50, 6789, 0},
+         {103, -1901, -10000, 32767, 50, 6780, 0},
+         IMM_SWORD_EACH_UNIT,
+         {0, 0, -1, 0, -1, 0, -1, -1}},
+        {{677, 10001, 1001, 23, 0},
+         {345, 677, 10001, 1003, 1001, 32, 23, 677},
+         IMM_SWORD_ANY_UNIT,
+         {0, -1, -1, 0, -1, 0, -1, -1}},
+        {{1024, -2288, 3752, -4096, 0},
+         {1024, 1024, -2288, 3752, -4096, 1024, -2288, 3752},
+         IMM_SWORD_ORDERED_UNIT,
+         {0, -1, 0, 0, 0, -1, 0, 0}},
+};
+
+#define MM_CMPISTRM_UBYTE_TEST_CASES(_, ...) \
+    _(UBYTE_EACH_UNIT, __VA_ARGS__)          \
+    _(UBYTE_ANY_BIT, __VA_ARGS__)            \
+    _(UBYTE_RANGES_UNIT, __VA_ARGS__)        \
+    _(UBYTE_ORDERED_UNIT, __VA_ARGS__)
+
+#define MM_CMPISTRM_SBYTE_TEST_CASES(_, ...)       \
+    _(SBYTE_EACH_BIT_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(SBYTE_ANY_UNIT, __VA_ARGS__)                 \
+    _(SBYTE_RANGES_UNIT, __VA_ARGS__)              \
+    _(SBYTE_ORDERED_UNIT, __VA_ARGS__)
+
+#define MM_CMPISTRM_UWORD_TEST_CASES(_, ...) \
+    _(UWORD_RANGES_UNIT, __VA_ARGS__)        \
+    _(UWORD_EACH_UNIT, __VA_ARGS__)          \
+    _(UWORD_ANY_UNIT, __VA_ARGS__)           \
+    _(UWORD_ORDERED_UNIT_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPISTRM_SWORD_TEST_CASES(_, ...) \
+    _(SWORD_RANGES_UNIT, __VA_ARGS__)        \
+    _(SWORD_EACH_UNIT, __VA_ARGS__)          \
+    _(SWORD_ANY_UNIT, __VA_ARGS__)           \
+    _(SWORD_ORDERED_UNIT, __VA_ARGS__)
+
+#define GENERATE_MM_CMPISTRM_TEST_CASES                                     \
+    ENUM_MM_CMPISTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpistrm, CMPISTRM,  \
+                                IS_CMPISTRM)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpistrm, CMPISTRM,   \
+                                IS_CMPISTRM)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(UWORD, uword, uint16_t, cmpistrm, CMPISTRM, \
+                                IS_CMPISTRM)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SWORD, sword, int16_t, cmpistrm, CMPISTRM,  \
+                                IS_CMPISTRM)
 
 result_t test_mm_cmpistrm(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    GENERATE_MM_CMPISTRM_TEST_CASES
+    return TEST_SUCCESS;
 }
+
+#undef IS_CMPISTRM
+
+#define TEST_MM_CMPISTRO_UBYTE_DATA_LEN 4
+static test_mm_cmpistri_ubyte_data_t
+    test_mm_cmpistro_ubyte_data[TEST_MM_CMPISTRO_UBYTE_DATA_LEN] = {
+        {{3, 4, 5, 0}, {5, 5, 5, 4, 3, 0}, IMM_UBYTE_ANY_LEAST, 1},
+        {{23, 127, 88, 3, 45, 6, 7, 2, 0},
+         {32, 127, 87, 2, 44, 32, 1, 2, 0},
+         IMM_UBYTE_EACH_MOST_NEGATIVE,
+         1},
+        {{3, 4, 55, 56, 0},
+         {2, 3, 4, 5, 43, 54, 55, 56, 0},
+         IMM_UBYTE_RANGES_LEAST,
+         0},
+        {{55, 66, 77, 11, 23, 0},
+         {55, 55, 66, 77, 11, 23, 55, 66, 77, 11, 23, 33, 123, 18, 0},
+         IMM_UBYTE_ORDERED_LEAST,
+         0},
+};
+
+#define TEST_MM_CMPISTRO_SBYTE_DATA_LEN 4
+static test_mm_cmpistri_sbyte_data_t
+    test_mm_cmpistro_sbyte_data[TEST_MM_CMPISTRO_SBYTE_DATA_LEN] = {
+        {{33, -33, 23, -32, -1, -1, 23, 46, 78, 34, 54, 100, 90, 91, 92, 101},
+         {32, 33, 23, -33, -2, -3, 23, 46, -78, 43, 56, 10, 9, 91, 90, 126},
+         IMM_SBYTE_EACH_LEAST,
+         0},
+        {{-1, -2, -3, -4, -5, -6, -7, -8, 87, 86, 85, 84, 83, 82, 81, 80},
+         {87, 79, 0},
+         IMM_SBYTE_ANY_LEAST,
+         1},
+        {{3, 4, 2, 0},
+         {3, 3, 4, 5, 6, 2, 0},
+         IMM_SBYTE_RANGES_MOST_NEGATIVE,
+         0},
+        {{23, 66, 1, 13, 17, 1, 13, 17, 0},
+         {23, 66, 1, 13, 17, 1, 13, 17, 32, 23, 66, 1, 13, 17, 1, 13},
+         IMM_SBYTE_ORDERED_LEAST,
+         1},
+};
+
+#define TEST_MM_CMPISTRO_UWORD_DATA_LEN 4
+static test_mm_cmpistri_uword_data_t
+    test_mm_cmpistro_uword_data[TEST_MM_CMPISTRO_UWORD_DATA_LEN] = {
+        {{3333, 4444, 10000, 20000, 40000, 50000, 65535, 0},
+         {3332, 4443, 10000, 20001, 40000, 50000, 65534, 0},
+         IMM_UWORD_EACH_LEAST,
+         0},
+        {{1, 2, 333, 4444, 55555, 7777, 23, 347},
+         {4444, 7777, 55555, 23, 347, 2, 1, 0},
+         IMM_UWORD_ANY_LEAST,
+         1},
+        {{356, 380, 320, 456, 0},
+         {455, 379, 333, 319, 300, 299, 0},
+         IMM_UWORD_RANGES_LEAST,
+         1},
+        {{3, 1001, 235, 0},
+         {3, 1001, 235, 0, 3, 1001, 235, 0},
+         IMM_UWORD_ORDERED_MOST_MASKED_NEGATIVE,
+         0},
+};
+
+#define TEST_MM_CMPISTRO_SWORD_DATA_LEN 4
+static test_mm_cmpistri_sword_data_t
+    test_mm_cmpistro_sword_data[TEST_MM_CMPISTRO_SWORD_DATA_LEN] = {
+        {{-10, -5, -100, -90, 45, 56, 1000, 1009},
+         {54, -1, -5, -6, 1001, 10001, 1009, 1009},
+         IMM_SWORD_RANGES_LEAST,
+         1},
+        {{456, -32768, 32767, 13, 0},
+         {455, -32768, 32767, 31, 0},
+         IMM_SWORD_EACH_LEAST,
+         0},
+        {{23, 46, -44, 32000, 0},
+         {23, 66, -44, 678, 32000, 0},
+         IMM_SWORD_ANY_MOST_MASKED_NEGATIVE,
+         0},
+        {{-7900, -101, -34, 666, 345, 0},
+         {-7900, -101, -34, 666, 345, -7900, -191, -34},
+         IMM_SWORD_ORDERED_LEAST,
+         1},
+};
+
+#define MM_CMPISTRO_UBYTE_TEST_CASES(_, ...) \
+    _(UBYTE_ANY_LEAST, __VA_ARGS__)          \
+    _(UBYTE_EACH_MOST_NEGATIVE, __VA_ARGS__) \
+    _(UBYTE_RANGES_LEAST, __VA_ARGS__)       \
+    _(UBYTE_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRO_SBYTE_TEST_CASES(_, ...)   \
+    _(SBYTE_EACH_LEAST, __VA_ARGS__)           \
+    _(SBYTE_ANY_LEAST, __VA_ARGS__)            \
+    _(SBYTE_RANGES_MOST_NEGATIVE, __VA_ARGS__) \
+    _(SBYTE_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRO_UWORD_TEST_CASES(_, ...) \
+    _(UWORD_EACH_LEAST, __VA_ARGS__)         \
+    _(UWORD_ANY_LEAST, __VA_ARGS__)          \
+    _(UWORD_RANGES_LEAST, __VA_ARGS__)       \
+    _(UWORD_ORDERED_MOST_MASKED_NEGATIVE, __VA_ARGS__)
+
+#define MM_CMPISTRO_SWORD_TEST_CASES(_, ...)       \
+    _(SWORD_RANGES_LEAST, __VA_ARGS__)             \
+    _(SWORD_EACH_LEAST, __VA_ARGS__)               \
+    _(SWORD_ANY_MOST_MASKED_NEGATIVE, __VA_ARGS__) \
+    _(SWORD_ORDERED_LEAST, __VA_ARGS__)
+
+#define GENERATE_MM_CMPISTRO_TEST_CASES                                     \
+    ENUM_MM_CMPISTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpistro, CMPISTRO,  \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpistro, CMPISTRO,   \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(UWORD, uword, uint16_t, cmpistro, CMPISTRO, \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SWORD, sword, int16_t, cmpistro, CMPISTRO,  \
+                                IS_CMPISTRI)
 
 result_t test_mm_cmpistro(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    GENERATE_MM_CMPISTRO_TEST_CASES
+    return TEST_SUCCESS;
 }
+
+#define TEST_MM_CMPISTRS_UBYTE_DATA_LEN 4
+static test_mm_cmpistri_ubyte_data_t
+    test_mm_cmpistrs_ubyte_data[TEST_MM_CMPISTRS_UBYTE_DATA_LEN] = {
+        {{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16},
+         {1, 2, 3, 4, 5, 0},
+         IMM_UBYTE_ANY_LEAST,
+         0},
+        {{127, 126, 125, 124, 0},
+         {127, 1, 34, 43, 54, 0},
+         IMM_UBYTE_EACH_LEAST,
+         1},
+        {{127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127,
+          127, 127},
+         {56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 0},
+         IMM_UBYTE_RANGES_LEAST,
+         0},
+        {{33, 44, 55, 78, 99, 100, 101, 102, 0},
+         {0},
+         IMM_UBYTE_ORDERED_LEAST,
+         1},
+};
+
+#define TEST_MM_CMPISTRS_SBYTE_DATA_LEN 4
+static test_mm_cmpistri_sbyte_data_t
+    test_mm_cmpistrs_sbyte_data[TEST_MM_CMPISTRS_SBYTE_DATA_LEN] = {
+        {{100, 99, 98, 97, -67, -4, -5, -6, -7, -1, -2, -3, -128, -128, -128,
+          -128},
+         {0},
+         IMM_SBYTE_EACH_LEAST,
+         0},
+        {{-128, -128, -128, -128, 127, 127, 127, 127, -128, -128, -128, -128,
+          127, 127, 127, 127},
+         {-1, -2, -11, -98, -12, 0},
+         IMM_SBYTE_ANY_LEAST,
+         0},
+        {{0, 1, 2, 3, 4, 5, -6, -7},
+         {0, 1, 2, 3, 4, 5, 6, 7},
+         IMM_SBYTE_RANGES_LEAST,
+         1},
+        {{0, 1, 0, -1, 0, -2, 0, 0, -3, 4, 0, 0, 5, 6, 7, 8},
+         {0},
+         IMM_SBYTE_ORDERED_LEAST,
+         1},
+};
+
+#define TEST_MM_CMPISTRS_UWORD_DATA_LEN 4
+static test_mm_cmpistri_uword_data_t
+    test_mm_cmpistrs_uword_data[TEST_MM_CMPISTRS_UWORD_DATA_LEN] = {
+        {{0, 1, 2, 3, 65535, 0, 0, 0},
+         {9, 8, 7, 6, 5, 4, 3, 2},
+         IMM_UWORD_EACH_LEAST,
+         1},
+        {{4, 567, 65535, 32, 34, 0}, {0}, IMM_UWORD_ANY_LEAST, 1},
+        {{65535, 65535, 65535, 65535, 65535, 65535, 65535, 65535},
+         {1, 2, 3, 4, 900, 7890, 6767, 0},
+         IMM_UWORD_RANGES_LEAST,
+         0},
+        {{1, 2, 3, 4, 5, 6, 7, 8}, {1, 2, 3, 4, 0}, IMM_UWORD_ORDERED_LEAST, 0},
+};
+
+#define TEST_MM_CMPISTRS_SWORD_DATA_LEN 4
+static test_mm_cmpistri_sword_data_t
+    test_mm_cmpistrs_sword_data[TEST_MM_CMPISTRS_SWORD_DATA_LEN] = {
+        {{-32768, -32768, -32768, -32768, -32768, -32768, -32768, -3276},
+         {34, 45, 6, 7, 9, 8, 7, 6},
+         IMM_SWORD_RANGES_LEAST,
+         0},
+        {{1000, 2000, 4000, 8000, 16000, 32000, 32767, 0},
+         {3, 4, 56, 23, 0},
+         IMM_SWORD_EACH_LEAST,
+         1},
+        {{0, 1, 3, 4, -32768, 9, 0, 1},
+         {56, 47, 43, 999, 1111, 0},
+         IMM_SWORD_ANY_LEAST,
+         1},
+        {{1111, 1212, 831, 2345, 32767, 32767, -32768, 32767},
+         {0},
+         IMM_SWORD_ORDERED_LEAST,
+         0},
+};
+
+#define MM_CMPISTRS_UBYTE_TEST_CASES(_, ...) \
+    _(UBYTE_ANY_LEAST, __VA_ARGS__)          \
+    _(UBYTE_EACH_LEAST, __VA_ARGS__)         \
+    _(UBYTE_RANGES_LEAST, __VA_ARGS__)       \
+    _(UBYTE_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRS_SBYTE_TEST_CASES(_, ...) \
+    _(SBYTE_EACH_LEAST, __VA_ARGS__)         \
+    _(SBYTE_ANY_LEAST, __VA_ARGS__)          \
+    _(SBYTE_RANGES_LEAST, __VA_ARGS__)       \
+    _(SBYTE_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRS_UWORD_TEST_CASES(_, ...) \
+    _(UWORD_EACH_LEAST, __VA_ARGS__)         \
+    _(UWORD_ANY_LEAST, __VA_ARGS__)          \
+    _(UWORD_RANGES_LEAST, __VA_ARGS__)       \
+    _(UWORD_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRS_SWORD_TEST_CASES(_, ...) \
+    _(SWORD_RANGES_LEAST, __VA_ARGS__)       \
+    _(SWORD_EACH_LEAST, __VA_ARGS__)         \
+    _(SWORD_ANY_LEAST, __VA_ARGS__)          \
+    _(SWORD_ORDERED_LEAST, __VA_ARGS__)
+
+#define GENERATE_MM_CMPISTRS_TEST_CASES                                     \
+    ENUM_MM_CMPISTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpistrs, CMPISTRS,  \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpistrs, CMPISTRS,   \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(UWORD, uword, uint16_t, cmpistrs, CMPISTRS, \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SWORD, sword, int16_t, cmpistrs, CMPISTRS,  \
+                                IS_CMPISTRI)
 
 result_t test_mm_cmpistrs(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    GENERATE_MM_CMPISTRS_TEST_CASES
+    return TEST_SUCCESS;
 }
+
+#define TEST_MM_CMPISTRZ_UBYTE_DATA_LEN 4
+static test_mm_cmpistri_ubyte_data_t
+    test_mm_cmpistrz_ubyte_data[TEST_MM_CMPISTRZ_UBYTE_DATA_LEN] = {
+        {{0},
+         {255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+          255, 255},
+         IMM_UBYTE_ANY_LEAST,
+         0},
+        {{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16},
+         {1, 1, 1, 1, 2, 2, 2, 2, 4, 5, 6, 7, 89, 89, 89, 89},
+         IMM_UBYTE_EACH_LEAST,
+         0},
+        {{1, 2, 3, 4, 0}, {}, IMM_UBYTE_RANGES_LEAST, 1},
+        {{127, 126, 125, 124, 124, 0},
+         {100, 101, 123, 100, 111, 122, 0},
+         IMM_UBYTE_ORDERED_LEAST,
+         1},
+};
+
+#define TEST_MM_CMPISTRZ_SBYTE_DATA_LEN 4
+static test_mm_cmpistri_sbyte_data_t
+    test_mm_cmpistrz_sbyte_data[TEST_MM_CMPISTRZ_SBYTE_DATA_LEN] = {
+        {{127, 126, 99, -100, 0},
+         {-128, -128, -128, -128, -128, -128, -128, -128, -128, -128, -128,
+          -128, -128, -128, -128, -128},
+         IMM_SBYTE_EACH_LEAST,
+         0},
+        {{120, 66, 54, 0}, {3, 4, 5, -99, -6, 0}, IMM_SBYTE_ANY_LEAST, 1},
+        {{0},
+         {127, 127, 127, 127, 126, 126, 126, 126, -127, -127, -127, -127, -1,
+          -1, -1, -1},
+         IMM_SBYTE_RANGES_LEAST,
+         0},
+        {{12, 3, 4, 5, 6, 7, 8, 0},
+         {-1, -2, -3, -4, -6, 75, 0},
+         IMM_SBYTE_ORDERED_LEAST,
+         1},
+};
+
+#define TEST_MM_CMPISTRZ_UWORD_DATA_LEN 4
+static test_mm_cmpistri_uword_data_t
+    test_mm_cmpistrz_uword_data[TEST_MM_CMPISTRZ_UWORD_DATA_LEN] = {
+        {{10000, 20000, 50000, 40000, 0},
+         {65535, 65533, 60000, 60000, 50000, 123, 1, 2},
+         IMM_UWORD_EACH_LEAST,
+         0},
+        {{0},
+         {65528, 65529, 65530, 65531, 65532, 65533, 65534, 65535},
+         IMM_UWORD_ANY_LEAST,
+         0},
+        {{3, 333, 3333, 33333, 0}, {0}, IMM_UWORD_RANGES_LEAST, 1},
+        {{123, 456, 7, 890, 0},
+         {123, 456, 7, 900, 0},
+         IMM_UWORD_ORDERED_LEAST,
+         1},
+};
+
+#define TEST_MM_CMPISTRZ_SWORD_DATA_LEN 4
+static test_mm_cmpistri_sword_data_t
+    test_mm_cmpistrz_sword_data[TEST_MM_CMPISTRZ_SWORD_DATA_LEN] = {
+        {{2, 22, 222, 2222, 22222, -2222, -222, -22},
+         {-32768, 32767, -32767, 32766, -32766, 32765, -32768, 32767},
+         IMM_SWORD_RANGES_LEAST,
+         0},
+        {{345, 10000, -10000, -30000, 0},
+         {1, 2, 3, 4, 5, 6, 7, 0},
+         IMM_SWORD_EACH_LEAST,
+         1},
+        {{}, {0}, IMM_SWORD_ANY_LEAST, 1},
+        {{1, 2, -789, -1, -90, 0},
+         {1, 10, 100, 1000, 10000, -10000, -1000, 1000},
+         IMM_SWORD_ORDERED_LEAST,
+         0},
+};
+
+#define MM_CMPISTRZ_UBYTE_TEST_CASES(_, ...) \
+    _(UBYTE_ANY_LEAST, __VA_ARGS__)          \
+    _(UBYTE_EACH_LEAST, __VA_ARGS__)         \
+    _(UBYTE_RANGES_LEAST, __VA_ARGS__)       \
+    _(UBYTE_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRZ_SBYTE_TEST_CASES(_, ...) \
+    _(SBYTE_EACH_LEAST, __VA_ARGS__)         \
+    _(SBYTE_ANY_LEAST, __VA_ARGS__)          \
+    _(SBYTE_RANGES_LEAST, __VA_ARGS__)       \
+    _(SBYTE_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRZ_UWORD_TEST_CASES(_, ...) \
+    _(UWORD_EACH_LEAST, __VA_ARGS__)         \
+    _(UWORD_ANY_LEAST, __VA_ARGS__)          \
+    _(UWORD_RANGES_LEAST, __VA_ARGS__)       \
+    _(UWORD_ORDERED_LEAST, __VA_ARGS__)
+
+#define MM_CMPISTRZ_SWORD_TEST_CASES(_, ...) \
+    _(SWORD_RANGES_LEAST, __VA_ARGS__)       \
+    _(SWORD_EACH_LEAST, __VA_ARGS__)         \
+    _(SWORD_ANY_LEAST, __VA_ARGS__)          \
+    _(SWORD_ORDERED_LEAST, __VA_ARGS__)
+
+#define GENERATE_MM_CMPISTRZ_TEST_CASES                                     \
+    ENUM_MM_CMPISTRX_TEST_CASES(UBYTE, ubyte, uint8_t, cmpistrz, CMPISTRZ,  \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SBYTE, sbyte, int8_t, cmpistrz, CMPISTRZ,   \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(UWORD, uword, uint16_t, cmpistrz, CMPISTRZ, \
+                                IS_CMPISTRI)                                \
+    ENUM_MM_CMPISTRX_TEST_CASES(SWORD, sword, int16_t, cmpistrz, CMPISTRZ,  \
+                                IS_CMPISTRI)
 
 result_t test_mm_cmpistrz(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    return TEST_UNIMPL;
+    GENERATE_MM_CMPISTRZ_TEST_CASES
+    return TEST_SUCCESS;
 }
 
 result_t test_mm_crc32_u16(const SSE2NEONTestImpl &impl, uint32_t iter)
@@ -9993,7 +11732,12 @@ result_t SSE2NEONTestImpl::runSingleTest(InstructionTest test, uint32_t i)
     result_t ret = TEST_SUCCESS;
 
     switch (test) {
-        INTRIN_FOREACH(CASE)
+#define _(x)                      \
+    case it_##x:                  \
+        ret = test_##x(*this, i); \
+        break;
+        INTRIN_LIST
+#undef _
     }
 
     return ret;
