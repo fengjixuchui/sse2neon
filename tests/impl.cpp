@@ -1,6 +1,6 @@
-#include "impl.h"
 #include <assert.h>
 #include <float.h>
+#include <inttypes.h>
 #include <math.h>
 #include <stdalign.h>
 #include <stdint.h>
@@ -8,9 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <utility>
-#include "binding.h"
 
-#include <inttypes.h>
+#include "binding.h"
+#include "impl.h"
 
 // Try 10,000 random floating point values for each test we run
 #define MAX_TEST_VALUE 10000
@@ -31,7 +31,7 @@
 // This program a set of unit tests to ensure that each SSE call provide the
 // output we expect.  If this fires an assert, then something didn't match up.
 //
-// Functions with `test_` prefix will be called in runSingleTest.
+// Functions with "test_" prefix will be called in runSingleTest.
 namespace SSE2NEON
 {
 // Forward declaration
@@ -329,8 +329,8 @@ result_t test_mm_slli_si128(const SSE2NEONTestImpl &impl, uint32_t iter);
 result_t test_mm_srli_si128(const SSE2NEONTestImpl &impl, uint32_t iter);
 result_t test_mm_shuffle_pi16(const SSE2NEONTestImpl &impl, uint32_t iter);
 
-// This function is not called from `runSingleTest`, but for other intrinsic
-// tests that might need to call `_mm_set_epi32`.
+// This function is not called from "runSingleTest", but for other intrinsic
+// tests that might need to call "_mm_set_epi32".
 __m128i do_mm_set_epi32(int32_t x, int32_t y, int32_t z, int32_t w)
 {
     __m128i a = _mm_set_epi32(x, y, z, w);
@@ -338,7 +338,7 @@ __m128i do_mm_set_epi32(int32_t x, int32_t y, int32_t z, int32_t w)
     return a;
 }
 
-// This function is not called from `runSingleTest`, but for other intrinsic
+// This function is not called from "runSingleTest", but for other intrinsic
 // tests that might need to load __m64 data.
 template <class T>
 __m64 load_m64(const T *p)
@@ -346,16 +346,16 @@ __m64 load_m64(const T *p)
     return *((const __m64 *) p);
 }
 
-// This function is not called from `runSingleTest`, but for other intrinsic
-// tests that might need to call `_mm_load_ps`.
+// This function is not called from "runSingleTest", but for other intrinsic
+// tests that might need to call "_mm_load_ps".
 template <class T>
 __m128 load_m128(const T *p)
 {
     return _mm_loadu_ps((const float *) p);
 }
 
-// This function is not called from `runSingleTest`, but for other intrinsic
-// tests that might need to call `_mm_load_ps`.
+// This function is not called from "runSingleTest", but for other intrinsic
+// tests that might need to call "_mm_load_ps".
 template <class T>
 __m128i load_m128i(const T *p)
 {
@@ -364,16 +364,16 @@ __m128i load_m128i(const T *p)
     return ia;
 }
 
-// This function is not called from `runSingleTest`, but for other intrinsic
-// tests that might need to call `_mm_load_pd`.
+// This function is not called from "runSingleTest", but for other intrinsic
+// tests that might need to call "_mm_load_pd".
 template <class T>
 __m128d load_m128d(const T *p)
 {
     return _mm_loadu_pd((const double *) p);
 }
 
-// This function is not called from `runSingleTest`, but for other intrinsic
-// tests that might need to call `_mm_store_ps`.
+// This function is not called from "runSingleTest", but for other intrinsic
+// tests that might need to call "_mm_store_ps".
 result_t do_mm_store_ps(float *p, float x, float y, float z, float w)
 {
     __m128 a = _mm_set_ps(x, y, z, w);
@@ -385,8 +385,8 @@ result_t do_mm_store_ps(float *p, float x, float y, float z, float w)
     return TEST_SUCCESS;
 }
 
-// This function is not called from `runSingleTest`, but for other intrinsic
-// tests that might need to call `_mm_store_ps`.
+// This function is not called from "runSingleTest", but for other intrinsic
+// tests that might need to call "_mm_store_ps".
 result_t do_mm_store_ps(int32_t *p, int32_t x, int32_t y, int32_t z, int32_t w)
 {
     __m128i a = _mm_set_epi32(x, y, z, w);
@@ -420,96 +420,44 @@ double cmp_hasNaN(double a, double b)
 
 int32_t comilt_ss(float a, float b)
 {
-    int32_t ret;
-
-    bool isNANA = isnan(a);
-    bool isNANB = isnan(b);
-    if (!isNANA && !isNANB) {
-        ret = a < b ? 1 : 0;
-    } else {
-        ret = 0;  // **NOTE** The documentation on MSDN is in error!  The actual
-                  // hardware returns a 0, not a 1 if either of the values is a
-                  // NAN!
-    }
-    return ret;
+    if (isnan(a) || isnan(b))
+        return 0;
+    return (a < b);
 }
 
 int32_t comigt_ss(float a, float b)
 {
-    int32_t ret;
-
-    bool isNANA = isnan(a);
-    bool isNANB = isnan(b);
-    if (!isNANA && !isNANB) {
-        ret = a > b ? 1 : 0;
-    } else {
-        ret = 0;  // **NOTE** The documentation on MSDN is in error!  The actual
-                  // hardware returns a 0, not a 1 if either of the values is a
-                  // NAN!
-    }
-    return ret;
+    if (isnan(a) || isnan(b))
+        return 0;
+    return (a > b);
 }
 
 int32_t comile_ss(float a, float b)
 {
-    int32_t ret;
-
-    bool isNANA = isnan(a);
-    bool isNANB = isnan(b);
-    if (!isNANA && !isNANB) {
-        ret = a <= b ? 1 : 0;
-    } else {
-        ret = 0;  // **NOTE** The documentation on MSDN is in error!  The actual
-                  // hardware returns a 0, not a 1 if either of the values is a
-                  // NAN!
-    }
-    return ret;
+    if (isnan(a) || isnan(b))
+        return 0;
+    return (a <= b);
 }
 
 int32_t comige_ss(float a, float b)
 {
-    int32_t ret;
-
-    bool isNANA = isnan(a);
-    bool isNANB = isnan(b);
-    if (!isNANA && !isNANB) {
-        ret = a >= b ? 1 : 0;
-    } else {
-        ret = 0;  // **NOTE** The documentation on MSDN is in error!  The actual
-                  // hardware returns a 0, not a 1 if either of the values is a
-                  // NAN!
-    }
-    return ret;
+    if (isnan(a) || isnan(b))
+        return 0;
+    return (a >= b);
 }
 
 int32_t comieq_ss(float a, float b)
 {
-    int32_t ret;
-
-    bool isNANA = isnan(a);
-    bool isNANB = isnan(b);
-    if (!isNANA && !isNANB) {
-        ret = a == b ? 1 : 0;
-    } else {
-        ret = 0;  // **NOTE** The documentation on MSDN is in error!  The actual
-                  // hardware returns a 0, not a 1 if either of the values is a
-                  // NAN!
-    }
-    return ret;
+    if (isnan(a) || isnan(b))
+        return 0;
+    return (a == b);
 }
 
 int32_t comineq_ss(float a, float b)
 {
-    int32_t ret;
-
-    bool isNANA = isnan(a);
-    bool isNANB = isnan(b);
-    if (!isNANA && !isNANB) {
-        ret = a != b ? 1 : 0;
-    } else {
-        ret = 1;
-    }
-    return ret;
+    if (isnan(a) || isnan(b))
+        return 1;
+    return (a != b);
 }
 
 static inline int16_t saturate_16(int32_t a)
@@ -581,7 +529,34 @@ static const uint8_t crypto_aes_sbox[256] = {
     0xb0, 0x54, 0xbb, 0x16,
 };
 
+static const uint8_t crypto_aes_rsbox[256] = {
+    0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e,
+    0x81, 0xf3, 0xd7, 0xfb, 0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87,
+    0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb, 0x54, 0x7b, 0x94, 0x32,
+    0xa6, 0xc2, 0x23, 0x3d, 0xee, 0x4c, 0x95, 0x0b, 0x42, 0xfa, 0xc3, 0x4e,
+    0x08, 0x2e, 0xa1, 0x66, 0x28, 0xd9, 0x24, 0xb2, 0x76, 0x5b, 0xa2, 0x49,
+    0x6d, 0x8b, 0xd1, 0x25, 0x72, 0xf8, 0xf6, 0x64, 0x86, 0x68, 0x98, 0x16,
+    0xd4, 0xa4, 0x5c, 0xcc, 0x5d, 0x65, 0xb6, 0x92, 0x6c, 0x70, 0x48, 0x50,
+    0xfd, 0xed, 0xb9, 0xda, 0x5e, 0x15, 0x46, 0x57, 0xa7, 0x8d, 0x9d, 0x84,
+    0x90, 0xd8, 0xab, 0x00, 0x8c, 0xbc, 0xd3, 0x0a, 0xf7, 0xe4, 0x58, 0x05,
+    0xb8, 0xb3, 0x45, 0x06, 0xd0, 0x2c, 0x1e, 0x8f, 0xca, 0x3f, 0x0f, 0x02,
+    0xc1, 0xaf, 0xbd, 0x03, 0x01, 0x13, 0x8a, 0x6b, 0x3a, 0x91, 0x11, 0x41,
+    0x4f, 0x67, 0xdc, 0xea, 0x97, 0xf2, 0xcf, 0xce, 0xf0, 0xb4, 0xe6, 0x73,
+    0x96, 0xac, 0x74, 0x22, 0xe7, 0xad, 0x35, 0x85, 0xe2, 0xf9, 0x37, 0xe8,
+    0x1c, 0x75, 0xdf, 0x6e, 0x47, 0xf1, 0x1a, 0x71, 0x1d, 0x29, 0xc5, 0x89,
+    0x6f, 0xb7, 0x62, 0x0e, 0xaa, 0x18, 0xbe, 0x1b, 0xfc, 0x56, 0x3e, 0x4b,
+    0xc6, 0xd2, 0x79, 0x20, 0x9a, 0xdb, 0xc0, 0xfe, 0x78, 0xcd, 0x5a, 0xf4,
+    0x1f, 0xdd, 0xa8, 0x33, 0x88, 0x07, 0xc7, 0x31, 0xb1, 0x12, 0x10, 0x59,
+    0x27, 0x80, 0xec, 0x5f, 0x60, 0x51, 0x7f, 0xa9, 0x19, 0xb5, 0x4a, 0x0d,
+    0x2d, 0xe5, 0x7a, 0x9f, 0x93, 0xc9, 0x9c, 0xef, 0xa0, 0xe0, 0x3b, 0x4d,
+    0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
+    0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63,
+    0x55, 0x21, 0x0c, 0x7d,
+};
+
+// XT is x_time function that muliplies 'x' by 2 in GF(2^8)
 #define XT(x) (((x) << 1) ^ ((((x) >> 7) & 1) * 0x1b))
+
 inline __m128i aesenc_128_reference(__m128i a, __m128i b)
 {
     uint8_t i, t, u, v[4][4];
@@ -597,6 +572,43 @@ inline __m128i aesenc_128_reference(__m128i a, __m128i b)
         v[i][2] ^= u ^ XT(v[i][2] ^ v[i][3]);
         v[i][3] ^= u ^ XT(v[i][3] ^ t);
     }
+
+    for (i = 0; i < 16; ++i) {
+        ((SIMDVec *) &a)->m128_u8[i] =
+            v[i / 4][i % 4] ^ ((SIMDVec *) &b)->m128_u8[i];
+    }
+
+    return a;
+}
+
+#define MULTIPLY(x, y)                                                     \
+    (((y & 1) * x) ^ ((y >> 1 & 1) * XT(x)) ^ ((y >> 2 & 1) * XT(XT(x))) ^ \
+     ((y >> 3 & 1) * XT(XT(XT(x)))) ^ ((y >> 4 & 1) * XT(XT(XT(XT(x))))))
+
+inline __m128i aesdec_128_reference(__m128i a, __m128i b)
+{
+    uint8_t i, e, f, g, h, v[4][4];
+    for (i = 0; i < 16; ++i) {
+        v[((i / 4) + (i % 4)) % 4][i % 4] =
+            crypto_aes_rsbox[((SIMDVec *) &a)->m128_u8[i]];
+    }
+
+    for (i = 0; i < 4; ++i) {
+        e = v[i][0];
+        f = v[i][1];
+        g = v[i][2];
+        h = v[i][3];
+
+        v[i][0] = MULTIPLY(e, 0x0e) ^ MULTIPLY(f, 0x0b) ^ MULTIPLY(g, 0x0d) ^
+                  MULTIPLY(h, 0x09);
+        v[i][1] = MULTIPLY(e, 0x09) ^ MULTIPLY(f, 0x0e) ^ MULTIPLY(g, 0x0b) ^
+                  MULTIPLY(h, 0x0d);
+        v[i][2] = MULTIPLY(e, 0x0d) ^ MULTIPLY(f, 0x09) ^ MULTIPLY(g, 0x0e) ^
+                  MULTIPLY(h, 0x0b);
+        v[i][3] = MULTIPLY(e, 0x0b) ^ MULTIPLY(f, 0x0d) ^ MULTIPLY(g, 0x09) ^
+                  MULTIPLY(h, 0x0e);
+    }
+
     for (i = 0; i < 16; ++i) {
         ((SIMDVec *) &a)->m128_u8[i] =
             v[i / 4][i % 4] ^ ((SIMDVec *) &b)->m128_u8[i];
@@ -616,25 +628,10 @@ inline __m128i aesenclast_128_reference(__m128i s, __m128i rk)
     return s;
 }
 
-static inline uint32_t sub_word(uint32_t key)
-{
-    return (crypto_aes_sbox[key >> 24] << 24) |
-           (crypto_aes_sbox[(key >> 16) & 0xff] << 16) |
-           (crypto_aes_sbox[(key >> 8) & 0xff] << 8) |
-           crypto_aes_sbox[key & 0xff];
-}
-
 // Rotates right (circular right shift) value by "amount" positions
 static inline uint32_t rotr(uint32_t value, uint32_t amount)
 {
     return (value >> amount) | (value << ((32 - amount) & 31));
-}
-
-inline __m128i aeskeygenassist_128_reference(__m128i a, const int rcon)
-{
-    const uint32_t X1 = sub_word(_mm_cvtsi128_si32(_mm_shuffle_epi32(a, 0x55)));
-    const uint32_t X3 = sub_word(_mm_cvtsi128_si32(_mm_shuffle_epi32(a, 0xFF)));
-    return _mm_set_epi32(rotr(X3, 8) ^ rcon, X3, rotr(X1, 8) ^ rcon, X1);
 }
 
 static inline uint64_t MUL(uint32_t a, uint32_t b)
@@ -1890,7 +1887,7 @@ result_t test_mm_div_ss(const SSE2NEONTestImpl &impl, uint32_t iter)
 
 result_t test_mm_extract_pi16(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
-    // FIXME GCC has bug on `_mm_extract_pi16` intrinsics. We will enable this
+    // FIXME GCC has bug on "_mm_extract_pi16" intrinsics. We will enable this
     // test when GCC fix this bug.
     // see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98495 for more
     // information
@@ -2605,8 +2602,8 @@ result_t test_mm_rsqrt_ps(const SSE2NEONTestImpl &impl, uint32_t iter)
     __m128 a = load_m128(_a);
     __m128 c = _mm_rsqrt_ps(a);
 
-    // Here, we ensure `_mm_rsqrt_ps()`'s error is under 1% compares to the C
-    // implementation.
+    // Here, we ensure the error rate of "_mm_rsqrt_ps()" is under 1% compared
+    // to the C implementation.
     return validateFloatError(c, f0, f1, f2, f3, 0.01f);
 }
 
@@ -2622,8 +2619,8 @@ result_t test_mm_rsqrt_ss(const SSE2NEONTestImpl &impl, uint32_t iter)
     __m128 a = load_m128(_a);
     __m128 c = _mm_rsqrt_ss(a);
 
-    // Here, we ensure `_mm_rsqrt_ps()`'s error is under 1% compares to the C
-    // implementation.
+    // Here, we ensure the error rate of "_mm_rsqrt_ps()" is under 1% compared
+    // to the C implementation.
     return validateFloatError(c, f0, f1, f2, f3, 0.01f);
 }
 
@@ -2847,8 +2844,8 @@ result_t test_mm_sqrt_ps(const SSE2NEONTestImpl &impl, uint32_t iter)
     __m128 a = load_m128(_a);
     __m128 c = _mm_sqrt_ps(a);
 
-    // Here, we ensure `_mm_sqrt_ps()`'s error is under 1% compares to the C
-    // implementation.
+    // Here, we ensure the error rate of "_mm_sqrt_ps()" is under 1% compared
+    // to the C implementation.
     return validateFloatError(c, f0, f1, f2, f3, 0.01f);
 }
 
@@ -2864,8 +2861,8 @@ result_t test_mm_sqrt_ss(const SSE2NEONTestImpl &impl, uint32_t iter)
     __m128 a = load_m128(_a);
     __m128 c = _mm_sqrt_ss(a);
 
-    // Here, we ensure `_mm_sqrt_ps()`'s error is under 1% compares to the C
-    // implementation.
+    // Here, we ensure the error rate of "_mm_sqrt_ps()" is under 1% compared
+    // to the C implementation.
     return validateFloatError(c, f0, f1, f2, f3, 0.01f);
 }
 
@@ -5936,7 +5933,7 @@ result_t test_mm_slli_epi64(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
     const int64_t *_a = (const int64_t *) impl.mTestIntPointer1;
 #if defined(__clang__)
-    // Clang compiler does not allow the second argument of `_mm_slli_epi64()`
+    // Clang compiler does not allow the second argument of "_mm_slli_epi64()"
     // to be greater than 63.
     const int count = (int) (iter % 65 - 1);  // range: -1 ~ 63
 #else
@@ -11552,6 +11549,19 @@ result_t test_mm_aesenc_si128(const SSE2NEONTestImpl &impl, uint32_t iter)
     return validate128(resultReference, resultIntrinsic);
 }
 
+result_t test_mm_aesdec_si128(const SSE2NEONTestImpl &impl, uint32_t iter)
+{
+    const int32_t *a = (int32_t *) impl.mTestIntPointer1;
+    const int32_t *b = (int32_t *) impl.mTestIntPointer2;
+    __m128i data = _mm_loadu_si128((const __m128i *) a);
+    __m128i rk = _mm_loadu_si128((const __m128i *) b);
+
+    __m128i resultReference = aesdec_128_reference(data, rk);
+    __m128i resultIntrinsic = _mm_aesdec_si128(data, rk);
+
+    return validate128(resultReference, resultIntrinsic);
+}
+
 result_t test_mm_aesenclast_si128(const SSE2NEONTestImpl &impl, uint32_t iter)
 {
     const int32_t *a = (const int32_t *) impl.mTestIntPointer1;
@@ -11565,23 +11575,90 @@ result_t test_mm_aesenclast_si128(const SSE2NEONTestImpl &impl, uint32_t iter)
     return validate128(resultReference, resultIntrinsic);
 }
 
+result_t test_mm_aesdeclast_si128(const SSE2NEONTestImpl &impl, uint32_t iter)
+{
+    const uint8_t *a = (uint8_t *) impl.mTestIntPointer1;
+    const uint8_t *rk = (uint8_t *) impl.mTestIntPointer2;
+    __m128i _a = _mm_loadu_si128((const __m128i *) a);
+    __m128i _rk = _mm_loadu_si128((const __m128i *) rk);
+    uint8_t c[16] = {};
+
+    uint8_t v[4][4];
+    for (int i = 0; i < 16; ++i) {
+        v[((i / 4) + (i % 4)) % 4][i % 4] = crypto_aes_rsbox[a[i]];
+    }
+    for (int i = 0; i < 16; ++i) {
+        c[i] = v[i / 4][i % 4] ^ rk[i];
+    }
+
+    __m128i result_reference = _mm_loadu_si128((const __m128i *) c);
+    __m128i result_intrinsic = _mm_aesdeclast_si128(_a, _rk);
+
+    return validate128(result_reference, result_intrinsic);
+}
+
+result_t test_mm_aesimc_si128(const SSE2NEONTestImpl &impl, uint32_t iter)
+{
+    const uint8_t *a = (uint8_t *) impl.mTestIntPointer1;
+    __m128i _a = _mm_loadu_si128((const __m128i *) a);
+
+    uint8_t e, f, g, h, v[4][4];
+    for (int i = 0; i < 16; ++i) {
+        ((uint8_t *) v)[i] = a[i];
+    }
+    for (int i = 0; i < 4; ++i) {
+        e = v[i][0];
+        f = v[i][1];
+        g = v[i][2];
+        h = v[i][3];
+
+        v[i][0] = MULTIPLY(e, 0x0e) ^ MULTIPLY(f, 0x0b) ^ MULTIPLY(g, 0x0d) ^
+                  MULTIPLY(h, 0x09);
+        v[i][1] = MULTIPLY(e, 0x09) ^ MULTIPLY(f, 0x0e) ^ MULTIPLY(g, 0x0b) ^
+                  MULTIPLY(h, 0x0d);
+        v[i][2] = MULTIPLY(e, 0x0d) ^ MULTIPLY(f, 0x09) ^ MULTIPLY(g, 0x0e) ^
+                  MULTIPLY(h, 0x0b);
+        v[i][3] = MULTIPLY(e, 0x0b) ^ MULTIPLY(f, 0x0d) ^ MULTIPLY(g, 0x09) ^
+                  MULTIPLY(h, 0x0e);
+    }
+
+    __m128i result_reference = _mm_loadu_si128((const __m128i *) v);
+    __m128i result_intrinsic = _mm_aesimc_si128(_a);
+
+    return validate128(result_reference, result_intrinsic);
+}
+
+static inline uint32_t sub_word(uint32_t in)
+{
+    return (crypto_aes_sbox[(in >> 24) & 0xff] << 24) |
+           (crypto_aes_sbox[(in >> 16) & 0xff] << 16) |
+           (crypto_aes_sbox[(in >> 8) & 0xff] << 8) |
+           (crypto_aes_sbox[in & 0xff]);
+}
+
 // FIXME: improve the test case for AES-256 key expansion.
 // Reference:
 // https://github.com/randombit/botan/blob/master/src/lib/block/aes/aes_ni/aes_ni.cpp
 result_t test_mm_aeskeygenassist_si128(const SSE2NEONTestImpl &impl,
                                        uint32_t iter)
 {
-    const int32_t *a = (int32_t *) impl.mTestIntPointer1;
-    const int32_t *b = (int32_t *) impl.mTestIntPointer2;
-    __m128i data = _mm_loadu_si128((const __m128i *) a);
-
-    (void) b;  // parameter b is unused because we can only pass an 8-bit
-               // immediate to _mm_aeskeygenassist_si128.
+    const uint32_t *a = (uint32_t *) impl.mTestIntPointer1;
+    __m128i data = load_m128i(a);
     const int8_t rcon = 0x40; /* an arbitrary 8-bit immediate */
-    __m128i resultReference = aeskeygenassist_128_reference(data, rcon);
-    __m128i resultIntrinsic = _mm_aeskeygenassist_si128(data, rcon);
 
-    return validate128(resultReference, resultIntrinsic);
+    uint32_t sub_x1 = sub_word(a[1]);
+    uint32_t sub_x3 = sub_word(a[3]);
+    uint32_t res[4] = {
+        sub_x1,
+        rotr(sub_x1, 8) ^ rcon,
+        sub_x3,
+        rotr(sub_x3, 8) ^ rcon,
+    };
+    __m128i result_reference = load_m128i(res);
+
+    __m128i result_intrinsic = _mm_aeskeygenassist_si128(data, rcon);
+
+    return validate128(result_reference, result_intrinsic);
 }
 
 /* Others */

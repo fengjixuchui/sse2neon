@@ -4,8 +4,6 @@
 // This header file provides a simple API translation layer
 // between SSE intrinsics to their corresponding Arm/Aarch64 NEON versions
 //
-// This header file does not yet translate all of the SSE intrinsics.
-//
 // Contributors to this work are:
 //   John W. Ratcliff <jratcliffscarab@gmail.com>
 //   Brandon Rowlett <browlett@nvidia.com>
@@ -13,8 +11,8 @@
 //   Eric van Beurden <evanbeurden@nvidia.com>
 //   Alexander Potylitsin <apotylitsin@nvidia.com>
 //   Hasindu Gamaarachchi <hasindu2008@gmail.com>
-//   Jim Huang <jserv@biilabs.io>
-//   Mark Cheng <marktwtn@biilabs.io>
+//   Jim Huang <jserv@ccns.ncku.edu.tw>
+//   Mark Cheng <marktwtn@gmail.com>
 //   Malcolm James MacLeod <malcolm@gulden.com>
 //   Devin Hussey (easyaspi314) <husseydevin@gmail.com>
 //   Sebastian Pop <spop@amazon.com>
@@ -22,7 +20,7 @@
 //   Danila Kutenin <danilak@google.com>
 //   François Turban (JishinMaster) <francois.turban@gmail.com>
 //   Pei-Hsuan Hung <afcidk@gmail.com>
-//   Yang-Hao Yuan <yanghau@biilabs.io>
+//   Yang-Hao Yuan <yuanyanghau@gmail.com>
 //   Syoyo Fujita <syoyo@lighttransport.com>
 //   Brecht Van Lommel <brecht@blender.org>
 //   Jonathan Hue <jhue@adobe.com>
@@ -1212,7 +1210,7 @@ FORCE_INLINE __m128 _mm_andnot_ps(__m128 a, __m128 b)
 //     dst[i+15:i] := (a[i+15:i] + b[i+15:i] + 1) >> 1
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_avg_pu16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_avg_pu16
 FORCE_INLINE __m64 _mm_avg_pu16(__m64 a, __m64 b)
 {
     return vreinterpret_m64_u16(
@@ -1227,7 +1225,7 @@ FORCE_INLINE __m64 _mm_avg_pu16(__m64 a, __m64 b)
 //     dst[i+7:i] := (a[i+7:i] + b[i+7:i] + 1) >> 1
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_avg_pu8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_avg_pu8
 FORCE_INLINE __m64 _mm_avg_pu8(__m64 a, __m64 b)
 {
     return vreinterpret_m64_u8(
@@ -1510,7 +1508,7 @@ FORCE_INLINE int _mm_comineq_ss(__m128 a, __m128 b)
 //   dst[95:64] := a[95:64]
 //   dst[127:96] := a[127:96]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvt_pi2ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvt_pi2ps
 FORCE_INLINE __m128 _mm_cvt_pi2ps(__m128 a, __m64 b)
 {
     return vreinterpretq_m128_f32(
@@ -1526,7 +1524,7 @@ FORCE_INLINE __m128 _mm_cvt_pi2ps(__m128 a, __m64 b)
 //       dst[i+31:i] := Convert_FP32_To_Int32(a[i+31:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvt_ps2pi
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvt_ps2pi
 FORCE_INLINE __m64 _mm_cvt_ps2pi(__m128 a)
 {
 #if defined(__aarch64__) || defined(__ARM_FEATURE_DIRECTED_ROUNDING)
@@ -1545,7 +1543,7 @@ FORCE_INLINE __m64 _mm_cvt_ps2pi(__m128 a)
 //   dst[31:0] := Convert_Int32_To_FP32(b[31:0])
 //   dst[127:32] := a[127:32]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvt_si2ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvt_si2ss
 FORCE_INLINE __m128 _mm_cvt_si2ss(__m128 a, int b)
 {
     return vreinterpretq_m128_f32(
@@ -1554,7 +1552,7 @@ FORCE_INLINE __m128 _mm_cvt_si2ss(__m128 a, int b)
 
 // Convert the lower single-precision (32-bit) floating-point element in a to a
 // 32-bit integer, and store the result in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvt_ss2si
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvt_ss2si
 FORCE_INLINE int _mm_cvt_ss2si(__m128 a)
 {
 #if defined(__aarch64__) || defined(__ARM_FEATURE_DIRECTED_ROUNDING)
@@ -1576,7 +1574,7 @@ FORCE_INLINE int _mm_cvt_ss2si(__m128 a)
 //      dst[m+31:m] := Convert_Int16_To_FP32(a[i+15:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtpi16_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtpi16_ps
 FORCE_INLINE __m128 _mm_cvtpi16_ps(__m64 a)
 {
     return vreinterpretq_m128_f32(
@@ -1592,7 +1590,7 @@ FORCE_INLINE __m128 _mm_cvtpi16_ps(__m64 a)
 //   dst[95:64] := a[95:64]
 //   dst[127:96] := a[127:96]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtpi32_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtpi32_ps
 FORCE_INLINE __m128 _mm_cvtpi32_ps(__m128 a, __m64 b)
 {
     return vreinterpretq_m128_f32(
@@ -1611,7 +1609,7 @@ FORCE_INLINE __m128 _mm_cvtpi32_ps(__m128 a, __m64 b)
 //   dst[95:64] := Convert_Int32_To_FP32(b[31:0])
 //   dst[127:96] := Convert_Int32_To_FP32(b[63:32])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtpi32x2_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtpi32x2_ps
 FORCE_INLINE __m128 _mm_cvtpi32x2_ps(__m64 a, __m64 b)
 {
     return vreinterpretq_m128_f32(vcvtq_f32_s32(
@@ -1627,7 +1625,7 @@ FORCE_INLINE __m128 _mm_cvtpi32x2_ps(__m64 a, __m64 b)
 //      dst[m+31:m] := Convert_Int8_To_FP32(a[i+7:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtpi8_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtpi8_ps
 FORCE_INLINE __m128 _mm_cvtpi8_ps(__m64 a)
 {
     return vreinterpretq_m128_f32(vcvtq_f32_s32(
@@ -1649,7 +1647,7 @@ FORCE_INLINE __m128 _mm_cvtpi8_ps(__m64 a)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtps_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtps_pi16
 FORCE_INLINE __m64 _mm_cvtps_pi16(__m128 a)
 {
     return vreinterpret_m64_s16(
@@ -1664,7 +1662,7 @@ FORCE_INLINE __m64 _mm_cvtps_pi16(__m128 a)
 //       dst[i+31:i] := Convert_FP32_To_Int32(a[i+31:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtps_pi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtps_pi32
 #define _mm_cvtps_pi32(a) _mm_cvt_ps2pi(a)
 
 // Convert packed single-precision (32-bit) floating-point elements in a to
@@ -1682,7 +1680,7 @@ FORCE_INLINE __m64 _mm_cvtps_pi16(__m128 a)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtps_pi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtps_pi8
 FORCE_INLINE __m64 _mm_cvtps_pi8(__m128 a)
 {
     return vreinterpret_m64_s8(vqmovn_s16(
@@ -1698,7 +1696,7 @@ FORCE_INLINE __m64 _mm_cvtps_pi8(__m128 a)
 //      dst[m+31:m] := Convert_UInt16_To_FP32(a[i+15:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtpu16_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtpu16_ps
 FORCE_INLINE __m128 _mm_cvtpu16_ps(__m64 a)
 {
     return vreinterpretq_m128_f32(
@@ -1715,7 +1713,7 @@ FORCE_INLINE __m128 _mm_cvtpu16_ps(__m64 a)
 //      dst[m+31:m] := Convert_UInt8_To_FP32(a[i+7:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtpu8_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtpu8_ps
 FORCE_INLINE __m128 _mm_cvtpu8_ps(__m64 a)
 {
     return vreinterpretq_m128_f32(vcvtq_f32_u32(
@@ -1729,7 +1727,7 @@ FORCE_INLINE __m128 _mm_cvtpu8_ps(__m64 a)
 //   dst[31:0] := Convert_Int32_To_FP32(b[31:0])
 //   dst[127:32] := a[127:32]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsi32_ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsi32_ss
 #define _mm_cvtsi32_ss(a, b) _mm_cvt_si2ss(a, b)
 
 // Convert the signed 64-bit integer b to a single-precision (32-bit)
@@ -1739,7 +1737,7 @@ FORCE_INLINE __m128 _mm_cvtpu8_ps(__m64 a)
 //   dst[31:0] := Convert_Int64_To_FP32(b[63:0])
 //   dst[127:32] := a[127:32]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsi64_ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsi64_ss
 FORCE_INLINE __m128 _mm_cvtsi64_ss(__m128 a, int64_t b)
 {
     return vreinterpretq_m128_f32(
@@ -1750,7 +1748,7 @@ FORCE_INLINE __m128 _mm_cvtsi64_ss(__m128 a, int64_t b)
 //
 //   dst[31:0] := a[31:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtss_f32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtss_f32
 FORCE_INLINE float _mm_cvtss_f32(__m128 a)
 {
     return vgetq_lane_f32(vreinterpretq_f32_m128(a), 0);
@@ -1761,7 +1759,7 @@ FORCE_INLINE float _mm_cvtss_f32(__m128 a)
 //
 //   dst[31:0] := Convert_FP32_To_Int32(a[31:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtss_si32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtss_si32
 #define _mm_cvtss_si32(a) _mm_cvt_ss2si(a)
 
 // Convert the lower single-precision (32-bit) floating-point element in a to a
@@ -1769,7 +1767,7 @@ FORCE_INLINE float _mm_cvtss_f32(__m128 a)
 //
 //   dst[63:0] := Convert_FP32_To_Int64(a[31:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtss_si64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtss_si64
 FORCE_INLINE int64_t _mm_cvtss_si64(__m128 a)
 {
 #if defined(__aarch64__) || defined(__ARM_FEATURE_DIRECTED_ROUNDING)
@@ -1789,7 +1787,7 @@ FORCE_INLINE int64_t _mm_cvtss_si64(__m128 a)
 //      dst[i+31:i] := Convert_FP32_To_Int32_Truncate(a[i+31:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtt_ps2pi
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtt_ps2pi
 FORCE_INLINE __m64 _mm_cvtt_ps2pi(__m128 a)
 {
     return vreinterpret_m64_s32(
@@ -1801,7 +1799,7 @@ FORCE_INLINE __m64 _mm_cvtt_ps2pi(__m128 a)
 //
 //   dst[31:0] := Convert_FP32_To_Int32_Truncate(a[31:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtt_ss2si
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtt_ss2si
 FORCE_INLINE int _mm_cvtt_ss2si(__m128 a)
 {
     return vgetq_lane_s32(vcvtq_s32_f32(vreinterpretq_f32_m128(a)), 0);
@@ -1815,7 +1813,7 @@ FORCE_INLINE int _mm_cvtt_ss2si(__m128 a)
 //      dst[i+31:i] := Convert_FP32_To_Int32_Truncate(a[i+31:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvttps_pi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvttps_pi32
 #define _mm_cvttps_pi32(a) _mm_cvtt_ps2pi(a)
 
 // Convert the lower single-precision (32-bit) floating-point element in a to a
@@ -1823,7 +1821,7 @@ FORCE_INLINE int _mm_cvtt_ss2si(__m128 a)
 //
 //   dst[31:0] := Convert_FP32_To_Int32_Truncate(a[31:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvttss_si32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvttss_si32
 #define _mm_cvttss_si32(a) _mm_cvtt_ss2si(a)
 
 // Convert the lower single-precision (32-bit) floating-point element in a to a
@@ -1831,7 +1829,7 @@ FORCE_INLINE int _mm_cvtt_ss2si(__m128 a)
 //
 //   dst[63:0] := Convert_FP32_To_Int64_Truncate(a[31:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvttss_si64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvttss_si64
 FORCE_INLINE int64_t _mm_cvttss_si64(__m128 a)
 {
     return (int64_t) vgetq_lane_f32(vreinterpretq_f32_m128(a), 0);
@@ -1873,12 +1871,12 @@ FORCE_INLINE __m128 _mm_div_ss(__m128 a, __m128 b)
 
 // Extract a 16-bit integer from a, selected with imm8, and store the result in
 // the lower element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_extract_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_extract_pi16
 #define _mm_extract_pi16(a, imm) \
     (int32_t) vget_lane_u16(vreinterpret_u16_m64(a), (imm))
 
 // Free aligned memory that was allocated with _mm_malloc.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_free
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_free
 #if !defined(SSE2NEON_ALLOC_DEFINED)
 FORCE_INLINE void _mm_free(void *addr)
 {
@@ -1889,7 +1887,7 @@ FORCE_INLINE void _mm_free(void *addr)
 // Macro: Get the flush zero bits from the MXCSR control and status register.
 // The flush zero may contain any of the following flags: _MM_FLUSH_ZERO_ON or
 // _MM_FLUSH_ZERO_OFF
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_MM_GET_FLUSH_ZERO_MODE
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_MM_GET_FLUSH_ZERO_MODE
 FORCE_INLINE unsigned int _sse2neon_mm_get_flush_zero_mode()
 {
     union {
@@ -1913,7 +1911,7 @@ FORCE_INLINE unsigned int _sse2neon_mm_get_flush_zero_mode()
 // Macro: Get the rounding mode bits from the MXCSR control and status register.
 // The rounding mode may contain any of the following flags: _MM_ROUND_NEAREST,
 // _MM_ROUND_DOWN, _MM_ROUND_UP, _MM_ROUND_TOWARD_ZERO
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_MM_GET_ROUNDING_MODE
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_MM_GET_ROUNDING_MODE
 FORCE_INLINE unsigned int _MM_GET_ROUNDING_MODE()
 {
     union {
@@ -1940,7 +1938,7 @@ FORCE_INLINE unsigned int _MM_GET_ROUNDING_MODE()
 
 // Copy a to dst, and insert the 16-bit integer i into dst at the location
 // specified by imm8.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_insert_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_insert_pi16
 #define _mm_insert_pi16(a, b, imm)                               \
     __extension__({                                              \
         vreinterpret_m64_s16(                                    \
@@ -1962,7 +1960,7 @@ FORCE_INLINE __m128 _mm_load_ps(const float *p)
 //   dst[95:64] := MEM[mem_addr+31:mem_addr]
 //   dst[127:96] := MEM[mem_addr+31:mem_addr]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_load_ps1
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_load_ps1
 #define _mm_load_ps1 _mm_load1_ps
 
 // Loads an single - precision, floating - point value into the low word and
@@ -2023,7 +2021,7 @@ FORCE_INLINE __m128 _mm_loadl_pi(__m128 a, __m64 const *p)
 //   dst[95:64] := MEM[mem_addr+63:mem_addr+32]
 //   dst[127:96] := MEM[mem_addr+31:mem_addr]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_loadr_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_loadr_ps
 FORCE_INLINE __m128 _mm_loadr_ps(const float *p)
 {
     float32x4_t v = vrev64q_f32(vld1q_f32(p));
@@ -2044,7 +2042,7 @@ FORCE_INLINE __m128 _mm_loadu_ps(const float *p)
 //   dst[15:0] := MEM[mem_addr+15:mem_addr]
 //   dst[MAX:16] := 0
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_loadu_si16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_loadu_si16
 FORCE_INLINE __m128i _mm_loadu_si16(const void *p)
 {
     return vreinterpretq_m128i_s16(
@@ -2056,7 +2054,7 @@ FORCE_INLINE __m128i _mm_loadu_si16(const void *p)
 //   dst[63:0] := MEM[mem_addr+63:mem_addr]
 //   dst[MAX:64] := 0
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_loadu_si64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_loadu_si64
 FORCE_INLINE __m128i _mm_loadu_si64(const void *p)
 {
     return vreinterpretq_m128i_s64(
@@ -2083,7 +2081,7 @@ FORCE_INLINE void *_mm_malloc(size_t size, size_t align)
 // Conditionally store 8-bit integer elements from a into memory using mask
 // (elements are not stored when the highest bit is not set in the corresponding
 // element) and a non-temporal memory hint.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_maskmove_si64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_maskmove_si64
 FORCE_INLINE void _mm_maskmove_si64(__m64 a, __m64 mask, char *mem_addr)
 {
     int8x8_t shr_mask = vshr_n_s8(vreinterpret_s8_m64(mask), 7);
@@ -2097,7 +2095,7 @@ FORCE_INLINE void _mm_maskmove_si64(__m64 a, __m64 mask, char *mem_addr)
 // Conditionally store 8-bit integer elements from a into memory using mask
 // (elements are not stored when the highest bit is not set in the corresponding
 // element) and a non-temporal memory hint.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_maskmovq
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_m_maskmovq
 #define _m_maskmovq(a, mask, mem_addr) _mm_maskmove_si64(a, mask, mem_addr)
 
 // Compare packed signed 16-bit integers in a and b, and store packed maximum
@@ -2108,7 +2106,7 @@ FORCE_INLINE void _mm_maskmove_si64(__m64 a, __m64 mask, char *mem_addr)
 //      dst[i+15:i] := MAX(a[i+15:i], b[i+15:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_max_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_max_pi16
 FORCE_INLINE __m64 _mm_max_pi16(__m64 a, __m64 b)
 {
     return vreinterpret_m64_s16(
@@ -2138,7 +2136,7 @@ FORCE_INLINE __m128 _mm_max_ps(__m128 a, __m128 b)
 //      dst[i+7:i] := MAX(a[i+7:i], b[i+7:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_max_pu8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_max_pu8
 FORCE_INLINE __m64 _mm_max_pu8(__m64 a, __m64 b)
 {
     return vreinterpret_m64_u8(
@@ -2163,7 +2161,7 @@ FORCE_INLINE __m128 _mm_max_ss(__m128 a, __m128 b)
 //      dst[i+15:i] := MIN(a[i+15:i], b[i+15:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_min_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_min_pi16
 FORCE_INLINE __m64 _mm_min_pi16(__m64 a, __m64 b)
 {
     return vreinterpret_m64_s16(
@@ -2193,7 +2191,7 @@ FORCE_INLINE __m128 _mm_min_ps(__m128 a, __m128 b)
 //      dst[i+7:i] := MIN(a[i+7:i], b[i+7:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_min_pu8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_min_pu8
 FORCE_INLINE __m64 _mm_min_pu8(__m64 a, __m64 b)
 {
     return vreinterpret_m64_u8(
@@ -2219,17 +2217,25 @@ FORCE_INLINE __m128 _mm_move_ss(__m128 a, __m128 b)
                        vreinterpretq_f32_m128(a), 0));
 }
 
-// Moves the upper two values of B into the lower two values of A.
+// Move the upper 2 single-precision (32-bit) floating-point elements from b to
+// the lower 2 elements of dst, and copy the upper 2 elements from a to the
+// upper 2 elements of dst.
 //
 //   r3 := a3
 //   r2 := a2
 //   r1 := b3
 //   r0 := b2
-FORCE_INLINE __m128 _mm_movehl_ps(__m128 __A, __m128 __B)
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_movehl_ps
+FORCE_INLINE __m128 _mm_movehl_ps(__m128 a, __m128 b)
 {
-    float32x2_t a32 = vget_high_f32(vreinterpretq_f32_m128(__A));
-    float32x2_t b32 = vget_high_f32(vreinterpretq_f32_m128(__B));
+#if defined(aarch64__)
+    return vreinterpretq_m128_u64(
+        vzip2q_u64(vreinterpretq_u64_m128(b), vreinterpretq_u64_m128(a)));
+#else
+    float32x2_t a32 = vget_high_f32(vreinterpretq_f32_m128(a));
+    float32x2_t b32 = vget_high_f32(vreinterpretq_f32_m128(b));
     return vreinterpretq_m128_f32(vcombine_f32(b32, a32));
+#endif
 }
 
 // Moves the lower two values of B into the upper two values of A.
@@ -2247,7 +2253,7 @@ FORCE_INLINE __m128 _mm_movelh_ps(__m128 __A, __m128 __B)
 
 // Create mask from the most significant bit of each 8-bit element in a, and
 // store the result in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_movemask_pi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_movemask_pi8
 FORCE_INLINE int _mm_movemask_pi8(__m64 a)
 {
     uint8x8_t input = vreinterpret_u8_m64(a);
@@ -2311,7 +2317,7 @@ FORCE_INLINE __m128 _mm_mul_ps(__m128 a, __m128 b)
 //   dst[31:0] := a[31:0] * b[31:0]
 //   dst[127:32] := a[127:32]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_mul_ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_mul_ss
 FORCE_INLINE __m128 _mm_mul_ss(__m128 a, __m128 b)
 {
     return _mm_move_ss(a, _mm_mul_ps(a, b));
@@ -2320,7 +2326,7 @@ FORCE_INLINE __m128 _mm_mul_ss(__m128 a, __m128 b)
 // Multiply the packed unsigned 16-bit integers in a and b, producing
 // intermediate 32-bit integers, and store the high 16 bits of the intermediate
 // integers in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_mulhi_pu16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_mulhi_pu16
 FORCE_INLINE __m64 _mm_mulhi_pu16(__m64 a, __m64 b)
 {
     return vreinterpret_m64_u16(vshrn_n_u32(
@@ -2344,7 +2350,7 @@ FORCE_INLINE __m128 _mm_or_ps(__m128 a, __m128 b)
 //     dst[i+7:i] := (a[i+7:i] + b[i+7:i] + 1) >> 1
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_pavgb
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_m_pavgb
 #define _m_pavgb(a, b) _mm_avg_pu8(a, b)
 
 // Average packed unsigned 16-bit integers in a and b, and store the results in
@@ -2355,48 +2361,48 @@ FORCE_INLINE __m128 _mm_or_ps(__m128 a, __m128 b)
 //     dst[i+15:i] := (a[i+15:i] + b[i+15:i] + 1) >> 1
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_pavgw
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_m_pavgw
 #define _m_pavgw(a, b) _mm_avg_pu16(a, b)
 
 // Extract a 16-bit integer from a, selected with imm8, and store the result in
 // the lower element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_pextrw
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_m_pextrw
 #define _m_pextrw(a, imm) _mm_extract_pi16(a, imm)
 
 // Copy a to dst, and insert the 16-bit integer i into dst at the location
 // specified by imm8.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=m_pinsrw
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=m_pinsrw
 #define _m_pinsrw(a, i, imm) _mm_insert_pi16(a, i, imm)
 
 // Compare packed signed 16-bit integers in a and b, and store packed maximum
 // values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_pmaxsw
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_m_pmaxsw
 #define _m_pmaxsw(a, b) _mm_max_pi16(a, b)
 
 // Compare packed unsigned 8-bit integers in a and b, and store packed maximum
 // values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_pmaxub
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_m_pmaxub
 #define _m_pmaxub(a, b) _mm_max_pu8(a, b)
 
 // Compare packed signed 16-bit integers in a and b, and store packed minimum
 // values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_pminsw
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_m_pminsw
 #define _m_pminsw(a, b) _mm_min_pi16(a, b)
 
 // Compare packed unsigned 8-bit integers in a and b, and store packed minimum
 // values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_pminub
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_m_pminub
 #define _m_pminub(a, b) _mm_min_pu8(a, b)
 
 // Create mask from the most significant bit of each 8-bit element in a, and
 // store the result in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_pmovmskb
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_m_pmovmskb
 #define _m_pmovmskb(a) _mm_movemask_pi8(a)
 
 // Multiply the packed unsigned 16-bit integers in a and b, producing
 // intermediate 32-bit integers, and store the high 16 bits of the intermediate
 // integers in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_pmulhuw
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_m_pmulhuw
 #define _m_pmulhuw(a, b) _mm_mulhi_pu16(a, b)
 
 // Fetch the line of data from memory that contains address p to a location in
@@ -2424,18 +2430,18 @@ FORCE_INLINE void _mm_prefetch(char const *p, int i)
 // b, then horizontally sum each consecutive 8 differences to produce four
 // unsigned 16-bit integers, and pack these unsigned 16-bit integers in the low
 // 16 bits of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=m_psadbw
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=m_psadbw
 #define _m_psadbw(a, b) _mm_sad_pu8(a, b)
 
 // Shuffle 16-bit integers in a using the control in imm8, and store the results
 // in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_m_pshufw
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_m_pshufw
 #define _m_pshufw(a, imm) _mm_shuffle_pi16(a, imm)
 
 // Compute the approximate reciprocal of packed single-precision (32-bit)
 // floating-point elements in a, and store the results in dst. The maximum
 // relative error for this approximation is less than 1.5*2^-12.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_rcp_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_rcp_ps
 FORCE_INLINE __m128 _mm_rcp_ps(__m128 in)
 {
     float32x4_t recip = vrecpeq_f32(vreinterpretq_f32_m128(in));
@@ -2455,7 +2461,7 @@ FORCE_INLINE __m128 _mm_rcp_ps(__m128 in)
 //   dst[31:0] := (1.0 / a[31:0])
 //   dst[127:32] := a[127:32]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_rcp_ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_rcp_ss
 FORCE_INLINE __m128 _mm_rcp_ss(__m128 a)
 {
     return _mm_move_ss(a, _mm_rcp_ps(a));
@@ -2482,7 +2488,7 @@ FORCE_INLINE __m128 _mm_rsqrt_ps(__m128 in)
 // (32-bit) floating-point element in a, store the result in the lower element
 // of dst, and copy the upper 3 packed elements from a to the upper elements of
 // dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_rsqrt_ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_rsqrt_ss
 FORCE_INLINE __m128 _mm_rsqrt_ss(__m128 in)
 {
     return vsetq_lane_f32(vgetq_lane_f32(_mm_rsqrt_ps(in), 0), in, 0);
@@ -2492,7 +2498,7 @@ FORCE_INLINE __m128 _mm_rsqrt_ss(__m128 in)
 // b, then horizontally sum each consecutive 8 differences to produce four
 // unsigned 16-bit integers, and pack these unsigned 16-bit integers in the low
 // 16 bits of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sad_pu8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sad_pu8
 FORCE_INLINE __m64 _mm_sad_pu8(__m64 a, __m64 b)
 {
     uint64x1_t t = vpaddl_u32(vpaddl_u16(
@@ -2504,7 +2510,7 @@ FORCE_INLINE __m64 _mm_sad_pu8(__m64 a, __m64 b)
 // Macro: Set the flush zero bits of the MXCSR control and status register to
 // the value in unsigned 32-bit integer a. The flush zero may contain any of the
 // following flags: _MM_FLUSH_ZERO_ON or _MM_FLUSH_ZERO_OFF
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_MM_SET_FLUSH_ZERO_MODE
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_MM_SET_FLUSH_ZERO_MODE
 FORCE_INLINE void _sse2neon_mm_set_flush_zero_mode(unsigned int flag)
 {
     // AArch32 Advanced SIMD arithmetic always uses the Flush-to-zero setting,
@@ -2552,7 +2558,7 @@ FORCE_INLINE __m128 _mm_set_ps1(float _w)
 // the value in unsigned 32-bit integer a. The rounding mode may contain any of
 // the following flags: _MM_ROUND_NEAREST, _MM_ROUND_DOWN, _MM_ROUND_UP,
 // _MM_ROUND_TOWARD_ZERO
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_MM_SET_ROUNDING_MODE
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_MM_SET_ROUNDING_MODE
 FORCE_INLINE void _MM_SET_ROUNDING_MODE(int rounding)
 {
     union {
@@ -2597,7 +2603,7 @@ FORCE_INLINE void _MM_SET_ROUNDING_MODE(int rounding)
 
 // Copy single-precision (32-bit) floating-point element a to the lower element
 // of dst, and zero the upper 3 elements.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_set_ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_set_ss
 FORCE_INLINE __m128 _mm_set_ss(float a)
 {
     return vreinterpretq_m128_f32(vsetq_lane_f32(a, vdupq_n_f32(0), 0));
@@ -2643,7 +2649,7 @@ FORCE_INLINE __m128 _mm_setzero_ps(void)
 
 // Shuffle 16-bit integers in a using the control in imm8, and store the results
 // in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_shuffle_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_shuffle_pi16
 #ifdef _sse2neon_shuffle
 #define _mm_shuffle_pi16(a, imm)                                           \
     __extension__({                                                        \
@@ -2846,7 +2852,7 @@ FORCE_INLINE void _mm_store_ps(float *p, __m128 a)
 //   MEM[mem_addr+95:mem_addr+64] := a[31:0]
 //   MEM[mem_addr+127:mem_addr+96] := a[31:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_store_ps1
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_store_ps1
 FORCE_INLINE void _mm_store_ps1(float *p, __m128 a)
 {
     float32_t a0 = vgetq_lane_f32(vreinterpretq_f32_m128(a), 0);
@@ -2869,7 +2875,7 @@ FORCE_INLINE void _mm_store_ss(float *p, __m128 a)
 //   MEM[mem_addr+95:mem_addr+64] := a[31:0]
 //   MEM[mem_addr+127:mem_addr+96] := a[31:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_store1_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_store1_ps
 #define _mm_store1_ps _mm_store_ps1
 
 // Stores the upper two single-precision, floating-point values of a to the
@@ -2905,7 +2911,7 @@ FORCE_INLINE void _mm_storel_pi(__m64 *p, __m128 a)
 //   MEM[mem_addr+95:mem_addr+64] := a[63:32]
 //   MEM[mem_addr+127:mem_addr+96] := a[31:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_storer_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_storer_ps
 FORCE_INLINE void _mm_storer_ps(float *p, __m128 a)
 {
     float32x4_t tmp = vrev64q_f32(vreinterpretq_f32_m128(a));
@@ -2921,14 +2927,14 @@ FORCE_INLINE void _mm_storeu_ps(float *p, __m128 a)
 }
 
 // Stores 16-bits of integer data a at the address p.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_storeu_si16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_storeu_si16
 FORCE_INLINE void _mm_storeu_si16(void *p, __m128i a)
 {
     vst1q_lane_s16((int16_t *) p, vreinterpretq_s16_m128i(a), 0);
 }
 
 // Stores 64-bits of integer data a at the address p.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_storeu_si64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_storeu_si64
 FORCE_INLINE void _mm_storeu_si64(void *p, __m128i a)
 {
     vst1q_lane_s64((int64_t *) p, vreinterpretq_s64_m128i(a), 0);
@@ -2936,7 +2942,7 @@ FORCE_INLINE void _mm_storeu_si64(void *p, __m128i a)
 
 // Store 64-bits of integer data from a into memory using a non-temporal memory
 // hint.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_stream_pi
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_stream_pi
 FORCE_INLINE void _mm_stream_pi(__m64 *p, __m64 a)
 {
     vst1_s64((int64_t *) p, vreinterpret_s64_m64(a));
@@ -2944,7 +2950,7 @@ FORCE_INLINE void _mm_stream_pi(__m64 *p, __m64 a)
 
 // Store 128-bits (composed of 4 packed single-precision (32-bit) floating-
 // point elements) from a into memory using a non-temporal memory hint.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_stream_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_stream_ps
 FORCE_INLINE void _mm_stream_ps(float *p, __m128 a)
 {
 #if __has_builtin(__builtin_nontemporal_store)
@@ -2976,7 +2982,7 @@ FORCE_INLINE __m128 _mm_sub_ps(__m128 a, __m128 b)
 //   dst[31:0] := a[31:0] - b[31:0]
 //   dst[127:32] := a[127:32]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sub_ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sub_ss
 FORCE_INLINE __m128 _mm_sub_ss(__m128 a, __m128 b)
 {
     return _mm_move_ss(a, _mm_sub_ps(a, b));
@@ -2985,7 +2991,7 @@ FORCE_INLINE __m128 _mm_sub_ss(__m128 a, __m128 b)
 // Macro: Transpose the 4x4 matrix formed by the 4 rows of single-precision
 // (32-bit) floating-point elements in row0, row1, row2, and row3, and store the
 // transposed matrix in these vectors (row0 now contains column 0, etc.).
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=MM_TRANSPOSE4_PS
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=MM_TRANSPOSE4_PS
 #define _MM_TRANSPOSE4_PS(row0, row1, row2, row3)         \
     do {                                                  \
         float32x4x2_t ROW01 = vtrnq_f32(row0, row1);      \
@@ -3010,7 +3016,7 @@ FORCE_INLINE __m128 _mm_sub_ss(__m128 a, __m128 b)
 #define _mm_ucomineq_ss _mm_comineq_ss
 
 // Return vector of type __m128i with undefined elements.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=mm_undefined_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=mm_undefined_si128
 FORCE_INLINE __m128i _mm_undefined_si128(void)
 {
 #if defined(__GNUC__) || defined(__clang__)
@@ -3025,7 +3031,7 @@ FORCE_INLINE __m128i _mm_undefined_si128(void)
 }
 
 // Return vector of type __m128 with undefined elements.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_undefined_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_undefined_ps
 FORCE_INLINE __m128 _mm_undefined_ps(void)
 {
 #if defined(__GNUC__) || defined(__clang__)
@@ -3138,7 +3144,7 @@ FORCE_INLINE __m128i _mm_add_epi8(__m128i a, __m128i b)
 
 // Add packed double-precision (64-bit) floating-point elements in a and b, and
 // store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_add_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_add_pd
 FORCE_INLINE __m128d _mm_add_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3161,7 +3167,7 @@ FORCE_INLINE __m128d _mm_add_pd(__m128d a, __m128d b)
 //   dst[63:0] := a[63:0] + b[63:0]
 //   dst[127:64] := a[127:64]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_add_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_add_sd
 FORCE_INLINE __m128d _mm_add_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3180,7 +3186,7 @@ FORCE_INLINE __m128d _mm_add_sd(__m128d a, __m128d b)
 //
 //   dst[63:0] := a[63:0] + b[63:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_add_si64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_add_si64
 FORCE_INLINE __m64 _mm_add_si64(__m64 a, __m64 b)
 {
     return vreinterpret_m64_s64(
@@ -3210,7 +3216,7 @@ FORCE_INLINE __m128i _mm_adds_epi16(__m128i a, __m128i b)
 //     dst[i+7:i] := Saturate8( a[i+7:i] + b[i+7:i] )
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_adds_epi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_adds_epi8
 FORCE_INLINE __m128i _mm_adds_epi8(__m128i a, __m128i b)
 {
     return vreinterpretq_m128i_s8(
@@ -3219,7 +3225,7 @@ FORCE_INLINE __m128i _mm_adds_epi8(__m128i a, __m128i b)
 
 // Add packed unsigned 16-bit integers in a and b using saturation, and store
 // the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_adds_epu16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_adds_epu16
 FORCE_INLINE __m128i _mm_adds_epu16(__m128i a, __m128i b)
 {
     return vreinterpretq_m128i_u16(
@@ -3243,7 +3249,7 @@ FORCE_INLINE __m128i _mm_adds_epu8(__m128i a, __m128i b)
 //     dst[i+63:i] := a[i+63:i] AND b[i+63:i]
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_and_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_and_pd
 FORCE_INLINE __m128d _mm_and_pd(__m128d a, __m128d b)
 {
     return vreinterpretq_m128d_s64(
@@ -3270,7 +3276,7 @@ FORCE_INLINE __m128i _mm_and_si128(__m128i a, __m128i b)
 // 	     dst[i+63:i] := ((NOT a[i+63:i]) AND b[i+63:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_andnot_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_andnot_pd
 FORCE_INLINE __m128d _mm_andnot_pd(__m128d a, __m128d b)
 {
     // *NOTE* argument swap
@@ -3323,17 +3329,17 @@ FORCE_INLINE __m128i _mm_avg_epu8(__m128i a, __m128i b)
 
 // Shift a left by imm8 bytes while shifting in zeros, and store the results in
 // dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_bslli_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_bslli_si128
 #define _mm_bslli_si128(a, imm) _mm_slli_si128(a, imm)
 
 // Shift a right by imm8 bytes while shifting in zeros, and store the results in
 // dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_bsrli_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_bsrli_si128
 #define _mm_bsrli_si128(a, imm) _mm_srli_si128(a, imm)
 
 // Cast vector of type __m128d to type __m128. This intrinsic is only used for
 // compilation and does not generate any instructions, thus it has zero latency.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_castpd_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_castpd_ps
 FORCE_INLINE __m128 _mm_castpd_ps(__m128d a)
 {
     return vreinterpretq_m128_s64(vreinterpretq_s64_m128d(a));
@@ -3341,7 +3347,7 @@ FORCE_INLINE __m128 _mm_castpd_ps(__m128d a)
 
 // Cast vector of type __m128d to type __m128i. This intrinsic is only used for
 // compilation and does not generate any instructions, thus it has zero latency.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_castpd_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_castpd_si128
 FORCE_INLINE __m128i _mm_castpd_si128(__m128d a)
 {
     return vreinterpretq_m128i_s64(vreinterpretq_s64_m128d(a));
@@ -3349,7 +3355,7 @@ FORCE_INLINE __m128i _mm_castpd_si128(__m128d a)
 
 // Cast vector of type __m128 to type __m128d. This intrinsic is only used for
 // compilation and does not generate any instructions, thus it has zero latency.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_castps_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_castps_pd
 FORCE_INLINE __m128d _mm_castps_pd(__m128 a)
 {
     return vreinterpretq_m128d_s32(vreinterpretq_s32_m128(a));
@@ -3365,7 +3371,7 @@ FORCE_INLINE __m128i _mm_castps_si128(__m128 a)
 
 // Cast vector of type __m128i to type __m128d. This intrinsic is only used for
 // compilation and does not generate any instructions, thus it has zero latency.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_castsi128_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_castsi128_pd
 FORCE_INLINE __m128d _mm_castsi128_pd(__m128i a)
 {
 #if defined(__aarch64__)
@@ -3436,7 +3442,7 @@ FORCE_INLINE __m128i _mm_cmpeq_epi8(__m128i a, __m128i b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // for equality, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpeq_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpeq_pd
 FORCE_INLINE __m128d _mm_cmpeq_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3454,7 +3460,7 @@ FORCE_INLINE __m128d _mm_cmpeq_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b for equality, store the result in the lower element of dst, and copy the
 // upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpeq_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpeq_sd
 FORCE_INLINE __m128d _mm_cmpeq_sd(__m128d a, __m128d b)
 {
     return _mm_move_sd(a, _mm_cmpeq_pd(a, b));
@@ -3462,7 +3468,7 @@ FORCE_INLINE __m128d _mm_cmpeq_sd(__m128d a, __m128d b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // for greater-than-or-equal, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpge_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpge_pd
 FORCE_INLINE __m128d _mm_cmpge_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3484,7 +3490,7 @@ FORCE_INLINE __m128d _mm_cmpge_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b for greater-than-or-equal, store the result in the lower element of dst,
 // and copy the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpge_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpge_sd
 FORCE_INLINE __m128d _mm_cmpge_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3543,7 +3549,7 @@ FORCE_INLINE __m128i _mm_cmpgt_epi8(__m128i a, __m128i b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // for greater-than, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpgt_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpgt_pd
 FORCE_INLINE __m128d _mm_cmpgt_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3565,7 +3571,7 @@ FORCE_INLINE __m128d _mm_cmpgt_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b for greater-than, store the result in the lower element of dst, and copy
 // the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpgt_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpgt_sd
 FORCE_INLINE __m128d _mm_cmpgt_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3585,7 +3591,7 @@ FORCE_INLINE __m128d _mm_cmpgt_sd(__m128d a, __m128d b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // for less-than-or-equal, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmple_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmple_pd
 FORCE_INLINE __m128d _mm_cmple_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3607,7 +3613,7 @@ FORCE_INLINE __m128d _mm_cmple_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b for less-than-or-equal, store the result in the lower element of dst, and
 // copy the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmple_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmple_sd
 FORCE_INLINE __m128d _mm_cmple_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3661,7 +3667,7 @@ FORCE_INLINE __m128i _mm_cmplt_epi8(__m128i a, __m128i b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // for less-than, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmplt_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmplt_pd
 FORCE_INLINE __m128d _mm_cmplt_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3683,7 +3689,7 @@ FORCE_INLINE __m128d _mm_cmplt_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b for less-than, store the result in the lower element of dst, and copy the
 // upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmplt_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmplt_sd
 FORCE_INLINE __m128d _mm_cmplt_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3702,7 +3708,7 @@ FORCE_INLINE __m128d _mm_cmplt_sd(__m128d a, __m128d b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // for not-equal, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpneq_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpneq_pd
 FORCE_INLINE __m128d _mm_cmpneq_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3720,7 +3726,7 @@ FORCE_INLINE __m128d _mm_cmpneq_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b for not-equal, store the result in the lower element of dst, and copy the
 // upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpneq_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpneq_sd
 FORCE_INLINE __m128d _mm_cmpneq_sd(__m128d a, __m128d b)
 {
     return _mm_move_sd(a, _mm_cmpneq_pd(a, b));
@@ -3728,7 +3734,7 @@ FORCE_INLINE __m128d _mm_cmpneq_sd(__m128d a, __m128d b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // for not-greater-than-or-equal, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpnge_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpnge_pd
 FORCE_INLINE __m128d _mm_cmpnge_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3753,7 +3759,7 @@ FORCE_INLINE __m128d _mm_cmpnge_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b for not-greater-than-or-equal, store the result in the lower element of
 // dst, and copy the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpnge_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpnge_sd
 FORCE_INLINE __m128d _mm_cmpnge_sd(__m128d a, __m128d b)
 {
     return _mm_move_sd(a, _mm_cmpnge_pd(a, b));
@@ -3761,7 +3767,7 @@ FORCE_INLINE __m128d _mm_cmpnge_sd(__m128d a, __m128d b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // for not-greater-than, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_cmpngt_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_cmpngt_pd
 FORCE_INLINE __m128d _mm_cmpngt_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3786,7 +3792,7 @@ FORCE_INLINE __m128d _mm_cmpngt_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b for not-greater-than, store the result in the lower element of dst, and
 // copy the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpngt_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpngt_sd
 FORCE_INLINE __m128d _mm_cmpngt_sd(__m128d a, __m128d b)
 {
     return _mm_move_sd(a, _mm_cmpngt_pd(a, b));
@@ -3794,7 +3800,7 @@ FORCE_INLINE __m128d _mm_cmpngt_sd(__m128d a, __m128d b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // for not-less-than-or-equal, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpnle_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpnle_pd
 FORCE_INLINE __m128d _mm_cmpnle_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3819,7 +3825,7 @@ FORCE_INLINE __m128d _mm_cmpnle_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b for not-less-than-or-equal, store the result in the lower element of dst,
 // and copy the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpnle_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpnle_sd
 FORCE_INLINE __m128d _mm_cmpnle_sd(__m128d a, __m128d b)
 {
     return _mm_move_sd(a, _mm_cmpnle_pd(a, b));
@@ -3827,7 +3833,7 @@ FORCE_INLINE __m128d _mm_cmpnle_sd(__m128d a, __m128d b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // for not-less-than, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpnlt_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpnlt_pd
 FORCE_INLINE __m128d _mm_cmpnlt_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3852,7 +3858,7 @@ FORCE_INLINE __m128d _mm_cmpnlt_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b for not-less-than, store the result in the lower element of dst, and copy
 // the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpnlt_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpnlt_sd
 FORCE_INLINE __m128d _mm_cmpnlt_sd(__m128d a, __m128d b)
 {
     return _mm_move_sd(a, _mm_cmpnlt_pd(a, b));
@@ -3860,7 +3866,7 @@ FORCE_INLINE __m128d _mm_cmpnlt_sd(__m128d a, __m128d b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // to see if neither is NaN, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpord_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpord_pd
 FORCE_INLINE __m128d _mm_cmpord_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3892,7 +3898,7 @@ FORCE_INLINE __m128d _mm_cmpord_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b to see if neither is NaN, store the result in the lower element of dst, and
 // copy the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpord_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpord_sd
 FORCE_INLINE __m128d _mm_cmpord_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3914,7 +3920,7 @@ FORCE_INLINE __m128d _mm_cmpord_sd(__m128d a, __m128d b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b
 // to see if either is NaN, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpunord_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpunord_pd
 FORCE_INLINE __m128d _mm_cmpunord_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3947,7 +3953,7 @@ FORCE_INLINE __m128d _mm_cmpunord_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b to see if either is NaN, store the result in the lower element of dst, and
 // copy the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpunord_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpunord_sd
 FORCE_INLINE __m128d _mm_cmpunord_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3969,7 +3975,7 @@ FORCE_INLINE __m128d _mm_cmpunord_sd(__m128d a, __m128d b)
 
 // Compare the lower double-precision (64-bit) floating-point element in a and b
 // for greater-than-or-equal, and return the boolean result (0 or 1).
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_comige_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_comige_sd
 FORCE_INLINE int _mm_comige_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3984,7 +3990,7 @@ FORCE_INLINE int _mm_comige_sd(__m128d a, __m128d b)
 
 // Compare the lower double-precision (64-bit) floating-point element in a and b
 // for greater-than, and return the boolean result (0 or 1).
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_comigt_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_comigt_sd
 FORCE_INLINE int _mm_comigt_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -3999,7 +4005,7 @@ FORCE_INLINE int _mm_comigt_sd(__m128d a, __m128d b)
 
 // Compare the lower double-precision (64-bit) floating-point element in a and b
 // for less-than-or-equal, and return the boolean result (0 or 1).
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_comile_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_comile_sd
 FORCE_INLINE int _mm_comile_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -4014,7 +4020,7 @@ FORCE_INLINE int _mm_comile_sd(__m128d a, __m128d b)
 
 // Compare the lower double-precision (64-bit) floating-point element in a and b
 // for less-than, and return the boolean result (0 or 1).
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_comilt_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_comilt_sd
 FORCE_INLINE int _mm_comilt_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -4029,7 +4035,7 @@ FORCE_INLINE int _mm_comilt_sd(__m128d a, __m128d b)
 
 // Compare the lower double-precision (64-bit) floating-point element in a and b
 // for equality, and return the boolean result (0 or 1).
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_comieq_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_comieq_sd
 FORCE_INLINE int _mm_comieq_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -4050,7 +4056,7 @@ FORCE_INLINE int _mm_comieq_sd(__m128d a, __m128d b)
 
 // Compare the lower double-precision (64-bit) floating-point element in a and b
 // for not-equal, and return the boolean result (0 or 1).
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_comineq_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_comineq_sd
 FORCE_INLINE int _mm_comineq_sd(__m128d a, __m128d b)
 {
     return !_mm_comieq_sd(a, b);
@@ -4065,7 +4071,7 @@ FORCE_INLINE int _mm_comineq_sd(__m128d a, __m128d b)
 //     dst[m+63:m] := Convert_Int32_To_FP64(a[i+31:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtepi32_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtepi32_pd
 FORCE_INLINE __m128d _mm_cvtepi32_pd(__m128i a)
 {
 #if defined(__aarch64__)
@@ -4095,7 +4101,7 @@ FORCE_INLINE __m128 _mm_cvtepi32_ps(__m128i a)
 //      dst[i+31:i] := Convert_FP64_To_Int32(a[k+63:k])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtpd_epi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtpd_epi32
 FORCE_INLINE __m128i _mm_cvtpd_epi32(__m128d a)
 {
 // vrnd32xq_f64 not supported on clang
@@ -4121,7 +4127,7 @@ FORCE_INLINE __m128i _mm_cvtpd_epi32(__m128d a)
 //      dst[i+31:i] := Convert_FP64_To_Int32(a[k+63:k])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtpd_pi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtpd_pi32
 FORCE_INLINE __m64 _mm_cvtpd_pi32(__m128d a)
 {
     __m128d rnd = _mm_round_pd(a, _MM_FROUND_CUR_DIRECTION);
@@ -4142,7 +4148,7 @@ FORCE_INLINE __m64 _mm_cvtpd_pi32(__m128d a)
 //   ENDFOR
 //   dst[127:64] := 0
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtpd_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtpd_ps
 FORCE_INLINE __m128 _mm_cvtpd_ps(__m128d a)
 {
 #if defined(__aarch64__)
@@ -4164,7 +4170,7 @@ FORCE_INLINE __m128 _mm_cvtpd_ps(__m128d a)
 //     dst[m+63:m] := Convert_Int32_To_FP64(a[i+31:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtpi32_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtpi32_pd
 FORCE_INLINE __m128d _mm_cvtpi32_pd(__m64 a)
 {
 #if defined(__aarch64__)
@@ -4249,7 +4255,7 @@ FORCE_INLINE __m128i _mm_cvtps_epi32(__m128 a)
 //     dst[i+63:i] := Convert_FP32_To_FP64(a[k+31:k])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtps_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtps_pd
 FORCE_INLINE __m128d _mm_cvtps_pd(__m128 a)
 {
 #if defined(__aarch64__)
@@ -4266,7 +4272,7 @@ FORCE_INLINE __m128d _mm_cvtps_pd(__m128 a)
 //
 //   dst[63:0] := a[63:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsd_f64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsd_f64
 FORCE_INLINE double _mm_cvtsd_f64(__m128d a)
 {
 #if defined(__aarch64__)
@@ -4281,7 +4287,7 @@ FORCE_INLINE double _mm_cvtsd_f64(__m128d a)
 //
 //   dst[31:0] := Convert_FP64_To_Int32(a[63:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsd_si32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsd_si32
 FORCE_INLINE int32_t _mm_cvtsd_si32(__m128d a)
 {
 #if defined(__aarch64__)
@@ -4298,7 +4304,7 @@ FORCE_INLINE int32_t _mm_cvtsd_si32(__m128d a)
 //
 //   dst[63:0] := Convert_FP64_To_Int64(a[63:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsd_si64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsd_si64
 FORCE_INLINE int64_t _mm_cvtsd_si64(__m128d a)
 {
 #if defined(__aarch64__)
@@ -4315,14 +4321,14 @@ FORCE_INLINE int64_t _mm_cvtsd_si64(__m128d a)
 //
 //   dst[63:0] := Convert_FP64_To_Int64(a[63:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsd_si64x
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsd_si64x
 #define _mm_cvtsd_si64x _mm_cvtsd_si64
 
 // Convert the lower double-precision (64-bit) floating-point element in b to a
 // single-precision (32-bit) floating-point element, store the result in the
 // lower element of dst, and copy the upper 3 packed elements from a to the
 // upper elements of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsd_ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsd_ss
 FORCE_INLINE __m128 _mm_cvtsd_ss(__m128 a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -4339,7 +4345,7 @@ FORCE_INLINE __m128 _mm_cvtsd_ss(__m128 a, __m128d b)
 //
 //   dst[31:0] := a[31:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsi128_si32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsi128_si32
 FORCE_INLINE int _mm_cvtsi128_si32(__m128i a)
 {
     return vgetq_lane_s32(vreinterpretq_s32_m128i(a), 0);
@@ -4349,20 +4355,20 @@ FORCE_INLINE int _mm_cvtsi128_si32(__m128i a)
 //
 //   dst[63:0] := a[63:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsi128_si64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsi128_si64
 FORCE_INLINE int64_t _mm_cvtsi128_si64(__m128i a)
 {
     return vgetq_lane_s64(vreinterpretq_s64_m128i(a), 0);
 }
 
 // Copy the lower 64-bit integer in a to dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsi128_si64x
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsi128_si64x
 #define _mm_cvtsi128_si64x(a) _mm_cvtsi128_si64(a)
 
 // Convert the signed 32-bit integer b to a double-precision (64-bit)
 // floating-point element, store the result in the lower element of dst, and
 // copy the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsi32_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsi32_sd
 FORCE_INLINE __m128d _mm_cvtsi32_sd(__m128d a, int32_t b)
 {
 #if defined(__aarch64__)
@@ -4379,7 +4385,7 @@ FORCE_INLINE __m128d _mm_cvtsi32_sd(__m128d a, int32_t b)
 //
 //   dst[63:0] := a[63:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsi128_si64x
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsi128_si64x
 #define _mm_cvtsi128_si64x(a) _mm_cvtsi128_si64(a)
 
 // Moves 32-bit integer a to the least significant 32 bits of an __m128 object,
@@ -4399,7 +4405,7 @@ FORCE_INLINE __m128i _mm_cvtsi32_si128(int a)
 // Convert the signed 64-bit integer b to a double-precision (64-bit)
 // floating-point element, store the result in the lower element of dst, and
 // copy the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsi64_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsi64_sd
 FORCE_INLINE __m128d _mm_cvtsi64_sd(__m128d a, int64_t b)
 {
 #if defined(__aarch64__)
@@ -4424,13 +4430,13 @@ FORCE_INLINE __m128i _mm_cvtsi64_si128(int64_t a)
 
 // Copy 64-bit integer a to the lower element of dst, and zero the upper
 // element.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsi64x_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsi64x_si128
 #define _mm_cvtsi64x_si128(a) _mm_cvtsi64_si128(a)
 
 // Convert the signed 64-bit integer b to a double-precision (64-bit)
 // floating-point element, store the result in the lower element of dst, and
 // copy the upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtsi64x_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtsi64x_sd
 #define _mm_cvtsi64x_sd(a, b) _mm_cvtsi64_sd(a, b)
 
 // Convert the lower single-precision (32-bit) floating-point element in b to a
@@ -4441,7 +4447,7 @@ FORCE_INLINE __m128i _mm_cvtsi64_si128(int64_t a)
 //   dst[63:0] := Convert_FP32_To_FP64(b[31:0])
 //   dst[127:64] := a[127:64]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtss_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtss_sd
 FORCE_INLINE __m128d _mm_cvtss_sd(__m128d a, __m128 b)
 {
     double d = (double) vgetq_lane_f32(vreinterpretq_f32_m128(b), 0);
@@ -4456,7 +4462,7 @@ FORCE_INLINE __m128d _mm_cvtss_sd(__m128d a, __m128 b)
 
 // Convert packed double-precision (64-bit) floating-point elements in a to
 // packed 32-bit integers with truncation, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvttpd_epi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvttpd_epi32
 FORCE_INLINE __m128i _mm_cvttpd_epi32(__m128d a)
 {
     double a0 = ((double *) &a)[0];
@@ -4466,7 +4472,7 @@ FORCE_INLINE __m128i _mm_cvttpd_epi32(__m128d a)
 
 // Convert packed double-precision (64-bit) floating-point elements in a to
 // packed 32-bit integers with truncation, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvttpd_pi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvttpd_pi32
 FORCE_INLINE __m64 _mm_cvttpd_pi32(__m128d a)
 {
     double a0 = ((double *) &a)[0];
@@ -4488,7 +4494,7 @@ FORCE_INLINE __m128i _mm_cvttps_epi32(__m128 a)
 //
 //   dst[63:0] := Convert_FP64_To_Int32_Truncate(a[63:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvttsd_si32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvttsd_si32
 FORCE_INLINE int32_t _mm_cvttsd_si32(__m128d a)
 {
     double ret = *((double *) &a);
@@ -4500,7 +4506,7 @@ FORCE_INLINE int32_t _mm_cvttsd_si32(__m128d a)
 //
 //   dst[63:0] := Convert_FP64_To_Int64_Truncate(a[63:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvttsd_si64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvttsd_si64
 FORCE_INLINE int64_t _mm_cvttsd_si64(__m128d a)
 {
 #if defined(__aarch64__)
@@ -4516,7 +4522,7 @@ FORCE_INLINE int64_t _mm_cvttsd_si64(__m128d a)
 //
 //   dst[63:0] := Convert_FP64_To_Int64_Truncate(a[63:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvttsd_si64x
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvttsd_si64x
 #define _mm_cvttsd_si64x(a) _mm_cvttsd_si64(a)
 
 // Divide packed double-precision (64-bit) floating-point elements in a by
@@ -4527,7 +4533,7 @@ FORCE_INLINE int64_t _mm_cvttsd_si64(__m128d a)
 //    dst[i+63:i] := a[i+63:i] / b[i+63:i]
 //  ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_div_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_div_pd
 FORCE_INLINE __m128d _mm_div_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -4547,7 +4553,7 @@ FORCE_INLINE __m128d _mm_div_pd(__m128d a, __m128d b)
 // lower double-precision (64-bit) floating-point element in b, store the result
 // in the lower element of dst, and copy the upper element from a to the upper
 // element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_div_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_div_sd
 FORCE_INLINE __m128d _mm_div_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -4583,7 +4589,7 @@ FORCE_INLINE __m128d _mm_div_sd(__m128d a, __m128d b)
 //
 //   dst[127:0] := MEM[mem_addr+127:mem_addr]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_load_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_load_pd
 FORCE_INLINE __m128d _mm_load_pd(const double *p)
 {
 #if defined(__aarch64__)
@@ -4601,7 +4607,7 @@ FORCE_INLINE __m128d _mm_load_pd(const double *p)
 //   dst[63:0] := MEM[mem_addr+63:mem_addr]
 //   dst[127:64] := MEM[mem_addr+63:mem_addr]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_load_pd1
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_load_pd1
 #define _mm_load_pd1 _mm_load1_pd
 
 // Load a double-precision (64-bit) floating-point element from memory into the
@@ -4611,7 +4617,7 @@ FORCE_INLINE __m128d _mm_load_pd(const double *p)
 //   dst[63:0] := MEM[mem_addr+63:mem_addr]
 //   dst[127:64] := 0
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_load_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_load_sd
 FORCE_INLINE __m128d _mm_load_sd(const double *p)
 {
 #if defined(__aarch64__)
@@ -4636,7 +4642,7 @@ FORCE_INLINE __m128i _mm_load_si128(const __m128i *p)
 //   dst[63:0] := MEM[mem_addr+63:mem_addr]
 //   dst[127:64] := MEM[mem_addr+63:mem_addr]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_load1_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_load1_pd
 FORCE_INLINE __m128d _mm_load1_pd(const double *p)
 {
 #if defined(__aarch64__)
@@ -4653,7 +4659,7 @@ FORCE_INLINE __m128d _mm_load1_pd(const double *p)
 //   dst[63:0] := a[63:0]
 //   dst[127:64] := MEM[mem_addr+63:mem_addr]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_loadh_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_loadh_pd
 FORCE_INLINE __m128d _mm_loadh_pd(__m128d a, const double *p)
 {
 #if defined(__aarch64__)
@@ -4666,7 +4672,7 @@ FORCE_INLINE __m128d _mm_loadh_pd(__m128d a, const double *p)
 }
 
 // Load 64-bit integer from memory into the first element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_loadl_epi64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_loadl_epi64
 FORCE_INLINE __m128i _mm_loadl_epi64(__m128i const *p)
 {
     /* Load the lower 64 bits of the value pointed to by p into the
@@ -4683,7 +4689,7 @@ FORCE_INLINE __m128i _mm_loadl_epi64(__m128i const *p)
 //   dst[63:0] := MEM[mem_addr+63:mem_addr]
 //   dst[127:64] := a[127:64]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_loadl_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_loadl_pd
 FORCE_INLINE __m128d _mm_loadl_pd(__m128d a, const double *p)
 {
 #if defined(__aarch64__)
@@ -4703,7 +4709,7 @@ FORCE_INLINE __m128d _mm_loadl_pd(__m128d a, const double *p)
 //   dst[63:0] := MEM[mem_addr+127:mem_addr+64]
 //   dst[127:64] := MEM[mem_addr+63:mem_addr]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_loadr_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_loadr_pd
 FORCE_INLINE __m128d _mm_loadr_pd(const double *p)
 {
 #if defined(__aarch64__)
@@ -4716,7 +4722,7 @@ FORCE_INLINE __m128d _mm_loadr_pd(const double *p)
 }
 
 // Loads two double-precision from unaligned memory, floating-point values.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_loadu_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_loadu_pd
 FORCE_INLINE __m128d _mm_loadu_pd(const double *p)
 {
     return _mm_load_pd(p);
@@ -4734,7 +4740,7 @@ FORCE_INLINE __m128i _mm_loadu_si128(const __m128i *p)
 //   dst[31:0] := MEM[mem_addr+31:mem_addr]
 //   dst[MAX:32] := 0
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_loadu_si32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_loadu_si32
 FORCE_INLINE __m128i _mm_loadu_si32(const void *p)
 {
     return vreinterpretq_m128i_s32(
@@ -4773,7 +4779,7 @@ FORCE_INLINE __m128i _mm_madd_epi16(__m128i a, __m128i b)
 // (elements are not stored when the highest bit is not set in the corresponding
 // element) and a non-temporal memory hint. mem_addr does not need to be aligned
 // on any particular boundary.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_maskmoveu_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_maskmoveu_si128
 FORCE_INLINE void _mm_maskmoveu_si128(__m128i a, __m128i mask, char *mem_addr)
 {
     int8x16_t shr_mask = vshrq_n_s8(vreinterpretq_s8_m128i(mask), 7);
@@ -4804,7 +4810,7 @@ FORCE_INLINE __m128i _mm_max_epu8(__m128i a, __m128i b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b,
 // and store packed maximum values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_max_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_max_pd
 FORCE_INLINE __m128d _mm_max_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -4832,7 +4838,7 @@ FORCE_INLINE __m128d _mm_max_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b, store the maximum value in the lower element of dst, and copy the upper
 // element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_max_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_max_sd
 FORCE_INLINE __m128d _mm_max_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -4865,7 +4871,7 @@ FORCE_INLINE __m128i _mm_min_epu8(__m128i a, __m128i b)
 
 // Compare packed double-precision (64-bit) floating-point elements in a and b,
 // and store packed minimum values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_min_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_min_pd
 FORCE_INLINE __m128d _mm_min_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -4892,7 +4898,7 @@ FORCE_INLINE __m128d _mm_min_pd(__m128d a, __m128d b)
 // Compare the lower double-precision (64-bit) floating-point elements in a and
 // b, store the minimum value in the lower element of dst, and copy the upper
 // element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_min_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_min_sd
 FORCE_INLINE __m128d _mm_min_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -4911,7 +4917,7 @@ FORCE_INLINE __m128d _mm_min_sd(__m128d a, __m128d b)
 //   dst[63:0] := a[63:0]
 //   dst[127:64] := 0
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_move_epi64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_move_epi64
 FORCE_INLINE __m128i _mm_move_epi64(__m128i a)
 {
     return vreinterpretq_m128i_s64(
@@ -4925,7 +4931,7 @@ FORCE_INLINE __m128i _mm_move_epi64(__m128i a)
 //   dst[63:0] := b[63:0]
 //   dst[127:64] := a[127:64]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_move_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_move_sd
 FORCE_INLINE __m128d _mm_move_sd(__m128d a, __m128d b)
 {
     return vreinterpretq_m128d_f32(
@@ -5019,7 +5025,7 @@ FORCE_INLINE int _mm_movemask_epi8(__m128i a)
 
 // Set each bit of mask dst based on the most significant bit of the
 // corresponding packed double-precision (64-bit) floating-point element in a.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_movemask_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_movemask_pd
 FORCE_INLINE int _mm_movemask_pd(__m128d a)
 {
     uint64x2_t input = vreinterpretq_u64_m128d(a);
@@ -5031,7 +5037,7 @@ FORCE_INLINE int _mm_movemask_pd(__m128d a)
 //
 //   dst[63:0] := a[63:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_movepi64_pi64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_movepi64_pi64
 FORCE_INLINE __m64 _mm_movepi64_pi64(__m128i a)
 {
     return vreinterpret_m64_s64(vget_low_s64(vreinterpretq_s64_m128i(a)));
@@ -5043,7 +5049,7 @@ FORCE_INLINE __m64 _mm_movepi64_pi64(__m128i a)
 //   dst[63:0] := a[63:0]
 //   dst[127:64] := 0
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_movpi64_epi64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_movpi64_epi64
 FORCE_INLINE __m128i _mm_movpi64_epi64(__m64 a)
 {
     return vreinterpretq_m128i_s64(
@@ -5065,7 +5071,7 @@ FORCE_INLINE __m128i _mm_mul_epu32(__m128i a, __m128i b)
 
 // Multiply packed double-precision (64-bit) floating-point elements in a and b,
 // and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_mul_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_mul_pd
 FORCE_INLINE __m128d _mm_mul_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -5084,7 +5090,7 @@ FORCE_INLINE __m128d _mm_mul_pd(__m128d a, __m128d b)
 // Multiply the lower double-precision (64-bit) floating-point element in a and
 // b, store the result in the lower element of dst, and copy the upper element
 // from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=mm_mul_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=mm_mul_sd
 FORCE_INLINE __m128d _mm_mul_sd(__m128d a, __m128d b)
 {
     return _mm_move_sd(a, _mm_mul_pd(a, b));
@@ -5095,7 +5101,7 @@ FORCE_INLINE __m128d _mm_mul_sd(__m128d a, __m128d b)
 //
 //   dst[63:0] := a[31:0] * b[31:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_mul_su32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_mul_su32
 FORCE_INLINE __m64 _mm_mul_su32(__m64 a, __m64 b)
 {
     return vreinterpret_m64_u64(vget_low_u64(
@@ -5131,7 +5137,7 @@ FORCE_INLINE __m128i _mm_mulhi_epi16(__m128i a, __m128i b)
 // Multiply the packed unsigned 16-bit integers in a and b, producing
 // intermediate 32-bit integers, and store the high 16 bits of the intermediate
 // integers in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_mulhi_epu16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_mulhi_epu16
 FORCE_INLINE __m128i _mm_mulhi_epu16(__m128i a, __m128i b)
 {
     uint16x4_t a3210 = vget_low_u16(vreinterpretq_u16_m128i(a));
@@ -5170,7 +5176,7 @@ FORCE_INLINE __m128i _mm_mullo_epi16(__m128i a, __m128i b)
 
 // Compute the bitwise OR of packed double-precision (64-bit) floating-point
 // elements in a and b, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=mm_or_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=mm_or_pd
 FORCE_INLINE __m128d _mm_or_pd(__m128d a, __m128d b)
 {
     return vreinterpretq_m128d_s64(
@@ -5252,7 +5258,7 @@ FORCE_INLINE void _mm_pause()
 // b, then horizontally sum each consecutive 8 differences to produce two
 // unsigned 16-bit integers, and pack these unsigned 16-bit integers in the low
 // 16 bits of 64-bit elements in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sad_epu8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sad_epu8
 FORCE_INLINE __m128i _mm_sad_epu8(__m128i a, __m128i b)
 {
     uint16x8_t t = vpaddlq_u8(vabdq_u8((uint8x16_t) a, (uint8x16_t) b));
@@ -5328,7 +5334,7 @@ FORCE_INLINE __m128i _mm_set_epi8(signed char b15,
 
 // Set packed double-precision (64-bit) floating-point elements in dst with the
 // supplied values.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_set_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_set_pd
 FORCE_INLINE __m128d _mm_set_pd(double e1, double e0)
 {
     double ALIGN_STRUCT(16) data[2] = {e0, e1};
@@ -5341,12 +5347,12 @@ FORCE_INLINE __m128d _mm_set_pd(double e1, double e0)
 
 // Broadcast double-precision (64-bit) floating-point value a to all elements of
 // dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_set_pd1
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_set_pd1
 #define _mm_set_pd1 _mm_set1_pd
 
 // Copy double-precision (64-bit) floating-point element a to the lower element
 // of dst, and zero the upper element.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_set_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_set_sd
 FORCE_INLINE __m128d _mm_set_sd(double a)
 {
 #if defined(__aarch64__)
@@ -5390,7 +5396,7 @@ FORCE_INLINE __m128i _mm_set1_epi64(__m64 _i)
 }
 
 // Sets the 2 signed 64-bit integer values to i.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_set1_epi64x
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_set1_epi64x
 FORCE_INLINE __m128i _mm_set1_epi64x(int64_t _i)
 {
     return vreinterpretq_m128i_s64(vdupq_n_s64(_i));
@@ -5411,7 +5417,7 @@ FORCE_INLINE __m128i _mm_set1_epi8(signed char w)
 
 // Broadcast double-precision (64-bit) floating-point value a to all elements of
 // dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_set1_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_set1_pd
 FORCE_INLINE __m128d _mm_set1_pd(double d)
 {
 #if defined(__aarch64__)
@@ -5450,7 +5456,7 @@ FORCE_INLINE __m128i _mm_setr_epi32(int i3, int i2, int i1, int i0)
 }
 
 // Set packed 64-bit integers in dst with the supplied values in reverse order.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_setr_epi64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_setr_epi64
 FORCE_INLINE __m128i _mm_setr_epi64(__m64 e1, __m64 e0)
 {
     return vreinterpretq_m128i_s64(vcombine_s64(e1, e0));
@@ -5485,14 +5491,14 @@ FORCE_INLINE __m128i _mm_setr_epi8(signed char b0,
 
 // Set packed double-precision (64-bit) floating-point elements in dst with the
 // supplied values in reverse order.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_setr_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_setr_pd
 FORCE_INLINE __m128d _mm_setr_pd(double e1, double e0)
 {
     return _mm_set_pd(e0, e1);
 }
 
 // Return vector of type __m128d with all elements set to zero.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_setzero_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_setzero_pd
 FORCE_INLINE __m128d _mm_setzero_pd(void)
 {
 #if defined(__aarch64__)
@@ -5583,7 +5589,7 @@ FORCE_INLINE __m128i _mm_setzero_si128(void)
 //   dst[63:0] := (imm8[0] == 0) ? a[63:0] : a[127:64]
 //   dst[127:64] := (imm8[1] == 0) ? b[63:0] : b[127:64]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_shuffle_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_shuffle_pd
 #ifdef _sse2neon_shuffle
 #define _mm_shuffle_pd(a, b, imm8)                                            \
     vreinterpretq_m128d_s64(                                                  \
@@ -5639,7 +5645,7 @@ FORCE_INLINE __m128i _mm_setzero_si128(void)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sll_epi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sll_epi16
 FORCE_INLINE __m128i _mm_sll_epi16(__m128i a, __m128i count)
 {
     uint64_t c = vreinterpretq_nth_u64_m128i(count, 0);
@@ -5662,7 +5668,7 @@ FORCE_INLINE __m128i _mm_sll_epi16(__m128i a, __m128i count)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sll_epi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sll_epi32
 FORCE_INLINE __m128i _mm_sll_epi32(__m128i a, __m128i count)
 {
     uint64_t c = vreinterpretq_nth_u64_m128i(count, 0);
@@ -5685,7 +5691,7 @@ FORCE_INLINE __m128i _mm_sll_epi32(__m128i a, __m128i count)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sll_epi64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sll_epi64
 FORCE_INLINE __m128i _mm_sll_epi64(__m128i a, __m128i count)
 {
     uint64_t c = vreinterpretq_nth_u64_m128i(count, 0);
@@ -5708,7 +5714,7 @@ FORCE_INLINE __m128i _mm_sll_epi64(__m128i a, __m128i count)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_slli_epi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_slli_epi16
 FORCE_INLINE __m128i _mm_slli_epi16(__m128i a, int imm)
 {
     if (_sse2neon_unlikely(imm & ~15))
@@ -5729,7 +5735,7 @@ FORCE_INLINE __m128i _mm_slli_epi16(__m128i a, int imm)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_slli_epi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_slli_epi32
 FORCE_INLINE __m128i _mm_slli_epi32(__m128i a, int imm)
 {
     if (_sse2neon_unlikely(imm & ~31))
@@ -5750,7 +5756,7 @@ FORCE_INLINE __m128i _mm_slli_epi32(__m128i a, int imm)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_slli_epi64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_slli_epi64
 FORCE_INLINE __m128i _mm_slli_epi64(__m128i a, int imm)
 {
     if (_sse2neon_unlikely(imm & ~63))
@@ -5768,7 +5774,7 @@ FORCE_INLINE __m128i _mm_slli_epi64(__m128i a, int imm)
 //   FI
 //   dst[127:0] := a[127:0] << (tmp*8)
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_slli_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_slli_si128
 #define _mm_slli_si128(a, imm)                                         \
     __extension__({                                                    \
         int8x16_t ret;                                                 \
@@ -5784,7 +5790,7 @@ FORCE_INLINE __m128i _mm_slli_epi64(__m128i a, int imm)
 
 // Compute the square root of packed double-precision (64-bit) floating-point
 // elements in a, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sqrt_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sqrt_pd
 FORCE_INLINE __m128d _mm_sqrt_pd(__m128d a)
 {
 #if defined(__aarch64__)
@@ -5799,7 +5805,7 @@ FORCE_INLINE __m128d _mm_sqrt_pd(__m128d a)
 // Compute the square root of the lower double-precision (64-bit) floating-point
 // element in b, store the result in the lower element of dst, and copy the
 // upper element from a to the upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sqrt_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sqrt_sd
 FORCE_INLINE __m128d _mm_sqrt_sd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -5821,7 +5827,7 @@ FORCE_INLINE __m128d _mm_sqrt_sd(__m128d a, __m128d b)
 //     FI
 //  ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sra_epi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sra_epi16
 FORCE_INLINE __m128i _mm_sra_epi16(__m128i a, __m128i count)
 {
     int64_t c = (int64_t) vget_low_s64((int64x2_t) count);
@@ -5842,7 +5848,7 @@ FORCE_INLINE __m128i _mm_sra_epi16(__m128i a, __m128i count)
 //     FI
 //  ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sra_epi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sra_epi32
 FORCE_INLINE __m128i _mm_sra_epi32(__m128i a, __m128i count)
 {
     int64_t c = (int64_t) vget_low_s64((int64x2_t) count);
@@ -5863,7 +5869,7 @@ FORCE_INLINE __m128i _mm_sra_epi32(__m128i a, __m128i count)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_srai_epi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_srai_epi16
 FORCE_INLINE __m128i _mm_srai_epi16(__m128i a, int imm)
 {
     const int count = (imm & ~15) ? 15 : imm;
@@ -5882,7 +5888,7 @@ FORCE_INLINE __m128i _mm_srai_epi16(__m128i a, int imm)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_srai_epi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_srai_epi32
 // FORCE_INLINE __m128i _mm_srai_epi32(__m128i a, __constrange(0,255) int imm)
 #define _mm_srai_epi32(a, imm)                                               \
     __extension__({                                                          \
@@ -5911,7 +5917,7 @@ FORCE_INLINE __m128i _mm_srai_epi16(__m128i a, int imm)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_srl_epi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_srl_epi16
 FORCE_INLINE __m128i _mm_srl_epi16(__m128i a, __m128i count)
 {
     uint64_t c = vreinterpretq_nth_u64_m128i(count, 0);
@@ -5934,7 +5940,7 @@ FORCE_INLINE __m128i _mm_srl_epi16(__m128i a, __m128i count)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_srl_epi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_srl_epi32
 FORCE_INLINE __m128i _mm_srl_epi32(__m128i a, __m128i count)
 {
     uint64_t c = vreinterpretq_nth_u64_m128i(count, 0);
@@ -5957,7 +5963,7 @@ FORCE_INLINE __m128i _mm_srl_epi32(__m128i a, __m128i count)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_srl_epi64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_srl_epi64
 FORCE_INLINE __m128i _mm_srl_epi64(__m128i a, __m128i count)
 {
     uint64_t c = vreinterpretq_nth_u64_m128i(count, 0);
@@ -5980,7 +5986,7 @@ FORCE_INLINE __m128i _mm_srl_epi64(__m128i a, __m128i count)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_srli_epi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_srli_epi16
 #define _mm_srli_epi16(a, imm)                                               \
     __extension__({                                                          \
         __m128i ret;                                                         \
@@ -6005,7 +6011,7 @@ FORCE_INLINE __m128i _mm_srl_epi64(__m128i a, __m128i count)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_srli_epi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_srli_epi32
 // FORCE_INLINE __m128i _mm_srli_epi32(__m128i a, __constrange(0,255) int imm)
 #define _mm_srli_epi32(a, imm)                                               \
     __extension__({                                                          \
@@ -6031,7 +6037,7 @@ FORCE_INLINE __m128i _mm_srl_epi64(__m128i a, __m128i count)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_srli_epi64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_srli_epi64
 #define _mm_srli_epi64(a, imm)                                               \
     __extension__({                                                          \
         __m128i ret;                                                         \
@@ -6053,7 +6059,7 @@ FORCE_INLINE __m128i _mm_srl_epi64(__m128i a, __m128i count)
 //   FI
 //   dst[127:0] := a[127:0] >> (tmp*8)
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_srli_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_srli_si128
 #define _mm_srli_si128(a, imm)                                       \
     __extension__({                                                  \
         int8x16_t ret;                                               \
@@ -6068,7 +6074,7 @@ FORCE_INLINE __m128i _mm_srl_epi64(__m128i a, __m128i count)
 // Store 128-bits (composed of 2 packed double-precision (64-bit) floating-point
 // elements) from a into memory. mem_addr must be aligned on a 16-byte boundary
 // or a general-protection exception may be generated.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_store_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_store_pd
 FORCE_INLINE void _mm_store_pd(double *mem_addr, __m128d a)
 {
 #if defined(__aarch64__)
@@ -6081,7 +6087,7 @@ FORCE_INLINE void _mm_store_pd(double *mem_addr, __m128d a)
 // Store the lower double-precision (64-bit) floating-point element from a into
 // 2 contiguous elements in memory. mem_addr must be aligned on a 16-byte
 // boundary or a general-protection exception may be generated.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_store_pd1
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_store_pd1
 FORCE_INLINE void _mm_store_pd1(double *mem_addr, __m128d a)
 {
 #if defined(__aarch64__)
@@ -6097,7 +6103,7 @@ FORCE_INLINE void _mm_store_pd1(double *mem_addr, __m128d a)
 
 // Store the lower double-precision (64-bit) floating-point element from a into
 // memory. mem_addr does not need to be aligned on any particular boundary.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=mm_store_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=mm_store_sd
 FORCE_INLINE void _mm_store_sd(double *mem_addr, __m128d a)
 {
 #if defined(__aarch64__)
@@ -6117,7 +6123,7 @@ FORCE_INLINE void _mm_store_si128(__m128i *p, __m128i a)
 // Store the lower double-precision (64-bit) floating-point element from a into
 // 2 contiguous elements in memory. mem_addr must be aligned on a 16-byte
 // boundary or a general-protection exception may be generated.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#expand=9,526,5601&text=_mm_store1_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#expand=9,526,5601&text=_mm_store1_pd
 #define _mm_store1_pd _mm_store_pd1
 
 // Store the upper double-precision (64-bit) floating-point element from a into
@@ -6125,7 +6131,7 @@ FORCE_INLINE void _mm_store_si128(__m128i *p, __m128i a)
 //
 //   MEM[mem_addr+63:mem_addr] := a[127:64]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_storeh_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_storeh_pd
 FORCE_INLINE void _mm_storeh_pd(double *mem_addr, __m128d a)
 {
 #if defined(__aarch64__)
@@ -6147,7 +6153,7 @@ FORCE_INLINE void _mm_storel_epi64(__m128i *a, __m128i b)
 //
 //   MEM[mem_addr+63:mem_addr] := a[63:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_storel_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_storel_pd
 FORCE_INLINE void _mm_storel_pd(double *mem_addr, __m128d a)
 {
 #if defined(__aarch64__)
@@ -6164,7 +6170,7 @@ FORCE_INLINE void _mm_storel_pd(double *mem_addr, __m128d a)
 //   MEM[mem_addr+63:mem_addr] := a[127:64]
 //   MEM[mem_addr+127:mem_addr+64] := a[63:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_storer_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_storer_pd
 FORCE_INLINE void _mm_storer_pd(double *mem_addr, __m128d a)
 {
     float32x4_t f = vreinterpretq_f32_m128d(a);
@@ -6174,21 +6180,21 @@ FORCE_INLINE void _mm_storer_pd(double *mem_addr, __m128d a)
 // Store 128-bits (composed of 2 packed double-precision (64-bit) floating-point
 // elements) from a into memory. mem_addr does not need to be aligned on any
 // particular boundary.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_storeu_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_storeu_pd
 FORCE_INLINE void _mm_storeu_pd(double *mem_addr, __m128d a)
 {
     _mm_store_pd(mem_addr, a);
 }
 
 // Stores 128-bits of integer data a at the address p.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_storeu_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_storeu_si128
 FORCE_INLINE void _mm_storeu_si128(__m128i *p, __m128i a)
 {
     vst1q_s32((int32_t *) p, vreinterpretq_s32_m128i(a));
 }
 
 // Stores 32-bits of integer data a at the address p.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_storeu_si32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_storeu_si32
 FORCE_INLINE void _mm_storeu_si32(void *p, __m128i a)
 {
     vst1q_lane_s32((int32_t *) p, vreinterpretq_s32_m128i(a), 0);
@@ -6198,7 +6204,7 @@ FORCE_INLINE void _mm_storeu_si32(void *p, __m128i a)
 // elements) from a into memory using a non-temporal memory hint. mem_addr must
 // be aligned on a 16-byte boundary or a general-protection exception may be
 // generated.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_stream_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_stream_pd
 FORCE_INLINE void _mm_stream_pd(double *p, __m128d a)
 {
 #if __has_builtin(__builtin_nontemporal_store)
@@ -6226,7 +6232,7 @@ FORCE_INLINE void _mm_stream_si128(__m128i *p, __m128i a)
 // Store 32-bit integer a into memory using a non-temporal hint to minimize
 // cache pollution. If the cache line containing address mem_addr is already in
 // the cache, the cache will be updated.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_stream_si32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_stream_si32
 FORCE_INLINE void _mm_stream_si32(int *p, int a)
 {
     vst1q_lane_s32((int32_t *) p, vdupq_n_s32(a), 0);
@@ -6235,7 +6241,7 @@ FORCE_INLINE void _mm_stream_si32(int *p, int a)
 // Store 64-bit integer a into memory using a non-temporal hint to minimize
 // cache pollution. If the cache line containing address mem_addr is already in
 // the cache, the cache will be updated.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_stream_si64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_stream_si64
 FORCE_INLINE void _mm_stream_si64(__int64 *p, __int64 a)
 {
     vst1_s64((int64_t *) p, vdup_n_s64((int64_t) a));
@@ -6243,7 +6249,7 @@ FORCE_INLINE void _mm_stream_si64(__int64 *p, __int64 a)
 
 // Subtract packed 16-bit integers in b from packed 16-bit integers in a, and
 // store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sub_epi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sub_epi16
 FORCE_INLINE __m128i _mm_sub_epi16(__m128i a, __m128i b)
 {
     return vreinterpretq_m128i_s16(
@@ -6277,7 +6283,7 @@ FORCE_INLINE __m128i _mm_sub_epi64(__m128i a, __m128i b)
 
 // Subtract packed 8-bit integers in b from packed 8-bit integers in a, and
 // store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sub_epi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sub_epi8
 FORCE_INLINE __m128i _mm_sub_epi8(__m128i a, __m128i b)
 {
     return vreinterpretq_m128i_s8(
@@ -6293,7 +6299,7 @@ FORCE_INLINE __m128i _mm_sub_epi8(__m128i a, __m128i b)
 //     dst[i+63:i] := a[i+63:i] - b[i+63:i]
 //   ENDFOR
 //
-//  https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=mm_sub_pd
+//  https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=mm_sub_pd
 FORCE_INLINE __m128d _mm_sub_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -6313,7 +6319,7 @@ FORCE_INLINE __m128d _mm_sub_pd(__m128d a, __m128d b)
 // the lower double-precision (64-bit) floating-point element in a, store the
 // result in the lower element of dst, and copy the upper element from a to the
 // upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sub_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sub_sd
 FORCE_INLINE __m128d _mm_sub_sd(__m128d a, __m128d b)
 {
     return _mm_move_sd(a, _mm_sub_pd(a, b));
@@ -6323,7 +6329,7 @@ FORCE_INLINE __m128d _mm_sub_sd(__m128d a, __m128d b)
 //
 //   dst[63:0] := a[63:0] - b[63:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sub_si64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sub_si64
 FORCE_INLINE __m64 _mm_sub_si64(__m64 a, __m64 b)
 {
     return vreinterpret_m64_s64(
@@ -6392,7 +6398,7 @@ FORCE_INLINE __m128i _mm_subs_epu8(__m128i a, __m128i b)
 #define _mm_ucomineq_sd _mm_comineq_sd
 
 // Return vector of type __m128d with undefined elements.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_undefined_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_undefined_pd
 FORCE_INLINE __m128d _mm_undefined_pd(void)
 {
 #if defined(__GNUC__) || defined(__clang__)
@@ -6453,11 +6459,17 @@ FORCE_INLINE __m128i _mm_unpackhi_epi32(__m128i a, __m128i b)
 //
 //   r0 := a1
 //   r1 := b1
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_unpackhi_epi64
 FORCE_INLINE __m128i _mm_unpackhi_epi64(__m128i a, __m128i b)
 {
+#if defined(__aarch64__)
+    return vreinterpretq_m128i_s64(
+        vzip2q_s64(vreinterpretq_s64_m128i(a), vreinterpretq_s64_m128i(b)));
+#else
     int64x1_t a_h = vget_high_s64(vreinterpretq_s64_m128i(a));
     int64x1_t b_h = vget_high_s64(vreinterpretq_s64_m128i(b));
     return vreinterpretq_m128i_s64(vcombine_s64(a_h, b_h));
+#endif
 }
 
 // Interleaves the upper 8 signed or unsigned 8-bit integers in a with the upper
@@ -6497,7 +6509,7 @@ FORCE_INLINE __m128i _mm_unpackhi_epi8(__m128i a, __m128i b)
 //   }
 //   dst[127:0] := INTERLEAVE_HIGH_QWORDS(a[127:0], b[127:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_unpackhi_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_unpackhi_pd
 FORCE_INLINE __m128d _mm_unpackhi_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -6558,11 +6570,19 @@ FORCE_INLINE __m128i _mm_unpacklo_epi32(__m128i a, __m128i b)
 #endif
 }
 
+// Unpack and interleave 64-bit integers from the low half of a and b, and store
+// the results in dst.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_unpacklo_epi64
 FORCE_INLINE __m128i _mm_unpacklo_epi64(__m128i a, __m128i b)
 {
+#if defined(__aarch64__)
+    return vreinterpretq_m128i_s64(
+        vzip1q_s64(vreinterpretq_s64_m128i(a), vreinterpretq_s64_m128i(b)));
+#else
     int64x1_t a_l = vget_low_s64(vreinterpretq_s64_m128i(a));
     int64x1_t b_l = vget_low_s64(vreinterpretq_s64_m128i(b));
     return vreinterpretq_m128i_s64(vcombine_s64(a_l, b_l));
+#endif
 }
 
 // Interleaves the lower 8 signed or unsigned 8-bit integers in a with the lower
@@ -6600,7 +6620,7 @@ FORCE_INLINE __m128i _mm_unpacklo_epi8(__m128i a, __m128i b)
 //   }
 //   dst[127:0] := INTERLEAVE_QWORDS(a[127:0], b[127:0])
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_unpacklo_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_unpacklo_pd
 FORCE_INLINE __m128d _mm_unpacklo_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -6621,7 +6641,7 @@ FORCE_INLINE __m128d _mm_unpacklo_pd(__m128d a, __m128d b)
 //      dst[i+63:i] := a[i+63:i] XOR b[i+63:i]
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_xor_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_xor_pd
 FORCE_INLINE __m128d _mm_xor_pd(__m128d a, __m128d b)
 {
     return vreinterpretq_m128d_s64(
@@ -6651,7 +6671,7 @@ FORCE_INLINE __m128i _mm_xor_si128(__m128i a, __m128i b)
 //   FI
 // ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_addsub_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_addsub_pd
 FORCE_INLINE __m128d _mm_addsub_pd(__m128d a, __m128d b)
 {
     _sse2neon_const __m128d mask = _mm_set_pd(1.0f, -1.0f);
@@ -6667,7 +6687,7 @@ FORCE_INLINE __m128d _mm_addsub_pd(__m128d a, __m128d b)
 // Alternatively add and subtract packed single-precision (32-bit)
 // floating-point elements in a to/from packed elements in b, and store the
 // results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=addsub_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=addsub_ps
 FORCE_INLINE __m128 _mm_addsub_ps(__m128 a, __m128 b)
 {
     _sse2neon_const __m128 mask = _mm_setr_ps(-1.0f, 1.0f, -1.0f, 1.0f);
@@ -6682,7 +6702,7 @@ FORCE_INLINE __m128 _mm_addsub_ps(__m128 a, __m128 b)
 
 // Horizontally add adjacent pairs of double-precision (64-bit) floating-point
 // elements in a and b, and pack the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_hadd_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_hadd_pd
 FORCE_INLINE __m128d _mm_hadd_pd(__m128d a, __m128d b)
 {
 #if defined(__aarch64__)
@@ -6716,7 +6736,7 @@ FORCE_INLINE __m128 _mm_hadd_ps(__m128 a, __m128 b)
 
 // Horizontally subtract adjacent pairs of double-precision (64-bit)
 // floating-point elements in a and b, and pack the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_hsub_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_hsub_pd
 FORCE_INLINE __m128d _mm_hsub_pd(__m128d _a, __m128d _b)
 {
 #if defined(__aarch64__)
@@ -6734,7 +6754,7 @@ FORCE_INLINE __m128d _mm_hsub_pd(__m128d _a, __m128d _b)
 
 // Horizontally subtract adjacent pairs of single-precision (32-bit)
 // floating-point elements in a and b, and pack the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_hsub_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_hsub_ps
 FORCE_INLINE __m128 _mm_hsub_ps(__m128 _a, __m128 _b)
 {
     float32x4_t a = vreinterpretq_f32_m128(_a);
@@ -6754,7 +6774,7 @@ FORCE_INLINE __m128 _mm_hsub_ps(__m128 _a, __m128 _b)
 //
 //   dst[127:0] := MEM[mem_addr+127:mem_addr]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_lddqu_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_lddqu_si128
 #define _mm_lddqu_si128 _mm_loadu_si128
 
 // Load a double-precision (64-bit) floating-point element from memory into both
@@ -6763,12 +6783,12 @@ FORCE_INLINE __m128 _mm_hsub_ps(__m128 _a, __m128 _b)
 //   dst[63:0] := MEM[mem_addr+63:mem_addr]
 //   dst[127:64] := MEM[mem_addr+63:mem_addr]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_loaddup_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_loaddup_pd
 #define _mm_loaddup_pd _mm_load1_pd
 
 // Duplicate the low double-precision (64-bit) floating-point element from a,
 // and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_movedup_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_movedup_pd
 FORCE_INLINE __m128d _mm_movedup_pd(__m128d a)
 {
 #if defined(__aarch64__)
@@ -6782,7 +6802,7 @@ FORCE_INLINE __m128d _mm_movedup_pd(__m128d a)
 
 // Duplicate odd-indexed single-precision (32-bit) floating-point elements
 // from a, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_movehdup_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_movehdup_ps
 FORCE_INLINE __m128 _mm_movehdup_ps(__m128 a)
 {
 #if defined(__aarch64__)
@@ -6801,7 +6821,7 @@ FORCE_INLINE __m128 _mm_movehdup_ps(__m128 a)
 
 // Duplicate even-indexed single-precision (32-bit) floating-point elements
 // from a, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_moveldup_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_moveldup_ps
 FORCE_INLINE __m128 _mm_moveldup_ps(__m128 a)
 {
 #if defined(__aarch64__)
@@ -6828,7 +6848,7 @@ FORCE_INLINE __m128 _mm_moveldup_ps(__m128 a)
 //     dst[i+15:i] := ABS(a[i+15:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_abs_epi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_abs_epi16
 FORCE_INLINE __m128i _mm_abs_epi16(__m128i a)
 {
     return vreinterpretq_m128i_s16(vabsq_s16(vreinterpretq_s16_m128i(a)));
@@ -6842,7 +6862,7 @@ FORCE_INLINE __m128i _mm_abs_epi16(__m128i a)
 //     dst[i+31:i] := ABS(a[i+31:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_abs_epi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_abs_epi32
 FORCE_INLINE __m128i _mm_abs_epi32(__m128i a)
 {
     return vreinterpretq_m128i_s32(vabsq_s32(vreinterpretq_s32_m128i(a)));
@@ -6856,7 +6876,7 @@ FORCE_INLINE __m128i _mm_abs_epi32(__m128i a)
 //     dst[i+7:i] := ABS(a[i+7:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_abs_epi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_abs_epi8
 FORCE_INLINE __m128i _mm_abs_epi8(__m128i a)
 {
     return vreinterpretq_m128i_s8(vabsq_s8(vreinterpretq_s8_m128i(a)));
@@ -6870,7 +6890,7 @@ FORCE_INLINE __m128i _mm_abs_epi8(__m128i a)
 //     dst[i+15:i] := ABS(a[i+15:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_abs_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_abs_pi16
 FORCE_INLINE __m64 _mm_abs_pi16(__m64 a)
 {
     return vreinterpret_m64_s16(vabs_s16(vreinterpret_s16_m64(a)));
@@ -6884,7 +6904,7 @@ FORCE_INLINE __m64 _mm_abs_pi16(__m64 a)
 //     dst[i+31:i] := ABS(a[i+31:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_abs_pi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_abs_pi32
 FORCE_INLINE __m64 _mm_abs_pi32(__m64 a)
 {
     return vreinterpret_m64_s32(vabs_s32(vreinterpret_s32_m64(a)));
@@ -6898,7 +6918,7 @@ FORCE_INLINE __m64 _mm_abs_pi32(__m64 a)
 //     dst[i+7:i] := ABS(a[i+7:i])
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_abs_pi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_abs_pi8
 FORCE_INLINE __m64 _mm_abs_pi8(__m64 a)
 {
     return vreinterpret_m64_s8(vabs_s8(vreinterpret_s8_m64(a)));
@@ -6910,7 +6930,7 @@ FORCE_INLINE __m64 _mm_abs_pi8(__m64 a)
 //   tmp[255:0] := ((a[127:0] << 128)[255:0] OR b[127:0]) >> (imm8*8)
 //   dst[127:0] := tmp[127:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_alignr_epi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_alignr_epi8
 #define _mm_alignr_epi8(a, b, imm)                                            \
     __extension__({                                                           \
         uint8x16_t _a = vreinterpretq_u8_m128i(a);                            \
@@ -6932,7 +6952,7 @@ FORCE_INLINE __m64 _mm_abs_pi8(__m64 a)
 //   tmp[127:0] := ((a[63:0] << 64)[127:0] OR b[63:0]) >> (imm8*8)
 //   dst[63:0] := tmp[63:0]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_alignr_pi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_alignr_pi8
 #define _mm_alignr_pi8(a, b, imm)                                           \
     __extension__({                                                         \
         __m64 ret;                                                          \
@@ -6987,7 +7007,7 @@ FORCE_INLINE __m128i _mm_hadd_epi32(__m128i _a, __m128i _b)
 
 // Horizontally add adjacent pairs of 16-bit integers in a and b, and pack the
 // signed 16-bit results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_hadd_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_hadd_pi16
 FORCE_INLINE __m64 _mm_hadd_pi16(__m64 a, __m64 b)
 {
     return vreinterpret_m64_s16(
@@ -6996,7 +7016,7 @@ FORCE_INLINE __m64 _mm_hadd_pi16(__m64 a, __m64 b)
 
 // Horizontally add adjacent pairs of 32-bit integers in a and b, and pack the
 // signed 32-bit results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_hadd_pi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_hadd_pi32
 FORCE_INLINE __m64 _mm_hadd_pi32(__m64 a, __m64 b)
 {
     return vreinterpret_m64_s32(
@@ -7027,7 +7047,7 @@ FORCE_INLINE __m128i _mm_hadds_epi16(__m128i _a, __m128i _b)
 
 // Horizontally add adjacent pairs of signed 16-bit integers in a and b using
 // saturation, and pack the signed 16-bit results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_hadds_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_hadds_pi16
 FORCE_INLINE __m64 _mm_hadds_pi16(__m64 _a, __m64 _b)
 {
     int16x4_t a = vreinterpret_s16_m64(_a);
@@ -7042,7 +7062,7 @@ FORCE_INLINE __m64 _mm_hadds_pi16(__m64 _a, __m64 _b)
 
 // Horizontally subtract adjacent pairs of 16-bit integers in a and b, and pack
 // the signed 16-bit results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_hsub_epi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_hsub_epi16
 FORCE_INLINE __m128i _mm_hsub_epi16(__m128i _a, __m128i _b)
 {
     int16x8_t a = vreinterpretq_s16_m128i(_a);
@@ -7058,7 +7078,7 @@ FORCE_INLINE __m128i _mm_hsub_epi16(__m128i _a, __m128i _b)
 
 // Horizontally subtract adjacent pairs of 32-bit integers in a and b, and pack
 // the signed 32-bit results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_hsub_epi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_hsub_epi32
 FORCE_INLINE __m128i _mm_hsub_epi32(__m128i _a, __m128i _b)
 {
     int32x4_t a = vreinterpretq_s32_m128i(_a);
@@ -7074,7 +7094,7 @@ FORCE_INLINE __m128i _mm_hsub_epi32(__m128i _a, __m128i _b)
 
 // Horizontally subtract adjacent pairs of 16-bit integers in a and b, and pack
 // the signed 16-bit results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_hsub_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_hsub_pi16
 FORCE_INLINE __m64 _mm_hsub_pi16(__m64 _a, __m64 _b)
 {
     int16x4_t a = vreinterpret_s16_m64(_a);
@@ -7089,7 +7109,7 @@ FORCE_INLINE __m64 _mm_hsub_pi16(__m64 _a, __m64 _b)
 
 // Horizontally subtract adjacent pairs of 32-bit integers in a and b, and pack
 // the signed 32-bit results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=mm_hsub_pi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=mm_hsub_pi32
 FORCE_INLINE __m64 _mm_hsub_pi32(__m64 _a, __m64 _b)
 {
     int32x2_t a = vreinterpret_s32_m64(_a);
@@ -7104,7 +7124,7 @@ FORCE_INLINE __m64 _mm_hsub_pi32(__m64 _a, __m64 _b)
 
 // Computes saturated pairwise difference of each argument as a 16-bit signed
 // integer values a and b.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_hsubs_epi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_hsubs_epi16
 FORCE_INLINE __m128i _mm_hsubs_epi16(__m128i _a, __m128i _b)
 {
     int16x8_t a = vreinterpretq_s16_m128i(_a);
@@ -7120,7 +7140,7 @@ FORCE_INLINE __m128i _mm_hsubs_epi16(__m128i _a, __m128i _b)
 
 // Horizontally subtract adjacent pairs of signed 16-bit integers in a and b
 // using saturation, and pack the signed 16-bit results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_hsubs_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_hsubs_pi16
 FORCE_INLINE __m64 _mm_hsubs_pi16(__m64 _a, __m64 _b)
 {
     int16x4_t a = vreinterpret_s16_m64(_a);
@@ -7181,7 +7201,7 @@ FORCE_INLINE __m128i _mm_maddubs_epi16(__m128i _a, __m128i _b)
 // signed 8-bit integer from b, producing intermediate signed 16-bit integers.
 // Horizontally add adjacent pairs of intermediate signed 16-bit integers, and
 // pack the saturated results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_maddubs_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_maddubs_pi16
 FORCE_INLINE __m64 _mm_maddubs_pi16(__m64 _a, __m64 _b)
 {
     uint16x4_t a = vreinterpret_u16_m64(_a);
@@ -7235,7 +7255,7 @@ FORCE_INLINE __m128i _mm_mulhrs_epi16(__m128i a, __m128i b)
 // Multiply packed signed 16-bit integers in a and b, producing intermediate
 // signed 32-bit integers. Truncate each intermediate integer to the 18 most
 // significant bits, round by adding 1, and store bits [16:1] to dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_mulhrs_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_mulhrs_pi16
 FORCE_INLINE __m64 _mm_mulhrs_pi16(__m64 a, __m64 b)
 {
     int32x4_t mul_extend =
@@ -7247,7 +7267,7 @@ FORCE_INLINE __m64 _mm_mulhrs_pi16(__m64 a, __m64 b)
 
 // Shuffle packed 8-bit integers in a according to shuffle control mask in the
 // corresponding 8-bit element of b, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_shuffle_epi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_shuffle_epi8
 FORCE_INLINE __m128i _mm_shuffle_epi8(__m128i a, __m128i b)
 {
     int8x16_t tbl = vreinterpretq_s8_m128i(a);   // input a
@@ -7288,7 +7308,7 @@ FORCE_INLINE __m128i _mm_shuffle_epi8(__m128i a, __m128i b)
 //     FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_shuffle_pi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_shuffle_pi8
 FORCE_INLINE __m64 _mm_shuffle_pi8(__m64 a, __m64 b)
 {
     const int8x8_t controlMask =
@@ -7426,7 +7446,7 @@ FORCE_INLINE __m128i _mm_sign_epi8(__m128i _a, __m128i _b)
 //      FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sign_pi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sign_pi16
 FORCE_INLINE __m64 _mm_sign_pi16(__m64 _a, __m64 _b)
 {
     int16x4_t a = vreinterpret_s16_m64(_a);
@@ -7467,7 +7487,7 @@ FORCE_INLINE __m64 _mm_sign_pi16(__m64 _a, __m64 _b)
 //      FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sign_pi32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sign_pi32
 FORCE_INLINE __m64 _mm_sign_pi32(__m64 _a, __m64 _b)
 {
     int32x2_t a = vreinterpret_s32_m64(_a);
@@ -7508,7 +7528,7 @@ FORCE_INLINE __m64 _mm_sign_pi32(__m64 _a, __m64 _b)
 //      FI
 //   ENDFOR
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_sign_pi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_sign_pi8
 FORCE_INLINE __m64 _mm_sign_pi8(__m64 _a, __m64 _b)
 {
     int8x8_t a = vreinterpret_s8_m64(_a);
@@ -7567,7 +7587,7 @@ FORCE_INLINE __m64 _mm_sign_pi8(__m64 _a, __m64 _b)
 
 // Blend packed double-precision (64-bit) floating-point elements from a and b
 // using control mask imm8, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_blend_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_blend_pd
 #define _mm_blend_pd(a, b, imm)                                \
     __extension__({                                            \
         const uint64_t _mask[2] = {                            \
@@ -7581,7 +7601,7 @@ FORCE_INLINE __m64 _mm_sign_pi8(__m64 _a, __m64 _b)
 
 // Blend packed single-precision (32-bit) floating-point elements from a and b
 // using mask, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_blend_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_blend_ps
 FORCE_INLINE __m128 _mm_blend_ps(__m128 _a, __m128 _b, const char imm8)
 {
     const uint32_t ALIGN_STRUCT(16)
@@ -7618,7 +7638,7 @@ FORCE_INLINE __m128i _mm_blendv_epi8(__m128i _a, __m128i _b, __m128i _mask)
 
 // Blend packed double-precision (64-bit) floating-point elements from a and b
 // using mask, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_blendv_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_blendv_pd
 FORCE_INLINE __m128d _mm_blendv_pd(__m128d _a, __m128d _b, __m128d _mask)
 {
     uint64x2_t mask =
@@ -7636,7 +7656,7 @@ FORCE_INLINE __m128d _mm_blendv_pd(__m128d _a, __m128d _b, __m128d _mask)
 
 // Blend packed single-precision (32-bit) floating-point elements from a and b
 // using mask, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_blendv_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_blendv_ps
 FORCE_INLINE __m128 _mm_blendv_ps(__m128 _a, __m128 _b, __m128 _mask)
 {
     // Use a signed shift right to create a mask with the sign bit
@@ -7650,7 +7670,7 @@ FORCE_INLINE __m128 _mm_blendv_ps(__m128 _a, __m128 _b, __m128 _mask)
 // Round the packed double-precision (64-bit) floating-point elements in a up
 // to an integer value, and store the results as packed double-precision
 // floating-point elements in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_ceil_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_ceil_pd
 FORCE_INLINE __m128d _mm_ceil_pd(__m128d a)
 {
 #if defined(__aarch64__)
@@ -7664,7 +7684,7 @@ FORCE_INLINE __m128d _mm_ceil_pd(__m128d a)
 // Round the packed single-precision (32-bit) floating-point elements in a up to
 // an integer value, and store the results as packed single-precision
 // floating-point elements in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_ceil_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_ceil_ps
 FORCE_INLINE __m128 _mm_ceil_ps(__m128 a)
 {
 #if defined(__aarch64__) || defined(__ARM_FEATURE_DIRECTED_ROUNDING)
@@ -7679,7 +7699,7 @@ FORCE_INLINE __m128 _mm_ceil_ps(__m128 a)
 // an integer value, store the result as a double-precision floating-point
 // element in the lower element of dst, and copy the upper element from a to the
 // upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_ceil_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_ceil_sd
 FORCE_INLINE __m128d _mm_ceil_sd(__m128d a, __m128d b)
 {
     return _mm_move_sd(a, _mm_ceil_pd(b));
@@ -7693,7 +7713,7 @@ FORCE_INLINE __m128d _mm_ceil_sd(__m128d a, __m128d b)
 //   dst[31:0] := CEIL(b[31:0])
 //   dst[127:32] := a[127:32]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_ceil_ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_ceil_ss
 FORCE_INLINE __m128 _mm_ceil_ss(__m128 a, __m128 b)
 {
     return _mm_move_ss(a, _mm_ceil_ps(b));
@@ -7800,7 +7820,7 @@ FORCE_INLINE __m128i _mm_cvtepu32_epi64(__m128i a)
 
 // Zero extend packed unsigned 8-bit integers in a to packed 16-bit integers,
 // and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cvtepu8_epi16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cvtepu8_epi16
 FORCE_INLINE __m128i _mm_cvtepu8_epi16(__m128i a)
 {
     uint8x16_t u8x16 = vreinterpretq_u8_m128i(a);    /* xxxx xxxx HGFE DCBA */
@@ -7833,7 +7853,7 @@ FORCE_INLINE __m128i _mm_cvtepu8_epi64(__m128i a)
 // Conditionally multiply the packed double-precision (64-bit) floating-point
 // elements in a and b using the high 4 bits in imm8, sum the four products, and
 // conditionally store the sum in dst using the low 4 bits of imm8.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_dp_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_dp_pd
 FORCE_INLINE __m128d _mm_dp_pd(__m128d a, __m128d b, const int imm)
 {
     // Generate mask value from constant immediate bit value
@@ -7879,7 +7899,7 @@ FORCE_INLINE __m128d _mm_dp_pd(__m128d a, __m128d b, const int imm)
 // Conditionally multiply the packed single-precision (32-bit) floating-point
 // elements in a and b using the high 4 bits in imm8, sum the four products,
 // and conditionally store the sum in dst using the low 4 bits of imm.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_dp_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_dp_ps
 FORCE_INLINE __m128 _mm_dp_ps(__m128 a, __m128 b, const int imm)
 {
 #if defined(__aarch64__)
@@ -7935,7 +7955,7 @@ FORCE_INLINE __m128 _mm_dp_ps(__m128 a, __m128 b, const int imm)
 // Extracts the selected signed or unsigned 8-bit integer from a and zero
 // extends.
 // FORCE_INLINE int _mm_extract_epi8(__m128i a, __constrange(0,16) int imm)
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_extract_epi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_extract_epi8
 #define _mm_extract_epi8(a, imm) vgetq_lane_u8(vreinterpretq_u8_m128i(a), (imm))
 
 // Extracts the selected single-precision (32-bit) floating-point from a.
@@ -7945,7 +7965,7 @@ FORCE_INLINE __m128 _mm_dp_ps(__m128 a, __m128 b, const int imm)
 // Round the packed double-precision (64-bit) floating-point elements in a down
 // to an integer value, and store the results as packed double-precision
 // floating-point elements in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_floor_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_floor_pd
 FORCE_INLINE __m128d _mm_floor_pd(__m128d a)
 {
 #if defined(__aarch64__)
@@ -7959,7 +7979,7 @@ FORCE_INLINE __m128d _mm_floor_pd(__m128d a)
 // Round the packed single-precision (32-bit) floating-point elements in a down
 // to an integer value, and store the results as packed single-precision
 // floating-point elements in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_floor_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_floor_ps
 FORCE_INLINE __m128 _mm_floor_ps(__m128 a)
 {
 #if defined(__aarch64__) || defined(__ARM_FEATURE_DIRECTED_ROUNDING)
@@ -7974,7 +7994,7 @@ FORCE_INLINE __m128 _mm_floor_ps(__m128 a)
 // an integer value, store the result as a double-precision floating-point
 // element in the lower element of dst, and copy the upper element from a to the
 // upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_floor_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_floor_sd
 FORCE_INLINE __m128d _mm_floor_sd(__m128d a, __m128d b)
 {
     return _mm_move_sd(a, _mm_floor_pd(b));
@@ -7988,7 +8008,7 @@ FORCE_INLINE __m128d _mm_floor_sd(__m128d a, __m128d b)
 //   dst[31:0] := FLOOR(b[31:0])
 //   dst[127:32] := a[127:32]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_floor_ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_floor_ss
 FORCE_INLINE __m128 _mm_floor_ss(__m128 a, __m128 b)
 {
     return _mm_move_ss(a, _mm_floor_ps(b));
@@ -8027,7 +8047,7 @@ FORCE_INLINE __m128 _mm_floor_ss(__m128 a, __m128 b)
 // Copy a to tmp, then insert a single-precision (32-bit) floating-point
 // element from b into tmp using the control in imm8. Store tmp to dst using
 // the mask in imm8 (elements are zeroed out when the corresponding bit is set).
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=insert_ps
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=insert_ps
 #define _mm_insert_ps(a, b, imm8)                                              \
     __extension__({                                                            \
         float32x4_t tmp1 =                                                     \
@@ -8066,7 +8086,7 @@ FORCE_INLINE __m128i _mm_max_epi32(__m128i a, __m128i b)
 
 // Compare packed signed 8-bit integers in a and b, and store packed maximum
 // values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_max_epi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_max_epi8
 FORCE_INLINE __m128i _mm_max_epi8(__m128i a, __m128i b)
 {
     return vreinterpretq_m128i_s8(
@@ -8075,7 +8095,7 @@ FORCE_INLINE __m128i _mm_max_epi8(__m128i a, __m128i b)
 
 // Compare packed unsigned 16-bit integers in a and b, and store packed maximum
 // values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_max_epu16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_max_epu16
 FORCE_INLINE __m128i _mm_max_epu16(__m128i a, __m128i b)
 {
     return vreinterpretq_m128i_u16(
@@ -8084,7 +8104,7 @@ FORCE_INLINE __m128i _mm_max_epu16(__m128i a, __m128i b)
 
 // Compare packed unsigned 32-bit integers in a and b, and store packed maximum
 // values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_max_epu32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_max_epu32
 FORCE_INLINE __m128i _mm_max_epu32(__m128i a, __m128i b)
 {
     return vreinterpretq_m128i_u32(
@@ -8109,7 +8129,7 @@ FORCE_INLINE __m128i _mm_min_epi32(__m128i a, __m128i b)
 
 // Compare packed signed 8-bit integers in a and b, and store packed minimum
 // values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_min_epi8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_min_epi8
 FORCE_INLINE __m128i _mm_min_epi8(__m128i a, __m128i b)
 {
     return vreinterpretq_m128i_s8(
@@ -8118,7 +8138,7 @@ FORCE_INLINE __m128i _mm_min_epi8(__m128i a, __m128i b)
 
 // Compare packed unsigned 16-bit integers in a and b, and store packed minimum
 // values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_min_epu16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_min_epu16
 FORCE_INLINE __m128i _mm_min_epu16(__m128i a, __m128i b)
 {
     return vreinterpretq_m128i_u16(
@@ -8127,7 +8147,7 @@ FORCE_INLINE __m128i _mm_min_epu16(__m128i a, __m128i b)
 
 // Compare packed unsigned 32-bit integers in a and b, and store packed minimum
 // values in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_max_epu32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_max_epu32
 FORCE_INLINE __m128i _mm_min_epu32(__m128i a, __m128i b)
 {
     return vreinterpretq_m128i_u32(
@@ -8150,7 +8170,7 @@ FORCE_INLINE __m128i _mm_min_epu32(__m128i a, __m128i b)
 //   dst[18:16] := index[2:0]
 //   dst[127:19] := 0
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_minpos_epu16
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_minpos_epu16
 FORCE_INLINE __m128i _mm_minpos_epu16(__m128i a)
 {
     __m128i dst;
@@ -8200,7 +8220,7 @@ FORCE_INLINE __m128i _mm_minpos_epu16(__m128i a)
 // quadruplets from a. One quadruplet is selected from b starting at on the
 // offset specified in imm8. Eight quadruplets are formed from sequential 8-bit
 // integers selected from a starting at the offset specified in imm8.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_mpsadbw_epu8
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_mpsadbw_epu8
 FORCE_INLINE __m128i _mm_mpsadbw_epu8(__m128i a, __m128i b, const int imm)
 {
     uint8x16_t _a, _b;
@@ -8321,7 +8341,7 @@ FORCE_INLINE __m128i _mm_packus_epi32(__m128i a, __m128i b)
 // Round the packed double-precision (64-bit) floating-point elements in a using
 // the rounding parameter, and store the results as packed double-precision
 // floating-point elements in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_round_pd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_round_pd
 FORCE_INLINE __m128d _mm_round_pd(__m128d a, int rounding)
 {
 #if defined(__aarch64__)
@@ -8450,7 +8470,7 @@ FORCE_INLINE __m128 _mm_round_ps(__m128 a, int rounding)
 // the rounding parameter, store the result as a double-precision floating-point
 // element in the lower element of dst, and copy the upper element from a to the
 // upper element of dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_round_sd
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_round_sd
 FORCE_INLINE __m128d _mm_round_sd(__m128d a, __m128d b, int rounding)
 {
     return _mm_move_sd(a, _mm_round_pd(b, rounding));
@@ -8470,7 +8490,7 @@ FORCE_INLINE __m128d _mm_round_sd(__m128d a, __m128d b, int rounding)
 //     (_MM_FROUND_TO_ZERO |_MM_FROUND_NO_EXC)        // truncate, and suppress
 //     exceptions _MM_FROUND_CUR_DIRECTION // use MXCSR.RC; see
 //     _MM_SET_ROUNDING_MODE
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_round_ss
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_round_ss
 FORCE_INLINE __m128 _mm_round_ss(__m128 a, __m128 b, int rounding)
 {
     return _mm_move_ss(a, _mm_round_ps(b, rounding));
@@ -8482,7 +8502,7 @@ FORCE_INLINE __m128 _mm_round_ss(__m128 a, __m128 b, int rounding)
 //
 //   dst[127:0] := MEM[mem_addr+127:mem_addr]
 //
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_stream_load_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_stream_load_si128
 FORCE_INLINE __m128i _mm_stream_load_si128(__m128i *p)
 {
 #if __has_builtin(__builtin_nontemporal_store)
@@ -8494,7 +8514,7 @@ FORCE_INLINE __m128i _mm_stream_load_si128(__m128i *p)
 
 // Compute the bitwise NOT of a and then AND with a 128-bit vector containing
 // all 1's, and return 1 if the result is zero, otherwise return 0.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_test_all_ones
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_test_all_ones
 FORCE_INLINE int _mm_test_all_ones(__m128i a)
 {
     return (uint64_t) (vgetq_lane_s64(a, 0) & vgetq_lane_s64(a, 1)) ==
@@ -8503,7 +8523,7 @@ FORCE_INLINE int _mm_test_all_ones(__m128i a)
 
 // Compute the bitwise AND of 128 bits (representing integer data) in a and
 // mask, and return 1 if the result is zero, otherwise return 0.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_test_all_zeros
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_test_all_zeros
 FORCE_INLINE int _mm_test_all_zeros(__m128i a, __m128i mask)
 {
     int64x2_t a_and_mask =
@@ -8516,7 +8536,7 @@ FORCE_INLINE int _mm_test_all_zeros(__m128i a, __m128i mask)
 // the bitwise NOT of a and then AND with mask, and set CF to 1 if the result is
 // zero, otherwise set CF to 0. Return 1 if both the ZF and CF values are zero,
 // otherwise return 0.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=mm_test_mix_ones_zero
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=mm_test_mix_ones_zero
 FORCE_INLINE int _mm_test_mix_ones_zeros(__m128i a, __m128i mask)
 {
     uint64x2_t zf =
@@ -8531,7 +8551,7 @@ FORCE_INLINE int _mm_test_mix_ones_zeros(__m128i a, __m128i mask)
 // and set ZF to 1 if the result is zero, otherwise set ZF to 0. Compute the
 // bitwise NOT of a and then AND with b, and set CF to 1 if the result is zero,
 // otherwise set CF to 0. Return the CF value.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_testc_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_testc_si128
 FORCE_INLINE int _mm_testc_si128(__m128i a, __m128i b)
 {
     int64x2_t s64 =
@@ -8544,14 +8564,14 @@ FORCE_INLINE int _mm_testc_si128(__m128i a, __m128i b)
 // bitwise NOT of a and then AND with b, and set CF to 1 if the result is zero,
 // otherwise set CF to 0. Return 1 if both the ZF and CF values are zero,
 // otherwise return 0.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_testnzc_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_testnzc_si128
 #define _mm_testnzc_si128(a, b) _mm_test_mix_ones_zeros(a, b)
 
 // Compute the bitwise AND of 128 bits (representing integer data) in a and b,
 // and set ZF to 1 if the result is zero, otherwise set ZF to 0. Compute the
 // bitwise NOT of a and then AND with b, and set CF to 1 if the result is zero,
 // otherwise set CF to 0. Return the ZF value.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_testz_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_testz_si128
 FORCE_INLINE int _mm_testz_si128(__m128i a, __m128i b)
 {
     int64x2_t s64 =
@@ -9157,7 +9177,7 @@ FORCE_INLINE int _mm_cmpestrc(__m128i a,
 
 // Compare packed strings in a and b with lengths la and lb using the control
 // in imm8, and store the generated index in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpestri
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpestri
 FORCE_INLINE int _mm_cmpestri(__m128i a,
                               int la,
                               __m128i b,
@@ -9170,7 +9190,7 @@ FORCE_INLINE int _mm_cmpestri(__m128i a,
 
 // Compare packed strings in a and b with lengths la and lb using the control
 // in imm8, and store the generated mask in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_cmpestrm
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_cmpestrm
 FORCE_INLINE __m128i
 _mm_cmpestrm(__m128i a, int la, __m128i b, int lb, const int imm8)
 {
@@ -9404,7 +9424,7 @@ FORCE_INLINE uint32_t _mm_crc32_u8(uint32_t crc, uint8_t v)
 
 #if !defined(__ARM_FEATURE_CRYPTO)
 /* clang-format off */
-#define SSE2NEON_AES_DATA(w)                                           \
+#define SSE2NEON_AES_SBOX(w)                                           \
     {                                                                  \
         w(0x63), w(0x7c), w(0x77), w(0x7b), w(0xf2), w(0x6b), w(0x6f), \
         w(0xc5), w(0x30), w(0x01), w(0x67), w(0x2b), w(0xfe), w(0xd7), \
@@ -9444,12 +9464,63 @@ FORCE_INLINE uint32_t _mm_crc32_u8(uint32_t crc, uint8_t v)
         w(0xe6), w(0x42), w(0x68), w(0x41), w(0x99), w(0x2d), w(0x0f), \
         w(0xb0), w(0x54), w(0xbb), w(0x16)                             \
     }
+#define SSE2NEON_AES_RSBOX(w)                                          \
+    {                                                                  \
+        w(0x52), w(0x09), w(0x6a), w(0xd5), w(0x30), w(0x36), w(0xa5), \
+        w(0x38), w(0xbf), w(0x40), w(0xa3), w(0x9e), w(0x81), w(0xf3), \
+        w(0xd7), w(0xfb), w(0x7c), w(0xe3), w(0x39), w(0x82), w(0x9b), \
+        w(0x2f), w(0xff), w(0x87), w(0x34), w(0x8e), w(0x43), w(0x44), \
+        w(0xc4), w(0xde), w(0xe9), w(0xcb), w(0x54), w(0x7b), w(0x94), \
+        w(0x32), w(0xa6), w(0xc2), w(0x23), w(0x3d), w(0xee), w(0x4c), \
+        w(0x95), w(0x0b), w(0x42), w(0xfa), w(0xc3), w(0x4e), w(0x08), \
+        w(0x2e), w(0xa1), w(0x66), w(0x28), w(0xd9), w(0x24), w(0xb2), \
+        w(0x76), w(0x5b), w(0xa2), w(0x49), w(0x6d), w(0x8b), w(0xd1), \
+        w(0x25), w(0x72), w(0xf8), w(0xf6), w(0x64), w(0x86), w(0x68), \
+        w(0x98), w(0x16), w(0xd4), w(0xa4), w(0x5c), w(0xcc), w(0x5d), \
+        w(0x65), w(0xb6), w(0x92), w(0x6c), w(0x70), w(0x48), w(0x50), \
+        w(0xfd), w(0xed), w(0xb9), w(0xda), w(0x5e), w(0x15), w(0x46), \
+        w(0x57), w(0xa7), w(0x8d), w(0x9d), w(0x84), w(0x90), w(0xd8), \
+        w(0xab), w(0x00), w(0x8c), w(0xbc), w(0xd3), w(0x0a), w(0xf7), \
+        w(0xe4), w(0x58), w(0x05), w(0xb8), w(0xb3), w(0x45), w(0x06), \
+        w(0xd0), w(0x2c), w(0x1e), w(0x8f), w(0xca), w(0x3f), w(0x0f), \
+        w(0x02), w(0xc1), w(0xaf), w(0xbd), w(0x03), w(0x01), w(0x13), \
+        w(0x8a), w(0x6b), w(0x3a), w(0x91), w(0x11), w(0x41), w(0x4f), \
+        w(0x67), w(0xdc), w(0xea), w(0x97), w(0xf2), w(0xcf), w(0xce), \
+        w(0xf0), w(0xb4), w(0xe6), w(0x73), w(0x96), w(0xac), w(0x74), \
+        w(0x22), w(0xe7), w(0xad), w(0x35), w(0x85), w(0xe2), w(0xf9), \
+        w(0x37), w(0xe8), w(0x1c), w(0x75), w(0xdf), w(0x6e), w(0x47), \
+        w(0xf1), w(0x1a), w(0x71), w(0x1d), w(0x29), w(0xc5), w(0x89), \
+        w(0x6f), w(0xb7), w(0x62), w(0x0e), w(0xaa), w(0x18), w(0xbe), \
+        w(0x1b), w(0xfc), w(0x56), w(0x3e), w(0x4b), w(0xc6), w(0xd2), \
+        w(0x79), w(0x20), w(0x9a), w(0xdb), w(0xc0), w(0xfe), w(0x78), \
+        w(0xcd), w(0x5a), w(0xf4), w(0x1f), w(0xdd), w(0xa8), w(0x33), \
+        w(0x88), w(0x07), w(0xc7), w(0x31), w(0xb1), w(0x12), w(0x10), \
+        w(0x59), w(0x27), w(0x80), w(0xec), w(0x5f), w(0x60), w(0x51), \
+        w(0x7f), w(0xa9), w(0x19), w(0xb5), w(0x4a), w(0x0d), w(0x2d), \
+        w(0xe5), w(0x7a), w(0x9f), w(0x93), w(0xc9), w(0x9c), w(0xef), \
+        w(0xa0), w(0xe0), w(0x3b), w(0x4d), w(0xae), w(0x2a), w(0xf5), \
+        w(0xb0), w(0xc8), w(0xeb), w(0xbb), w(0x3c), w(0x83), w(0x53), \
+        w(0x99), w(0x61), w(0x17), w(0x2b), w(0x04), w(0x7e), w(0xba), \
+        w(0x77), w(0xd6), w(0x26), w(0xe1), w(0x69), w(0x14), w(0x63), \
+        w(0x55), w(0x21), w(0x0c), w(0x7d)                             \
+    }
 /* clang-format on */
 
 /* X Macro trick. See https://en.wikipedia.org/wiki/X_Macro */
 #define SSE2NEON_AES_H0(x) (x)
-static const uint8_t SSE2NEON_sbox[256] = SSE2NEON_AES_DATA(SSE2NEON_AES_H0);
+static const uint8_t _sse2neon_sbox[256] = SSE2NEON_AES_SBOX(SSE2NEON_AES_H0);
+static const uint8_t _sse2neon_rsbox[256] = SSE2NEON_AES_RSBOX(SSE2NEON_AES_H0);
 #undef SSE2NEON_AES_H0
+
+/* x_time function and matrix multiply function */
+#if !defined(__aarch64__)
+#define SSE2NEON_XT(x) (((x) << 1) ^ ((((x) >> 7) & 1) * 0x1b))
+#define SSE2NEON_MULTIPLY(x, y)                                  \
+    (((y & 1) * x) ^ ((y >> 1 & 1) * SSE2NEON_XT(x)) ^           \
+     ((y >> 2 & 1) * SSE2NEON_XT(SSE2NEON_XT(x))) ^              \
+     ((y >> 3 & 1) * SSE2NEON_XT(SSE2NEON_XT(SSE2NEON_XT(x)))) ^ \
+     ((y >> 4 & 1) * SSE2NEON_XT(SSE2NEON_XT(SSE2NEON_XT(SSE2NEON_XT(x))))))
+#endif
 
 // In the absence of crypto extensions, implement aesenc using regular neon
 // intrinsics instead. See:
@@ -9457,40 +9528,51 @@ static const uint8_t SSE2NEON_sbox[256] = SSE2NEON_AES_DATA(SSE2NEON_AES_H0);
 // https://www.workofard.com/2017/07/ghash-for-low-end-cores/ and
 // https://github.com/ColinIanKing/linux-next-mirror/blob/b5f466091e130caaf0735976648f72bd5e09aa84/crypto/aegis128-neon-inner.c#L52
 // for more information Reproduced with permission of the author.
-FORCE_INLINE __m128i _mm_aesenc_si128(__m128i EncBlock, __m128i RoundKey)
+FORCE_INLINE __m128i _mm_aesenc_si128(__m128i a, __m128i RoundKey)
 {
 #if defined(__aarch64__)
-    static const uint8_t shift_rows[] = {0x0, 0x5, 0xa, 0xf, 0x4, 0x9,
-                                         0xe, 0x3, 0x8, 0xd, 0x2, 0x7,
-                                         0xc, 0x1, 0x6, 0xb};
-    static const uint8_t ror32by8[] = {0x1, 0x2, 0x3, 0x0, 0x5, 0x6, 0x7, 0x4,
-                                       0x9, 0xa, 0xb, 0x8, 0xd, 0xe, 0xf, 0xc};
+    static const uint8_t shift_rows[] = {
+        0x0, 0x5, 0xa, 0xf, 0x4, 0x9, 0xe, 0x3,
+        0x8, 0xd, 0x2, 0x7, 0xc, 0x1, 0x6, 0xb,
+    };
+    static const uint8_t ror32by8[] = {
+        0x1, 0x2, 0x3, 0x0, 0x5, 0x6, 0x7, 0x4,
+        0x9, 0xa, 0xb, 0x8, 0xd, 0xe, 0xf, 0xc,
+    };
 
     uint8x16_t v;
-    uint8x16_t w = vreinterpretq_u8_m128i(EncBlock);
+    uint8x16_t w = vreinterpretq_u8_m128i(a);
 
-    // shift rows
+    /* shift rows */
     w = vqtbl1q_u8(w, vld1q_u8(shift_rows));
 
-    // sub bytes
-    v = vqtbl4q_u8(_sse2neon_vld1q_u8_x4(SSE2NEON_sbox), w);
-    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(SSE2NEON_sbox + 0x40), w - 0x40);
-    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(SSE2NEON_sbox + 0x80), w - 0x80);
-    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(SSE2NEON_sbox + 0xc0), w - 0xc0);
+    /* sub bytes */
+    // Here, we separate the whole 256-bytes table into 4 64-bytes tables, and
+    // look up each of the table. After each lookup, we load the next table
+    // which locates at the next 64-bytes. In the meantime, the index in the
+    // table would be smaller than it was, so the index parameters of
+    // `vqtbx4q_u8()` need to be added the same constant as the loaded tables.
+    v = vqtbl4q_u8(_sse2neon_vld1q_u8_x4(_sse2neon_sbox), w);
+    // 'w-0x40' equals to 'vsubq_u8(w, vdupq_n_u8(0x40))'
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_sbox + 0x40), w - 0x40);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_sbox + 0x80), w - 0x80);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_sbox + 0xc0), w - 0xc0);
 
-    // mix columns
+    /* mix columns */
     w = (v << 1) ^ (uint8x16_t) (((int8x16_t) v >> 7) & 0x1b);
     w ^= (uint8x16_t) vrev32q_u16((uint16x8_t) v);
     w ^= vqtbl1q_u8(v ^ w, vld1q_u8(ror32by8));
 
-    //  add round key
+    /* add round key */
     return vreinterpretq_m128i_u8(w) ^ RoundKey;
 
-#else /* ARMv7-A NEON implementation */
+#else /* ARMv7-A implementation for a table-based AES */
 #define SSE2NEON_AES_B2W(b0, b1, b2, b3)                 \
     (((uint32_t) (b3) << 24) | ((uint32_t) (b2) << 16) | \
      ((uint32_t) (b1) << 8) | (uint32_t) (b0))
+// muliplying 'x' by 2 in GF(2^8)
 #define SSE2NEON_AES_F2(x) ((x << 1) ^ (((x >> 7) & 1) * 0x011b /* WPOLY */))
+// muliplying 'x' by 3 in GF(2^8)
 #define SSE2NEON_AES_F3(x) (SSE2NEON_AES_F2(x) ^ x)
 #define SSE2NEON_AES_U0(p) \
     SSE2NEON_AES_B2W(SSE2NEON_AES_F2(p), p, p, SSE2NEON_AES_F3(p))
@@ -9500,11 +9582,14 @@ FORCE_INLINE __m128i _mm_aesenc_si128(__m128i EncBlock, __m128i RoundKey)
     SSE2NEON_AES_B2W(p, SSE2NEON_AES_F3(p), SSE2NEON_AES_F2(p), p)
 #define SSE2NEON_AES_U3(p) \
     SSE2NEON_AES_B2W(p, p, SSE2NEON_AES_F3(p), SSE2NEON_AES_F2(p))
+
+    // this generates a table containing every possible permutation of
+    // shift_rows() and sub_bytes() with mix_columns().
     static const uint32_t ALIGN_STRUCT(16) aes_table[4][256] = {
-        SSE2NEON_AES_DATA(SSE2NEON_AES_U0),
-        SSE2NEON_AES_DATA(SSE2NEON_AES_U1),
-        SSE2NEON_AES_DATA(SSE2NEON_AES_U2),
-        SSE2NEON_AES_DATA(SSE2NEON_AES_U3),
+        SSE2NEON_AES_SBOX(SSE2NEON_AES_U0),
+        SSE2NEON_AES_SBOX(SSE2NEON_AES_U1),
+        SSE2NEON_AES_SBOX(SSE2NEON_AES_U2),
+        SSE2NEON_AES_SBOX(SSE2NEON_AES_U3),
     };
 #undef SSE2NEON_AES_B2W
 #undef SSE2NEON_AES_F2
@@ -9514,11 +9599,15 @@ FORCE_INLINE __m128i _mm_aesenc_si128(__m128i EncBlock, __m128i RoundKey)
 #undef SSE2NEON_AES_U2
 #undef SSE2NEON_AES_U3
 
-    uint32_t x0 = _mm_cvtsi128_si32(EncBlock);
-    uint32_t x1 = _mm_cvtsi128_si32(_mm_shuffle_epi32(EncBlock, 0x55));
-    uint32_t x2 = _mm_cvtsi128_si32(_mm_shuffle_epi32(EncBlock, 0xAA));
-    uint32_t x3 = _mm_cvtsi128_si32(_mm_shuffle_epi32(EncBlock, 0xFF));
+    uint32_t x0 = _mm_cvtsi128_si32(a);  // get a[31:0]
+    uint32_t x1 =
+        _mm_cvtsi128_si32(_mm_shuffle_epi32(a, 0x55));  // get a[63:32]
+    uint32_t x2 =
+        _mm_cvtsi128_si32(_mm_shuffle_epi32(a, 0xAA));  // get a[95:64]
+    uint32_t x3 =
+        _mm_cvtsi128_si32(_mm_shuffle_epi32(a, 0xFF));  // get a[127:96]
 
+    // finish the modulo addition step in mix_columns()
     __m128i out = _mm_set_epi32(
         (aes_table[0][x3 & 0xff] ^ aes_table[1][(x0 >> 8) & 0xff] ^
          aes_table[2][(x1 >> 16) & 0xff] ^ aes_table[3][x2 >> 24]),
@@ -9533,34 +9622,210 @@ FORCE_INLINE __m128i _mm_aesenc_si128(__m128i EncBlock, __m128i RoundKey)
 #endif
 }
 
+// Perform one round of an AES decryption flow on data (state) in a using the
+// round key in RoundKey, and store the result in dst.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_aesdec_si128
+FORCE_INLINE __m128i _mm_aesdec_si128(__m128i a, __m128i RoundKey)
+{
+#if defined(__aarch64__)
+    static const uint8_t inv_shift_rows[] = {
+        0x0, 0xd, 0xa, 0x7, 0x4, 0x1, 0xe, 0xb,
+        0x8, 0x5, 0x2, 0xf, 0xc, 0x9, 0x6, 0x3,
+    };
+    static const uint8_t ror32by8[] = {
+        0x1, 0x2, 0x3, 0x0, 0x5, 0x6, 0x7, 0x4,
+        0x9, 0xa, 0xb, 0x8, 0xd, 0xe, 0xf, 0xc,
+    };
+
+    uint8x16_t v;
+    uint8x16_t w = vreinterpretq_u8_m128i(a);
+
+    // inverse shift rows
+    w = vqtbl1q_u8(w, vld1q_u8(inv_shift_rows));
+
+    // inverse sub bytes
+    v = vqtbl4q_u8(_sse2neon_vld1q_u8_x4(_sse2neon_rsbox), w);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_rsbox + 0x40), w - 0x40);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_rsbox + 0x80), w - 0x80);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_rsbox + 0xc0), w - 0xc0);
+
+    // inverse mix columns
+    // muliplying 'v' by 4 in GF(2^8)
+    w = (v << 1) ^ (uint8x16_t) (((int8x16_t) v >> 7) & 0x1b);
+    w = (w << 1) ^ (uint8x16_t) (((int8x16_t) w >> 7) & 0x1b);
+    v ^= w;
+    v ^= (uint8x16_t) vrev32q_u16((uint16x8_t) w);
+
+    w = (v << 1) ^ (uint8x16_t) (((int8x16_t) v >> 7) &
+                                 0x1b);  // muliplying 'v' by 2 in GF(2^8)
+    w ^= (uint8x16_t) vrev32q_u16((uint16x8_t) v);
+    w ^= vqtbl1q_u8(v ^ w, vld1q_u8(ror32by8));
+
+    // add round key
+    return vreinterpretq_m128i_u8(w) ^ RoundKey;
+
+#else /* ARMv7-A NEON implementation */
+    /* FIXME: optimized for NEON */
+    uint8_t i, e, f, g, h, v[4][4];
+    uint8_t *_a = (uint8_t *) &a;
+    for (i = 0; i < 16; ++i) {
+        v[((i / 4) + (i % 4)) % 4][i % 4] = _sse2neon_rsbox[_a[i]];
+    }
+
+    // inverse mix columns
+    for (i = 0; i < 4; ++i) {
+        e = v[i][0];
+        f = v[i][1];
+        g = v[i][2];
+        h = v[i][3];
+
+        v[i][0] = SSE2NEON_MULTIPLY(e, 0x0e) ^ SSE2NEON_MULTIPLY(f, 0x0b) ^
+                  SSE2NEON_MULTIPLY(g, 0x0d) ^ SSE2NEON_MULTIPLY(h, 0x09);
+        v[i][1] = SSE2NEON_MULTIPLY(e, 0x09) ^ SSE2NEON_MULTIPLY(f, 0x0e) ^
+                  SSE2NEON_MULTIPLY(g, 0x0b) ^ SSE2NEON_MULTIPLY(h, 0x0d);
+        v[i][2] = SSE2NEON_MULTIPLY(e, 0x0d) ^ SSE2NEON_MULTIPLY(f, 0x09) ^
+                  SSE2NEON_MULTIPLY(g, 0x0e) ^ SSE2NEON_MULTIPLY(h, 0x0b);
+        v[i][3] = SSE2NEON_MULTIPLY(e, 0x0b) ^ SSE2NEON_MULTIPLY(f, 0x0d) ^
+                  SSE2NEON_MULTIPLY(g, 0x09) ^ SSE2NEON_MULTIPLY(h, 0x0e);
+    }
+
+    return vreinterpretq_m128i_u8(vld1q_u8((uint8_t *) v)) ^ RoundKey;
+#endif
+}
+
 // Perform the last round of an AES encryption flow on data (state) in a using
 // the round key in RoundKey, and store the result in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_aesenclast_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_aesenclast_si128
 FORCE_INLINE __m128i _mm_aesenclast_si128(__m128i a, __m128i RoundKey)
 {
-    /* FIXME: optimized for NEON */
-    uint8_t v[4][4] = {
-        {SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 0)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 5)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 10)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 15)]},
-        {SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 4)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 9)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 14)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 3)]},
-        {SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 8)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 13)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 2)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 7)]},
-        {SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 12)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 1)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 6)],
-         SSE2NEON_sbox[vreinterpretq_nth_u8_m128i(a, 11)]},
+#if defined(__aarch64__)
+    static const uint8_t shift_rows[] = {
+        0x0, 0x5, 0xa, 0xf, 0x4, 0x9, 0xe, 0x3,
+        0x8, 0xd, 0x2, 0x7, 0xc, 0x1, 0x6, 0xb,
     };
-    for (int i = 0; i < 16; i++)
-        vreinterpretq_nth_u8_m128i(a, i) =
-            v[i / 4][i % 4] ^ vreinterpretq_nth_u8_m128i(RoundKey, i);
-    return a;
+
+    uint8x16_t v;
+    uint8x16_t w = vreinterpretq_u8_m128i(a);
+
+    // shift rows
+    w = vqtbl1q_u8(w, vld1q_u8(shift_rows));
+
+    // sub bytes
+    v = vqtbl4q_u8(_sse2neon_vld1q_u8_x4(_sse2neon_sbox), w);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_sbox + 0x40), w - 0x40);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_sbox + 0x80), w - 0x80);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_sbox + 0xc0), w - 0xc0);
+
+    // add round key
+    return vreinterpretq_m128i_u8(v) ^ RoundKey;
+
+#else /* ARMv7-A implementation */
+    uint8_t v[16] = {
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 0)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 5)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 10)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 15)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 4)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 9)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 14)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 3)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 8)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 13)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 2)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 7)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 12)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 1)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 6)],
+        _sse2neon_sbox[vgetq_lane_u8(vreinterpretq_u8_m128i(a), 11)],
+    };
+
+    return vreinterpretq_m128i_u8(vld1q_u8(v)) ^ RoundKey;
+#endif
+}
+
+// Perform the last round of an AES decryption flow on data (state) in a using
+// the round key in RoundKey, and store the result in dst.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_aesdeclast_si128
+FORCE_INLINE __m128i _mm_aesdeclast_si128(__m128i a, __m128i RoundKey)
+{
+#if defined(__aarch64__)
+    static const uint8_t inv_shift_rows[] = {
+        0x0, 0xd, 0xa, 0x7, 0x4, 0x1, 0xe, 0xb,
+        0x8, 0x5, 0x2, 0xf, 0xc, 0x9, 0x6, 0x3,
+    };
+
+    uint8x16_t v;
+    uint8x16_t w = vreinterpretq_u8_m128i(a);
+
+    // inverse shift rows
+    w = vqtbl1q_u8(w, vld1q_u8(inv_shift_rows));
+
+    // inverse sub bytes
+    v = vqtbl4q_u8(_sse2neon_vld1q_u8_x4(_sse2neon_rsbox), w);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_rsbox + 0x40), w - 0x40);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_rsbox + 0x80), w - 0x80);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_rsbox + 0xc0), w - 0xc0);
+
+    // add round key
+    return vreinterpretq_m128i_u8(v) ^ RoundKey;
+
+#else /* ARMv7-A NEON implementation */
+    /* FIXME: optimized for NEON */
+    uint8_t v[4][4];
+    uint8_t *_a = (uint8_t *) &a;
+    for (int i = 0; i < 16; ++i) {
+        v[((i / 4) + (i % 4)) % 4][i % 4] = _sse2neon_rsbox[_a[i]];
+    }
+
+    return vreinterpretq_m128i_u8(vld1q_u8((uint8_t *) v)) ^ RoundKey;
+#endif
+}
+
+// Perform the InvMixColumns transformation on a and store the result in dst.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_aesimc_si128
+FORCE_INLINE __m128i _mm_aesimc_si128(__m128i a)
+{
+#if defined(__aarch64__)
+    static const uint8_t ror32by8[] = {
+        0x1, 0x2, 0x3, 0x0, 0x5, 0x6, 0x7, 0x4,
+        0x9, 0xa, 0xb, 0x8, 0xd, 0xe, 0xf, 0xc,
+    };
+    uint8x16_t v = vreinterpretq_u8_m128i(a);
+    uint8x16_t w;
+
+    // multiplying 'v' by 4 in GF(2^8)
+    w = (v << 1) ^ (uint8x16_t) (((int8x16_t) v >> 7) & 0x1b);
+    w = (w << 1) ^ (uint8x16_t) (((int8x16_t) w >> 7) & 0x1b);
+    v ^= w;
+    v ^= (uint8x16_t) vrev32q_u16((uint16x8_t) w);
+
+    // multiplying 'v' by 2 in GF(2^8)
+    w = (v << 1) ^ (uint8x16_t) (((int8x16_t) v >> 7) & 0x1b);
+    w ^= (uint8x16_t) vrev32q_u16((uint16x8_t) v);
+    w ^= vqtbl1q_u8(v ^ w, vld1q_u8(ror32by8));
+    return vreinterpretq_m128i_u8(w);
+
+#else /* ARMv7-A NEON implementation */
+    uint8_t i, e, f, g, h, v[4][4];
+    vst1q_u8((uint8_t *) v, vreinterpretq_u8_m128i(a));
+    for (i = 0; i < 4; ++i) {
+        e = v[i][0];
+        f = v[i][1];
+        g = v[i][2];
+        h = v[i][3];
+
+        v[i][0] = SSE2NEON_MULTIPLY(e, 0x0e) ^ SSE2NEON_MULTIPLY(f, 0x0b) ^
+                  SSE2NEON_MULTIPLY(g, 0x0d) ^ SSE2NEON_MULTIPLY(h, 0x09);
+        v[i][1] = SSE2NEON_MULTIPLY(e, 0x09) ^ SSE2NEON_MULTIPLY(f, 0x0e) ^
+                  SSE2NEON_MULTIPLY(g, 0x0b) ^ SSE2NEON_MULTIPLY(h, 0x0d);
+        v[i][2] = SSE2NEON_MULTIPLY(e, 0x0d) ^ SSE2NEON_MULTIPLY(f, 0x09) ^
+                  SSE2NEON_MULTIPLY(g, 0x0e) ^ SSE2NEON_MULTIPLY(h, 0x0b);
+        v[i][3] = SSE2NEON_MULTIPLY(e, 0x0b) ^ SSE2NEON_MULTIPLY(f, 0x0d) ^
+                  SSE2NEON_MULTIPLY(g, 0x09) ^ SSE2NEON_MULTIPLY(h, 0x0e);
+    }
+
+    return vreinterpretq_m128i_u8(vld1q_u8((uint8_t *) v));
+#endif
 }
 
 // Emits the Advanced Encryption Standard (AES) instruction aeskeygenassist.
@@ -9568,19 +9833,40 @@ FORCE_INLINE __m128i _mm_aesenclast_si128(__m128i a, __m128i RoundKey)
 // https://kazakov.life/2017/11/01/cryptocurrency-mining-on-ios-devices/
 // for details.
 //
-// https://msdn.microsoft.com/en-us/library/cc714138(v=vs.120).aspx
-FORCE_INLINE __m128i _mm_aeskeygenassist_si128(__m128i key, const int rcon)
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_aeskeygenassist_si128
+FORCE_INLINE __m128i _mm_aeskeygenassist_si128(__m128i a, const int rcon)
 {
-    uint32_t X1 = _mm_cvtsi128_si32(_mm_shuffle_epi32(key, 0x55));
-    uint32_t X3 = _mm_cvtsi128_si32(_mm_shuffle_epi32(key, 0xFF));
+#if defined(__aarch64__)
+    uint8x16_t _a = vreinterpretq_u8_m128i(a);
+    uint8x16_t v = vqtbl4q_u8(_sse2neon_vld1q_u8_x4(_sse2neon_sbox), _a);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_sbox + 0x40), _a - 0x40);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_sbox + 0x80), _a - 0x80);
+    v = vqtbx4q_u8(v, _sse2neon_vld1q_u8_x4(_sse2neon_sbox + 0xc0), _a - 0xc0);
+
+    uint32x4_t v_u32 = vreinterpretq_u32_u8(v);
+    uint32x4_t ror_v = vorrq_u32(vshrq_n_u32(v_u32, 8), vshlq_n_u32(v_u32, 24));
+    uint32x4_t ror_xor_v = veorq_u32(ror_v, vdupq_n_u32(rcon));
+
+    return vreinterpretq_m128i_u32(vtrn2q_u32(v_u32, ror_xor_v));
+
+#else /* ARMv7-A NEON implementation */
+    uint32_t X1 = _mm_cvtsi128_si32(_mm_shuffle_epi32(a, 0x55));
+    uint32_t X3 = _mm_cvtsi128_si32(_mm_shuffle_epi32(a, 0xFF));
     for (int i = 0; i < 4; ++i) {
-        ((uint8_t *) &X1)[i] = SSE2NEON_sbox[((uint8_t *) &X1)[i]];
-        ((uint8_t *) &X3)[i] = SSE2NEON_sbox[((uint8_t *) &X3)[i]];
+        ((uint8_t *) &X1)[i] = _sse2neon_sbox[((uint8_t *) &X1)[i]];
+        ((uint8_t *) &X3)[i] = _sse2neon_sbox[((uint8_t *) &X3)[i]];
     }
     return _mm_set_epi32(((X3 >> 8) | (X3 << 24)) ^ rcon, X3,
                          ((X1 >> 8) | (X1 << 24)) ^ rcon, X1);
+#endif
 }
-#undef SSE2NEON_AES_DATA
+#undef SSE2NEON_AES_SBOX
+#undef SSE2NEON_AES_RSBOX
+
+#if defined(__aarch64__)
+#undef SSE2NEON_XT
+#undef SSE2NEON_MULTIPLY
+#endif
 
 #else /* __ARM_FEATURE_CRYPTO */
 // Implements equivalent of 'aesenc' by combining AESE (with an empty key) and
@@ -9596,7 +9882,19 @@ FORCE_INLINE __m128i _mm_aesenc_si128(__m128i a, __m128i b)
         vreinterpretq_u8_m128i(b));
 }
 
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_aesenclast_si128
+// Perform one round of an AES decryption flow on data (state) in a using the
+// round key in RoundKey, and store the result in dst.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_aesdec_si128
+FORCE_INLINE __m128i _mm_aesdec_si128(__m128i a, __m128i RoundKey)
+{
+    return vreinterpretq_m128i_u8(veorq_u8(
+        vaesimcq_u8(vaesdq_u8(vreinterpretq_u8_m128i(a), vdupq_n_u8(0))),
+        vreinterpretq_u8_m128i(RoundKey)));
+}
+
+// Perform the last round of an AES encryption flow on data (state) in a using
+// the round key in RoundKey, and store the result in dst.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_aesenclast_si128
 FORCE_INLINE __m128i _mm_aesenclast_si128(__m128i a, __m128i RoundKey)
 {
     return _mm_xor_si128(vreinterpretq_m128i_u8(vaeseq_u8(
@@ -9604,6 +9902,27 @@ FORCE_INLINE __m128i _mm_aesenclast_si128(__m128i a, __m128i RoundKey)
                          RoundKey);
 }
 
+// Perform the last round of an AES decryption flow on data (state) in a using
+// the round key in RoundKey, and store the result in dst.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_aesdeclast_si128
+FORCE_INLINE __m128i _mm_aesdeclast_si128(__m128i a, __m128i RoundKey)
+{
+    return vreinterpretq_m128i_u8(
+        vaesdq_u8(vreinterpretq_u8_m128i(a), vdupq_n_u8(0)) ^
+        vreinterpretq_u8_m128i(RoundKey));
+}
+
+// Perform the InvMixColumns transformation on a and store the result in dst.
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_aesimc_si128
+FORCE_INLINE __m128i _mm_aesimc_si128(__m128i a)
+{
+    return vreinterpretq_m128i_u8(vaesimcq_u8(vreinterpretq_u8_m128i(a)));
+}
+
+// Assist in expanding the AES cipher key by computing steps towards generating
+// a round key for encryption cipher using data from a and an 8-bit round
+// constant specified in imm8, and store the result in dst."
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_aeskeygenassist_si128
 FORCE_INLINE __m128i _mm_aeskeygenassist_si128(__m128i a, const int rcon)
 {
     // AESE does ShiftRows and SubBytes on A
@@ -9625,7 +9944,7 @@ FORCE_INLINE __m128i _mm_aeskeygenassist_si128(__m128i a, const int rcon)
 
 // Perform a carry-less multiplication of two 64-bit integers, selected from a
 // and b according to imm8, and store the results in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_clmulepi64_si128
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_clmulepi64_si128
 FORCE_INLINE __m128i _mm_clmulepi64_si128(__m128i _a, __m128i _b, const int imm)
 {
     uint64x2_t a = vreinterpretq_u64_m128i(_a);
@@ -9670,7 +9989,7 @@ FORCE_INLINE unsigned int _sse2neon_mm_get_denormals_zero_mode()
 
 // Count the number of bits set to 1 in unsigned 32-bit integer a, and
 // return that count in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_popcnt_u32
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_popcnt_u32
 FORCE_INLINE int _mm_popcnt_u32(unsigned int a)
 {
 #if defined(__aarch64__)
@@ -9697,7 +10016,7 @@ FORCE_INLINE int _mm_popcnt_u32(unsigned int a)
 
 // Count the number of bits set to 1 in unsigned 64-bit integer a, and
 // return that count in dst.
-// https://software.intel.com/sites/landingpage/IntrinsicsGuide/#text=_mm_popcnt_u64
+// https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#text=_mm_popcnt_u64
 FORCE_INLINE int64_t _mm_popcnt_u64(uint64_t a)
 {
 #if defined(__aarch64__)

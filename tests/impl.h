@@ -524,7 +524,10 @@
     _(mm_crc32_u8)                \
     /* AES */                     \
     _(mm_aesenc_si128)            \
+    _(mm_aesdec_si128)            \
     _(mm_aesenclast_si128)        \
+    _(mm_aesdeclast_si128)        \
+    _(mm_aesimc_si128)            \
     _(mm_aeskeygenassist_si128)   \
     /* Others */                  \
     _(mm_clmulepi64_si128)        \

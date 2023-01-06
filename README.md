@@ -30,8 +30,8 @@ Header file | Extension |
 
 In order to deliver NEON-equivalent intrinsics for all SSE intrinsics used widely,
 please be aware that some SSE intrinsics exist a direct mapping with a concrete
-NEON-equivalent intrinsic. However, others lack of 1-to-1 mapping, that means the
-equivalents are implemented using several NEON intrinsics.
+NEON-equivalent intrinsic. Others, unfortunately, lack a 1:1 mapping, meaning that
+their equivalents are built utilizing a number of NEON intrinsics.
 
 For example, SSE intrinsic `_mm_loadu_si128` has a direct NEON mapping (`vld1q_s32`),
 but SSE intrinsic `_mm_maddubs_epi16` has to be implemented with 13+ NEON instructions.
@@ -45,7 +45,7 @@ but SSE intrinsic `_mm_maddubs_epi16` has to be implemented with 13+ NEON instru
 #include <xmmintrin.h>
 #include <emmintrin.h>
 ```
-  {p,t,s,n,w}mmintrin.h should be replaceable, but the coverage of these extensions might be limited though.
+  {p,t,s,n,w}mmintrin.h could be replaceable as well.
 
 - Replace them with:
 ```C
@@ -69,7 +69,7 @@ but SSE intrinsic `_mm_maddubs_epi16` has to be implemented with 13+ NEON instru
 ## Compile-time Configurations
 
 Considering the balance between correctness and performance, `sse2neon` recognizes the following compile-time configurations:
-* `SSE2NEON_PRECISE_MINMAX`: Enable precise implementation of `_mm_min_ps` and `_mm_max_ps`. If you need consistent results such as NaN special cases, enable it.
+* `SSE2NEON_PRECISE_MINMAX`: Enable precise implementation of `_mm_min_{ps,pd}` and `_mm_max_{ps,pd}`. If you need consistent results such as NaN special cases, enable it.
 * `SSE2NEON_PRECISE_DIV`: Enable precise implementation of `_mm_rcp_ps` and `_mm_div_ps` by additional Netwon-Raphson iteration for accuracy.
 * `SSE2NEON_PRECISE_SQRT`: Enable precise implementation of `_mm_sqrt_ps` and `_mm_rsqrt_ps` by additional Netwon-Raphson iteration for accuracy.
 * `SSE2NEON_PRECISE_DP`: Enable precise implementation of `_mm_dp_pd`. When the conditional bit is not set, the corresponding multiplication would not be executed.
@@ -83,6 +83,13 @@ cases are located in `tests` directory, and the input data is specified at
 runtime. Use the following commands to perform test cases:
 ```shell
 $ make check
+```
+
+For running check with enabling features, you can use assign the features with `FEATURE` command.
+If `none` is assigned, then the command will be the same as simply calling `make check`.
+The following command enable `crypto` and `crc` features in the tests.
+```
+$ make FEATURE=crypto+crc check
 ```
 
 You can specify GNU toolchain for cross compilation as well.
@@ -179,12 +186,14 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [Surge](https://github.com/surge-synthesizer/surge) is an open source digital synthesizer.
 * [The Forge](https://github.com/ConfettiFX/The-Forge) is a cross-platform rendering framework, providing building blocks to write your own game engine.
 * [Typesense](https://github.com/typesense/typesense) is a fast, typo-tolerant search engine for building delightful search experiences.
+* [Vcpkg](https://github.com/microsoft/vcpkg) is a C++ Library Manager for Windows, Linux, and macOS.
 * [VelocyPack](https://github.com/arangodb/velocypack) is a fast and compact format for serialization and storage.
 * [VOLK](https://github.com/gnuradio/volk), Vector-Optimized Library of Kernel, is a sub-project of [GNU Radio](https://www.gnuradio.org/).
 * [Vowpal Wabbit](https://github.com/VowpalWabbit/vowpal_wabbit) is a machine learning system which pushes the frontier of machine learning with techniques such as online, hashing, allreduce, reductions, learning2search, active, and interactive learning.
 * [Winter](https://github.com/rosenthj/Winter) is the top rated chess engine from Switzerland and has competed at top invite only computer chess events.
 * [XEVE](https://github.com/mpeg5/xeve) (eXtra-fast Essential Video Encoder) is an open sourced and fast MPEG-5 EVC encoder.
 * [XMRig](https://github.com/xmrig/xmrig) is an open source CPU miner for [Monero](https://web.getmonero.org/) cryptocurrency.
+* [xsimd](https://github.com/xtensor-stack/xsimd) provides a unified means for using SIMD intrinsics and parallelized, optimized mathematical functions.
 * [YACL](https://github.com/secretflow/yasl) is a C++ library contains modules and utilities which [SecretFlow](https://github.com/secretflow) code depends on.
 
 ## Related Projects
@@ -199,7 +208,8 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
     - implementation: [xmmintrin.h](https://github.com/gcc-mirror/gcc/blob/master/gcc/config/rs6000/xmmintrin.h), [emmintrin.h](https://github.com/gcc-mirror/gcc/blob/master/gcc/config/rs6000/emmintrin.h), [pmmintrin.h](https://github.com/gcc-mirror/gcc/blob/master/gcc/config/rs6000/pmmintrin.h), [tmmintrin.h](https://github.com/gcc-mirror/gcc/blob/master/gcc/config/rs6000/tmmintrin.h), [smmintrin.h](https://github.com/gcc-mirror/gcc/blob/master/gcc/config/rs6000/smmintrin.h)
 
 ## Reference
-* [Intel Intrinsics Guide](https://software.intel.com/sites/landingpage/IntrinsicsGuide/)
+* [Intel Intrinsics Guide](https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html)
+* [Microsoft: x86 intrinsics list](https://learn.microsoft.com/en-us/cpp/intrinsics/x86-intrinsics-list)
 * [Arm Neon Intrinsics Reference](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/intrinsics)
 * [Neon Programmer's Guide for Armv8-A](https://developer.arm.com/architectures/instruction-sets/simd-isas/neon/neon-programmers-guide-for-armv8-a)
 * [NEON Programmer's Guide](https://static.docs.arm.com/den0018/a/DEN0018A_neon_programmers_guide_en.pdf)
