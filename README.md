@@ -70,8 +70,8 @@ but SSE intrinsic `_mm_maddubs_epi16` has to be implemented with 13+ NEON instru
 
 Considering the balance between correctness and performance, `sse2neon` recognizes the following compile-time configurations:
 * `SSE2NEON_PRECISE_MINMAX`: Enable precise implementation of `_mm_min_{ps,pd}` and `_mm_max_{ps,pd}`. If you need consistent results such as NaN special cases, enable it.
-* `SSE2NEON_PRECISE_DIV`: Enable precise implementation of `_mm_rcp_ps` and `_mm_div_ps` by additional Netwon-Raphson iteration for accuracy.
-* `SSE2NEON_PRECISE_SQRT`: Enable precise implementation of `_mm_sqrt_ps` and `_mm_rsqrt_ps` by additional Netwon-Raphson iteration for accuracy.
+* `SSE2NEON_PRECISE_DIV` (deprecated): Enable precise implementation of `_mm_rcp_ps` and `_mm_div_ps` by additional Netwon-Raphson iteration for accuracy.
+* `SSE2NEON_PRECISE_SQRT` (deprecated): Enable precise implementation of `_mm_sqrt_ps` and `_mm_rsqrt_ps` by additional Netwon-Raphson iteration for accuracy.
 * `SSE2NEON_PRECISE_DP`: Enable precise implementation of `_mm_dp_pd`. When the conditional bit is not set, the corresponding multiplication would not be executed.
 
 The above are turned off by default, and you should define the corresponding macro(s) as `1` before including `sse2neon.h` if you need the precise implementations.
@@ -109,6 +109,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [Aaru Data Preservation Suite](https://www.aaru.app/) is a fully-featured software package to preserve all storage media from the very old to the cutting edge, as well as to give detailed information about any supported image file (whether from Aaru or not) and to extract the files from those images.
 * [aether-game-utils](https://github.com/johnhues/aether-game-utils) is a collection of cross platform utilities for quickly creating small game prototypes in C++.
 * [ALE](https://github.com/sc932/ALE), aka Assembly Likelihood Evaluation, is a tool for evaluating accuracy of assemblies without the need of a reference genome.
+* [AnchorWave](https://github.com/baoxingsong/AnchorWave), Anchored Wavefront Alignment, identifies collinear regions via conserved anchors (full-length CDS and full-length exon have been implemented currently) and breaks collinear regions into shorter fragments, i.e., anchor and inter-anchor intervals.
 * [ATAK-CIV](https://github.com/deptofdefense/AndroidTacticalAssaultKit-CIV), Android Tactical Assault Kit for Civilian Use, is the official geospatial-temporal and situational awareness tool used by the US Government.
 * [Apache Doris](https://doris.apache.org/) is a Massively Parallel Processing (MPP) based interactive SQL data warehousing for reporting and analysis.
 * [Apache Impala](https://impala.apache.org/) is a lightning-fast, distributed SQL queries for petabytes of data stored in Apache Hadoop clusters.
@@ -154,6 +155,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [Loosejaw](https://github.com/TheHolyDiver/Loosejaw) provides deep hybrid CPU/GPU digital signal processing.
 * [Madronalib](https://github.com/madronalabs/madronalib) enables efficient audio DSP on SIMD processors with readable and brief C++ code.
 * [minimap2](https://github.com/lh3/minimap2) is a versatile sequence alignment program that aligns DNA or mRNA sequences against a large reference database.
+* [mixed-fem](https://github.com/tytrusty/mixed-fem) is an open source reference implementation of Mixed Variational Finite Elements for Implicit Simulation of Deformables.
 * [MMseqs2](https://github.com/soedinglab/MMseqs2) (Many-against-Many sequence searching) is a software suite to search and cluster huge protein and nucleotide sequence sets.
 * [MRIcroGL](https://github.com/rordenlab/MRIcroGL) is a cross-platform tool for viewing NIfTI, DICOM, MGH, MHD, NRRD, AFNI format medical images.
 * [N2](https://github.com/oddconcepts/n2o) is an approximate nearest neighborhoods algorithm library written in C++, providing a much faster search speed than other implementations when modeling large dataset.
@@ -177,6 +179,7 @@ Here is a partial list of open source projects that have adopted `sse2neon` for 
 * [rkcommon](https://github.com/ospray/rkcommon) represents a common set of C++ infrastructure and CMake utilities used by various components of [Intel oneAPI Rendering Toolkit](https://www.intel.com/content/www/us/en/developer/tools/oneapi/rendering-toolkit.html).
 * [RPCS3](https://github.com/RPCS3/rpcs3) is the world's first free and open-source PlayStation 3 emulator/debugger, written in C++.
 * [simd_utils](https://github.com/JishinMaster/simd_utils) is a header-only library implementing common mathematical functions using SIMD intrinsics.
+* [Sire](https://github.com/OpenBioSim/sire) is a molecular modelling framework that provides extensive functionality to manipulate representations of biomolecular systems.
 * [SMhasher](https://github.com/rurban/smhasher) provides comprehensive Hash function quality and speed tests.
 * [SNN++](https://github.com/ianmkim/snnpp) implements a single layer non linear Spiking Neural Network for images classification and generation.
 * [Spack](https://github.com/spack/spack) is a multi-platform package manager that builds and installs multiple versions and configurations of software.
